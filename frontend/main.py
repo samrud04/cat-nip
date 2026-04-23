@@ -1,4 +1,5 @@
 import tkinter as tk
+from turtle import color
 
 def main():
     root = tk.Tk()
@@ -16,6 +17,8 @@ def main():
     right_frame = tk.Frame(main_frame, bg="#e6ccb3", width=450)
     right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
     right_frame.pack_propagate(False)
+
+    tk.Label(left_frame, text="Cat-Nip", fg="white", bg="#804000", font=("Arial", 24)).pack(pady=20)
 
     root.mainloop()
 
