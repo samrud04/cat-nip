@@ -1,11 +1,10 @@
 import tkinter as tk
-from turtle import color
 
 def main():
     root = tk.Tk()
     root.title("Cat-Nip")
     root.geometry("800x600")
-    root.iconphoto(False, tk.PhotoImage(file="C:/Users/Dr.Satyan/Documents/Samrud/Sam Codes/cat-nip/frontend/assets/catnipico.png"))
+    #root.iconphoto(False, tk.PhotoImage(file="./cat-nip/frontend/assets/catnipico.png"))
     
     main_frame = tk.Frame(root, bg="white")
     main_frame.pack(fill=tk.BOTH, expand=True)
