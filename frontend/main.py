@@ -1,5 +1,7 @@
 import tkinter as tk
-
+def mbox():
+    tk.messagebox.showinfo("CATNIP", "PET HAVEN" )
+    
 def main():
     root = tk.Tk()
     root.title("Cat-Nip")
@@ -18,10 +20,8 @@ def main():
     right_frame.pack_propagate(False)
 
     tk.Label(left_frame, text="Cat-Nip", fg="white", bg="#804000", font=("Arial", 24)).pack(pady=20)
-    button_frame= tk.Frame(left_frame, bg="#804000")
-    button_frame.pack(pady=20)
-    tk.Button(button_frame, text="Start", width=15, height=2).pack(pady=10 )
-    
+    btn=tk.Button(root, text="Start", width=15, height=2,command=mbox).pack(pady=10 )
+
     root.mainloop()
 
 if __name__ == "__main__":
