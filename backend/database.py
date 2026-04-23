@@ -9,11 +9,18 @@ con = sql.connect(
     database="catnip"
 )
 cur = con.cursor()
+l=[]
 
 def add_food(name, qty=20, price=0, type=None):
-    f_id = random.randint(1000, 9999)
-    cur.execute("insert into food (f_id, name, quantity, price, type) values (%s, %s, %s, %s, %s)", (f_id, name, qty, price,type))
-    con.commit()
+    Global l
+    while True:
+        f_id = random.randint(1000, 9999)
+        if f_id not in l:
+            l.append(f_id)
+            cur.execute("insert into food (f_id, name, quantity, price, type) values (%s, %s, %s, %s, %s)", (f_id, name, qty, price,type))
+            con.commit()
+            break
+    
 
 def delete_food(f_id):
     cur.execute("delete from food where f_id = %s", (f_id,))
