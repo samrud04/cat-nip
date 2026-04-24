@@ -1,4 +1,6 @@
 import tkinter as tk
+import sys
+sys.path.append("C:/Users/Dr.Satyan/Documents/Samrud/Sam Codes/cat-nip/backend")
 from db import add_data
 
 def show_frame(frame):
@@ -134,10 +136,7 @@ def main():
 
     def submit():
         name = name_entry.get()
-        tk.Label(
-            usrlogin,
-            text=name
-        ).pack(pady=20)
+        
 
     name_entry = tk.Entry(usrlogin)
     name_entry.pack(pady=20)
