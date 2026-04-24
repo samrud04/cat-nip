@@ -139,9 +139,9 @@ def main():
 
     tk.Label(
         usrlogin,
-        text="Username",
+        text="Username:",
         bg="#d9f2d9"
-    ).pack(pady=10)
+    ).place(x=270,y=160)
 
     username_entry = tk.Entry(usrlogin)
     username_entry.pack(pady=20)
@@ -150,7 +150,7 @@ def main():
         usrlogin,
         text="Password",
         bg="#d9f2d9"
-    ).pack(pady=10)
+    ).place(x=270,y=220)
     pwd_entry = tk.Entry(usrlogin, show="*")
     pwd_entry.pack(pady=20)
     
