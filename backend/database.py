@@ -26,7 +26,5 @@ def add(table, input_data):
     cur.execute(query, input_data)
     con.commit()
 
-    # return whether it was successful
-    return True
 
 con.close()
