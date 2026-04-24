@@ -60,7 +60,11 @@ def main():
     # ---------------- LOGIN SCREEN ----------------
     login = tk.Frame(container, bg="#e61f1f")
     login.grid(row=0, column=0, sticky="nsew")
-
+    ch=tk.StringVar()
+    tk.Radiobutton(login, text="User", variable=ch, value="user").pack(pady=10)
+    tk.Radiobutton(login, text="Employee", variable=ch, value="employee").pack(pady=10)
+    tk.Radiobutton(login, text="Admin", variable=ch, value="admin").pack(pady=10)
+    '''
     tk.Label(
         login,
         text="Login",
@@ -89,7 +93,7 @@ def main():
         width=15,
         command=lambda: show_frame(admlogin)
     ).pack(pady=20)
-
+    '''
     tk.Button(
         login,
         text="Back",
@@ -116,46 +120,36 @@ def main():
 
 
     # ---------------- USER SCREEN ----------------
-    usrlogin = tk.Frame(container, bg="#d9f2d9")
-    usrlogin.grid(row=0,column=0,sticky="nsew")
+    
 
     def submit():
         username = username_entry.get()
         password = pwd_entry.get()
         add_data("login_det", (username, password))
 
-    tk.Label(
-        usrlogin,
-        text="User Login",
-        font=("Arial",24),
-        bg="#d9f2d9"
-    ).pack(pady=50)
+    
 
-    tk.Button(
-        usrlogin,
-        text="Back",
-        command=lambda: show_frame(login)
-    ).place(x=10,y=10)
+    
 
     tk.Label(
-        usrlogin,
+        login,
         text="Username:",
         bg="#d9f2d9"
     ).place(x=270,y=160)
 
-    username_entry = tk.Entry(usrlogin)
+    username_entry = tk.Entry(login)
     username_entry.pack(pady=20)
 
     tk.Label(
-        usrlogin,
+        login,
         text="Password:",
         bg="#d9f2d9"
     ).place(x=270,y=220)
-    pwd_entry = tk.Entry(usrlogin, show="*")
+    pwd_entry = tk.Entry(login, show="*")
     pwd_entry.pack(pady=20)
     
     tk.Button(
-        usrlogin, 
+        login, 
         text="Submit", 
         command=submit
         ).pack()
@@ -164,86 +158,21 @@ def main():
 
 
     # ---------------- EMPLOYEE SCREEN ----------------
-    emplogin = tk.Frame(container, bg="#d9f2d9")
-    emplogin.grid(row=0,column=0,sticky="nsew")
-
-    tk.Label(
-        emplogin,
-        text="Employee Login",
-        font=("Arial",24),
-        bg="#d9f2d9"
-    ).pack(pady=50)
     
-    tk.Label(
-        emplogin,
-        text="Username:",
-        bg="#d9f2d9"
-    ).place(x=270,y=160)
-
-    username_entry = tk.Entry(emplogin)
-    username_entry.pack(pady=20)
-
-    tk.Label(
-        emplogin,
-        text="Password:",
-        bg="#d9f2d9"
-    ).place(x=270,y=220)
-    pwd_entry = tk.Entry(emplogin, show="*")
-    pwd_entry.pack(pady=20)
-
-    tk.Button(
-        emplogin,
-        text="Submit",
-        command=submit
-    ).pack(pady=20)
+    
+    
 
 
-    tk.Button(
-        emplogin,
-        text="Back",
-        command=lambda: show_frame(login)
-    ).place(x=10,y=10)
+    
 
     
     # ---------------- ADMIN SCREEN ----------------
-    admlogin = tk.Frame(container, bg="#d9f2d9")
-    admlogin.grid(row=0,column=0,sticky="nsew")
+    
 
-    tk.Label(
-        admlogin,
-        text="Admin Login",
-        font=("Arial",24),
-        bg="#d9f2d9"
-    ).pack(pady=50)
-    tk.Label(
-        admlogin,
-        text="Username:",
-        bg="#d9f2d9"
-    ).place(x=270,y=160)
+    
+    
 
-    username_entry = tk.Entry(admlogin)
-    username_entry.pack(pady=20)
-
-    tk.Label(
-        admlogin,
-        text="Password:",
-        bg="#d9f2d9"
-    ).place(x=270,y=220)
-    pwd_entry = tk.Entry(admlogin, show="*")
-    pwd_entry.pack(pady=20)
-
-    tk.Button(
-        usrlogin,
-        text="Submit",
-        command=submit
-    ).pack(pady=20)
-
-    tk.Button(
-        admlogin,
-        text="Back",
-        command=lambda: show_frame(login)
-    ).place(x=10,y=10)
-
+    
 
     # Start with home page
     show_frame(main_frame)
