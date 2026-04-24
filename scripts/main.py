@@ -1,7 +1,5 @@
 import tkinter as tk
-import sys
-sys.path.append("C:/Users/Dr.Satyan/Documents/Samrud/Sam Codes/cat-nip/backend")
-#from db import add_data
+from db import add_data
 
 def show_frame(frame):
     frame.tkraise()
