@@ -68,39 +68,10 @@ def main():
     rframe = tk.Frame(login, bg="#040404")
     rframe.grid(row=0, column=1, sticky="nsew")
     ch=tk.StringVar()
-    tk.Radiobutton(login, text="User", variable=ch, value="user").pack(pady=10)
-    tk.Radiobutton(login, text="Employee", variable=ch, value="employee").pack(pady=10)
-    tk.Radiobutton(login, text="Admin", variable=ch, value="admin").pack(pady=10)
-    '''
-    tk.Label(
-        login,
-        text="Login",
-        bg="#e61f1f",
-        fg="white",
-        font=("Arial",24)
-    ).pack(pady=50)
-
-    tk.Button(
-        login,
-        text="User Login",
-        width=15,
-        command=lambda: show_frame(usrlogin)
-    ).pack(pady=20)
-
-    tk.Button(
-        login,
-        text="Employee Login",
-        width=15,
-        command=lambda: show_frame(emplogin)
-    ).pack(pady=20)
-
-    tk.Button(
-        login,
-        text="Admin Login",
-        width=15,
-        command=lambda: show_frame(admlogin)
-    ).pack(pady=20)
-    '''
+    tk.Radiobutton(lframe, text="User", variable=ch, value="user").pack(pady=10)
+    tk.Radiobutton(lframe, text="Employee", variable=ch, value="employee").pack(pady=10)
+    tk.Radiobutton(lframe, text="Admin", variable=ch, value="admin").pack(pady=10)
+    
     tk.Button(
         login,
         text="Back",
@@ -138,17 +109,17 @@ def main():
         rframe,
         text="Username:",
         bg="#d9f2d9"
-    ).place(x=270,y=160)
+    ).place(x=80,y=30)
 
-    username_entry = tk.Entry(login)
+    username_entry = tk.Entry(rframe)
     username_entry.pack(pady=20)
 
     tk.Label(
         rframe,
         text="Password:",
         bg="#d9f2d9"
-    ).place(x=270,y=220)
-    pwd_entry = tk.Entry(login, show="*")
+    ).place(x=80,y=75)
+    pwd_entry = tk.Entry(rframe, show="*")
     pwd_entry.pack(pady=20)
     
     tk.Button(
