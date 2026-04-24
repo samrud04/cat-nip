@@ -27,4 +27,5 @@ def add(table, input_data):
     con.commit()
 
 
+
 con.close()
