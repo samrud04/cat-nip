@@ -9,40 +9,24 @@ con = sql.connect(
     database="catnip"
 )
 cur = con.cursor()
-l=[]
 
-def add_food(name, qty=20, price=0, type=None):
-    Global l
+def add(table, input_data):
+
+    # generate a random id
     while True:
-        f_id = random.randint(1000, 9999)
-        if f_id not in l:
-            l.append(f_id)
-            cur.execute("insert into food (f_id, name, quantity, price, type) values (%s, %s, %s, %s, %s)", (f_id, name, qty, price,type))
-            con.commit()
+        new_id = random.randint(1000000, 9999999)
+        cur.execute(f"SELECT * FROM {table} WHERE id = {new_id}")
+        if cur.fetchone() is None:
             break
-    
 
-def delete_food(f_id):
-    cur.execute("delete from food where f_id = %s", (f_id,))
+    # add input to database with that id
+    input_data = (new_id, ) + input_data
+    placeholders = ", ".join(["%s"] * len(input_data))
+    query = f"INSERT INTO {table} VALUES ({placeholders})"
+    cur.execute(query, input_data)
     con.commit()
 
-def update_food(f_id, name=None, qty=None, price=None, type=None):
-    if name:
-        cur.execute("update food set name = %s where f_id = %s", (name, f_id))
-    if qty:
-        cur.execute("update food set quantity = %s where f_id = %s", (qty, f_id))
-    if price:
-        cur.execute("update food set price = %s where f_id = %s", (price, f_id))
-    if type:
-        cur.execute("update food set type = %s where f_id = %s", (type, f_id))
-    con.commit()
-
-def get_food(f_id=None):
-    if f_id:
-        cur.execute("select * from food where f_id = %s", (f_id,))
-        return cur.fetchone()
-    else:
-        cur.execute("select * from food")
-        return cur.fetchall()
+    # return whether it was successful
+    return True
 
 con.close()
