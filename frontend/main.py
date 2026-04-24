@@ -37,30 +37,65 @@ def main():
 
     tk.Button(
         main_frame,
-        text="Start",
+        text="login",
         width=15,
         height=2,
-        command=lambda: show_frame(secondscreen)
+        command=lambda: show_frame(login)
     ).pack(pady=20)
 
+    tk.Button(
+        main_frame,
+        text="register",
+        width=15,
+        height=2,
+        command=lambda: show_frame(register)
+    ).pack(pady=20)
+
+
     # ---------------- Second Screen ----------------
-    secondscreen = tk.Frame(container, bg="#b3e6d8")
-    secondscreen.grid(row=0, column=0, sticky="nsew")
+    login  = tk.Frame(container, bg="#b3e6d8")
+    login.grid(row=0, column=0, sticky="nsew")
+    left_frame = tk.Frame(login, bg="#804000", width=400)
+    left_frame.pack(side="left", fill="both")
+    left_frame.pack_propagate(False)
+
+    right_frame = tk.Frame(login, bg="#e6ccb3")
+    right_frame.pack(side="right", fill="both", expand=True)
 
     tk.Label(
-        secondscreen,
-        text="Second Screen",
+        login,
+        text="Login",
         bg="#b3e6d8",
         font=("Arial", 24)
     ).pack(pady=50)
 
     tk.Button(
-        secondscreen,
+        login,
         text="Back",
         command=lambda: show_frame(main_frame)
-    ).pack()
+    ).pack(pady=20)
+    register = tk.Frame(container, bg="#b3e6d8")
+    register.grid(row=0, column=0, sticky="nsew")
+    left_frame = tk.Frame(register, bg="#804000", width=400)
+    left_frame.pack(side="left", fill="both")
+    left_frame.pack_propagate(False)
 
-    # Start on first screen
+    right_frame = tk.Frame(register, bg="#e6ccb3")
+    right_frame.pack(side="right", fill="both", expand=True)
+    tk.Label(
+        register,
+        text="Register",
+        bg="#b3e6d8",
+        font=("Arial", 24)
+    ).pack(pady=50)
+    tk.Button(
+        register,
+        text="Back",
+        command=lambda: show_frame(main_frame)
+    ).pack(pady=20)
+
+     # Start on first screen
+
     show_frame(main_frame)
 
     root.mainloop()
