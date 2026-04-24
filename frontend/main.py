@@ -121,6 +121,11 @@ def main():
     usrlogin = tk.Frame(container, bg="#d9f2d9")
     usrlogin.grid(row=0,column=0,sticky="nsew")
 
+    def submit():
+        username = username_entry.get()
+        password = pwd_entry.get()
+        add_data("login_det", (username, password))
+
     tk.Label(
         usrlogin,
         text="User Login",
@@ -134,18 +139,29 @@ def main():
         command=lambda: show_frame(login)
     ).place(x=10,y=10)
 
-    def submit():
-        name = name_entry.get()
-        
+    tk.Label(
+        usrlogin,
+        text="Username",
+        bg="#d9f2d9"
+    ).pack(pady=10)
 
-    name_entry = tk.Entry(usrlogin)
-    name_entry.pack(pady=20)
+    username_entry = tk.Entry(usrlogin)
+    username_entry.pack(pady=20)
+
+    tk.Label(
+        usrlogin,
+        text="Password",
+        bg="#d9f2d9"
+    ).pack(pady=10)
+    pwd_entry = tk.Entry(usrlogin, show="*")
+    pwd_entry.pack(pady=20)
     
     tk.Button(
         usrlogin, 
         text="Submit", 
         command=submit
         ).pack()
+
 
 
 

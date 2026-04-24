@@ -1,17 +1,19 @@
 import mysql.connector as sql
 import random
 
+def connect():
+    con = sql.connect(
+        host="localhost",
+        user="root",
+        password="admin",
+        database="catnip"
+    )
+    cur = con.cursor()
+    return con, cur
 
-con = sql.connect(
-    host="localhost",
-    user="root",
-    password="admin",
-    database="catnip"
-)
-cur = con.cursor()
 
 def add_data(table, input_data):
-
+    con, cur = connect()
     # generate a random id
     while True:
         new_id = random.randint(1000000, 9999999)
@@ -26,6 +28,7 @@ def add_data(table, input_data):
     cur.execute(query, input_data)
     con.commit()
 
+    con.close()
 
 
-con.close()
+
