@@ -61,39 +61,10 @@ def main():
     login = tk.Frame(container, bg="#e61f1f")
     login.grid(row=0, column=0, sticky="nsew")
     ch=tk.StringVar()
-    tk.Radiobutton(login, text="User", variable=ch, value="user").pack(pady=10)
-    tk.Radiobutton(login, text="Employee", variable=ch, value="employee").pack(pady=10)
-    tk.Radiobutton(login, text="Admin", variable=ch, value="admin").pack(pady=10)
-    '''
-    tk.Label(
-        login,
-        text="Login",
-        bg="#e61f1f",
-        fg="white",
-        font=("Arial",24)
-    ).pack(pady=50)
-
-    tk.Button(
-        login,
-        text="User Login",
-        width=15,
-        command=lambda: show_frame(usrlogin)
-    ).pack(pady=20)
-
-    tk.Button(
-        login,
-        text="Employee Login",
-        width=15,
-        command=lambda: show_frame(emplogin)
-    ).pack(pady=20)
-
-    tk.Button(
-        login,
-        text="Admin Login",
-        width=15,
-        command=lambda: show_frame(admlogin)
-    ).pack(pady=20)
-    '''
+    tk.Radiobutton(login, text="User", variable=ch, value="user").place(x=200,y=200)
+    tk.Radiobutton(login, text="Employee", variable=ch, value="employee").place(x=200,y=230)
+    tk.Radiobutton(login, text="Admin", variable=ch, value="admin").place(x=200,y=260)
+   
     tk.Button(
         login,
         text="Back",
@@ -125,54 +96,30 @@ def main():
     def submit():
         username = username_entry.get()
         password = pwd_entry.get()
-        add_data("login_det", (username, password))
-
-    
-
-    
+        add_data("login_det", (username, password))   
 
     tk.Label(
         login,
         text="Username:",
         bg="#d9f2d9"
-    ).place(x=270,y=160)
+    ).place(x=480,y=180)
 
     username_entry = tk.Entry(login)
-    username_entry.pack(pady=20)
+    username_entry.place(x=550,y=180)
 
     tk.Label(
         login,
         text="Password:",
         bg="#d9f2d9"
-    ).place(x=270,y=220)
+    ).place(x=480,y=240)
     pwd_entry = tk.Entry(login, show="*")
-    pwd_entry.pack(pady=20)
+    pwd_entry.place(x=550,y=240)
     
     tk.Button(
         login, 
         text="Submit", 
         command=submit
         ).pack()
-
-
-
-
-    # ---------------- EMPLOYEE SCREEN ----------------
-    
-    
-    
-
-
-    
-
-    
-    # ---------------- ADMIN SCREEN ----------------
-    
-
-    
-    
-
-    
 
     # Start with home page
     show_frame(main_frame)
