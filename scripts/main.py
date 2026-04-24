@@ -148,7 +148,7 @@ def main():
 
     tk.Label(
         usrlogin,
-        text="Password",
+        text="Password:",
         bg="#d9f2d9"
     ).place(x=270,y=220)
     pwd_entry = tk.Entry(usrlogin, show="*")
@@ -173,6 +173,30 @@ def main():
         font=("Arial",24),
         bg="#d9f2d9"
     ).pack(pady=50)
+    
+    tk.Label(
+        emplogin,
+        text="Username:",
+        bg="#d9f2d9"
+    ).place(x=270,y=160)
+
+    username_entry = tk.Entry(emplogin)
+    username_entry.pack(pady=20)
+
+    tk.Label(
+        emplogin,
+        text="Password:",
+        bg="#d9f2d9"
+    ).place(x=270,y=220)
+    pwd_entry = tk.Entry(emplogin, show="*")
+    pwd_entry.pack(pady=20)
+
+    tk.Button(
+        emplogin,
+        text="Submit",
+        command=submit
+    ).pack(pady=20)
+
 
     tk.Button(
         emplogin,
@@ -191,6 +215,28 @@ def main():
         font=("Arial",24),
         bg="#d9f2d9"
     ).pack(pady=50)
+    tk.Label(
+        admlogin,
+        text="Username:",
+        bg="#d9f2d9"
+    ).place(x=270,y=160)
+
+    username_entry = tk.Entry(admlogin)
+    username_entry.pack(pady=20)
+
+    tk.Label(
+        admlogin,
+        text="Password:",
+        bg="#d9f2d9"
+    ).place(x=270,y=220)
+    pwd_entry = tk.Entry(admlogin, show="*")
+    pwd_entry.pack(pady=20)
+
+    tk.Button(
+        usrlogin,
+        text="Submit",
+        command=submit
+    ).pack(pady=20)
 
     tk.Button(
         admlogin,
