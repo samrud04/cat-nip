@@ -53,14 +53,14 @@ def main():
 
 
     # ---------------- Second Screen ----------------
-    login  = tk.Frame(container, bg="#b3e6d8")
+    login  = tk.Frame(container, bg="#e61f1f")
     login.grid(row=0, column=0, sticky="nsew")
-    left_frame = tk.Frame(login, bg="#804000", width=400)
-    left_frame.pack(side="left", fill="both")
-    left_frame.pack_propagate(False)
+    #left_frame = tk.Frame(login, bg="#804000", width=400)
+    #left_frame.pack(side="left", fill="both")
+    #left_frame.pack_propagate(False)
 
-    right_frame = tk.Frame(login, bg="#e6ccb3")
-    right_frame.pack(side="right", fill="both", expand=True)
+    #rframel = tk.Frame(login, bg="#e6ccb3")
+    #rframel.pack(side="right", fill="both", expand=True)
 
     tk.Label(
         login,
@@ -73,15 +73,15 @@ def main():
         login,
         text="Back",
         command=lambda: show_frame(main_frame)
-    ).pack(pady=20)
+    ).place(x=10, y=10 )
     register = tk.Frame(container, bg="#b3e6d8")
     register.grid(row=0, column=0, sticky="nsew")
-    left_frame = tk.Frame(register, bg="#804000", width=400)
-    left_frame.pack(side="left", fill="both")
-    left_frame.pack_propagate(False)
+    #left_frame = tk.Frame(register, bg="#804000", width=400)
+    #left_frame.pack(side="left", fill="both")
+    #left_frame.pack_propagate(False)
 
-    right_frame = tk.Frame(register, bg="#e6ccb3")
-    right_frame.pack(side="right", fill="both", expand=True)
+    #right_frame = tk.Frame(register, bg="#e6ccb3")
+    #right_frame.pack(side="right", fill="both", expand=True)
     tk.Label(
         register,
         text="Register",
@@ -92,7 +92,7 @@ def main():
         register,
         text="Back",
         command=lambda: show_frame(main_frame)
-    ).pack(pady=20)
+    ).place(x=10, y=10 )
 
      # Start on first screen
 
