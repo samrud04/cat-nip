@@ -10,7 +10,7 @@ con = sql.connect(
 )
 cur = con.cursor()
 
-def add(table, input_data):
+def add_data(table, input_data):
 
     # generate a random id
     while True:

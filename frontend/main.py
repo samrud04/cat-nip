@@ -1,4 +1,5 @@
 import tkinter as tk
+from db import add_data
 
 def show_frame(frame):
     frame.tkraise()
@@ -70,13 +71,6 @@ def main():
 
     tk.Button(
         login,
-        text="Admin Login",
-        width=15,
-        command=lambda: show_frame(admlogin)
-    ).pack(pady=20)
-
-    tk.Button(
-        login,
         text="User Login",
         width=15,
         command=lambda: show_frame(usrlogin)
@@ -87,6 +81,13 @@ def main():
         text="Employee Login",
         width=15,
         command=lambda: show_frame(emplogin)
+    ).pack(pady=20)
+
+    tk.Button(
+        login,
+        text="Admin Login",
+        width=15,
+        command=lambda: show_frame(admlogin)
     ).pack(pady=20)
 
     tk.Button(
@@ -114,24 +115,6 @@ def main():
     ).place(x=10,y=10)
 
 
-    # ---------------- ADMIN SCREEN ----------------
-    admlogin = tk.Frame(container, bg="#d9f2d9")
-    admlogin.grid(row=0,column=0,sticky="nsew")
-
-    tk.Label(
-        admlogin,
-        text="Admin Login",
-        font=("Arial",24),
-        bg="#d9f2d9"
-    ).pack(pady=50)
-
-    tk.Button(
-        admlogin,
-        text="Back",
-        command=lambda: show_frame(login)
-    ).place(x=10,y=10)
-
-
     # ---------------- USER SCREEN ----------------
     usrlogin = tk.Frame(container, bg="#d9f2d9")
     usrlogin.grid(row=0,column=0,sticky="nsew")
@@ -149,6 +132,23 @@ def main():
         command=lambda: show_frame(login)
     ).place(x=10,y=10)
 
+    def submit():
+        name = name_entry.get()
+        tk.Label(
+            usrlogin,
+            text=name
+        ).pack(pady=20)
+
+    name_entry = tk.Entry(usrlogin)
+    name_entry.pack(pady=20)
+    
+    tk.Button(
+        usrlogin, 
+        text="Submit", 
+        command=submit
+        ).pack()
+
+
 
     # ---------------- EMPLOYEE SCREEN ----------------
     emplogin = tk.Frame(container, bg="#d9f2d9")
@@ -163,6 +163,24 @@ def main():
 
     tk.Button(
         emplogin,
+        text="Back",
+        command=lambda: show_frame(login)
+    ).place(x=10,y=10)
+
+    
+    # ---------------- ADMIN SCREEN ----------------
+    admlogin = tk.Frame(container, bg="#d9f2d9")
+    admlogin.grid(row=0,column=0,sticky="nsew")
+
+    tk.Label(
+        admlogin,
+        text="Admin Login",
+        font=("Arial",24),
+        bg="#d9f2d9"
+    ).pack(pady=50)
+
+    tk.Button(
+        admlogin,
         text="Back",
         command=lambda: show_frame(login)
     ).place(x=10,y=10)
