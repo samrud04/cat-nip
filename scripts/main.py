@@ -8,6 +8,11 @@ def main():
     root = tk.Tk()
     root.title("Cat-Nip")
     root.geometry("800x600")
+    photo=tk.PhotoImage(file="assets/catnipico.png")
+    soto=photo.subsample(4,4)
+    root.iconphoto(False, soto)
+
+
 
     # Main container holding all screens
     container = tk.Frame(root)
@@ -31,6 +36,7 @@ def main():
 
     right_frame = tk.Frame(main_frame, bg="#e6ccb3")
     right_frame.grid(row=0, column=1, sticky="nsew")
+    plc=tk.Label(left_frame,image=soto,bg="#e6ccb3").place(x=100,y=200)
 
     tk.Label(
         left_frame,
