@@ -4,29 +4,29 @@ from db import add_data
 def show_frame(frame):
     frame.tkraise()
 
+
 def main():
     root = tk.Tk()
     root.title("Cat-Nip")
     root.geometry("800x600")
-    photo=tk.PhotoImage(file="assets/catnipico.png")
-    soto=photo.subsample(4,4)
+
+    # App icon
+    photo = tk.PhotoImage(file="assets/catnipico.png")
+    soto = photo.subsample(4,4)
+
     root.iconphoto(False, soto)
 
-
-
-    # Main container holding all screens
+    # Main container
     container = tk.Frame(root)
     container.pack(fill="both", expand=True)
 
     container.grid_rowconfigure(0, weight=1)
     container.grid_columnconfigure(0, weight=1)
 
-
     # ---------------- HOME SCREEN ----------------
     main_frame = tk.Frame(container, bg="white")
     main_frame.grid(row=0, column=0, sticky="nsew")
 
-    # Use grid instead of pack
     main_frame.grid_columnconfigure(0, weight=1)
     main_frame.grid_columnconfigure(1, weight=1)
     main_frame.grid_rowconfigure(0, weight=1)
@@ -36,16 +36,120 @@ def main():
 
     right_frame = tk.Frame(main_frame, bg="#e6ccb3")
     right_frame.grid(row=0, column=1, sticky="nsew")
-    plc=tk.Label(left_frame,image=soto,bg="#e6ccb3").place(x=100,y=200)
+
+    # Keep image reference
+    img_label = tk.Label(left_frame, image=soto, bg="#804000")
+    img_label.image = soto
+    img_label.place(x=100, y=200)
 
     tk.Label(
         left_frame,
         text="Cat-Nip",
         fg="white",
         bg="#804000",
-        font=("Arial", 24)
+        font=("Arial",24)
     ).pack(pady=40)
 
+    # ---------------- LOGIN SCREEN ----------------
+    login = tk.Frame(container, bg="#e61f1f")
+    login.grid(row=0, column=0, sticky="nsew")
+
+    login.grid_columnconfigure(0, weight=1)
+    login.grid_columnconfigure(1, weight=1)
+    login.grid_rowconfigure(0, weight=1)
+
+    lframe = tk.Frame(login, bg="#EA7A0A")
+    lframe.grid(row=0, column=0, sticky="nsew")
+
+    rframe = tk.Frame(login, bg="#040404")
+    rframe.grid(row=0, column=1, sticky="nsew")
+
+    # User type radio buttons
+    ch = tk.StringVar()
+
+    tk.Radiobutton(
+        lframe, text="User",
+        variable=ch, value="user"
+    ).pack(pady=10)
+
+    tk.Radiobutton(
+        lframe, text="Employee",
+        variable=ch, value="employee"
+    ).pack(pady=10)
+
+    tk.Radiobutton(
+        lframe, text="Admin",
+        variable=ch, value="admin"
+    ).pack(pady=10)
+
+    # Login fields
+    tk.Label(rframe, text="Username:", bg="#E6E0E0").pack(pady=5)
+    username_entry = tk.Entry(rframe)
+    username_entry.pack(pady=10)
+
+    tk.Label(rframe, text="Password:", bg="#DCE9DC").pack(pady=5)
+    pwd_entry = tk.Entry(rframe, show="*")
+    pwd_entry.pack(pady=10)
+
+    def submit():
+        username = username_entry.get()
+        password = pwd_entry.get()
+
+        add_data("login_det", (username, password))
+        print("Saved!")
+
+    tk.Button(
+        rframe,
+        text="Submit",
+        command=submit
+    ).pack(pady=20)
+
+    tk.Button(
+        login,
+        text="Back",
+        command=lambda: show_frame(main_frame)
+    ).place(x=10,y=10)
+
+    # ---------------- REGISTER SCREEN ----------------
+    register = tk.Frame(container, bg="#b3e6d8")
+    register.grid(row=0, column=0, sticky="nsew")
+
+    reg_ch = tk.StringVar()
+
+    tk.Label(
+        register,
+        text="Register as:",
+        font=("Arial",24),
+        bg="#b3e6d8"
+    ).place(x=100,y=50)
+
+    tk.Radiobutton(
+        register, text="User",
+        variable=reg_ch, value="user"
+    ).place(x=100,y=150)
+
+    tk.Radiobutton(
+        register, text="Employee",
+        variable=reg_ch, value="employee"
+    ).place(x=100,y=200)
+
+    tk.Radiobutton(
+        register, text="Admin",
+        variable=reg_ch, value="admin"
+    ).place(x=100,y=250)
+
+    tk.Button(
+        register,
+        text="Submit"
+    ).place(x=100,y=300)
+
+    tk.Button(
+        register,
+        text="Back",
+        command=lambda: show_frame(main_frame)
+    ).place(x=10,y=10)
+
+    # Home buttons
     tk.Button(
         right_frame,
         text="Login",
@@ -62,79 +166,7 @@ def main():
         command=lambda: show_frame(register)
     ).pack(pady=30)
 
-
-    # ---------------- LOGIN SCREEN ----------------
-    login = tk.Frame(container, bg="#e61f1f")
-    login.grid(row=0, column=0, sticky="nsew")
-    login.grid_columnconfigure(0, weight=1)
-    login.grid_columnconfigure(1, weight=1)
-    login.grid_rowconfigure(0, weight=1)
-    lframe = tk.Frame(login, bg="#EA7A0A")
-    lframe.grid(row=0, column=0, sticky="nsew")
-    rframe = tk.Frame(login, bg="#040404")
-    rframe.grid(row=0, column=1, sticky="nsew")
-    ch=tk.StringVar()
-    tk.Radiobutton(lframe, text="User", variable=ch, value="user").pack(pady=10)
-    tk.Radiobutton(lframe, text="Employee", variable=ch, value="employee").pack(pady=10)
-    tk.Radiobutton(lframe, text="Admin", variable=ch, value="admin").pack(pady=10)
-    
-    tk.Button(
-        login,
-        text="Back",
-        command=lambda: show_frame(main_frame)
-    ).place(x=10,y=10)
-
-
-    # ---------------- REGISTER SCREEN ----------------
-    register = tk.Frame(container, bg="#b3e6d8")
-    register.grid(row=0,column=0,sticky="nsew")
-
-    tk.Label(
-        register,
-        text="Register",
-        font=("Arial",24),
-        bg="#b3e6d8"
-    ).pack(pady=50)
-
-    tk.Button(
-        register,
-        text="Back",
-        command=lambda: show_frame(main_frame)
-    ).place(x=10,y=10)
-
-
-    # ---------------- USER SCREEN ----------------
-    
-
-    def submit():
-        username = username_entry.get()
-        password = pwd_entry.get()
-        add_data("login_det", (username, password))   
-
-    tk.Label(
-        rframe,
-        text="Username:",
-        bg="#E6E0E0"
-    ).place(x=80,y=22)
-
-    username_entry = tk.Entry(rframe)
-    username_entry.pack(pady=20)
-
-    tk.Label(
-        rframe,
-        text="Password:",
-        bg="#DCE9DC"
-    ).place(x=80,y=75)
-    pwd_entry = tk.Entry(rframe, show="*")
-    pwd_entry.pack(pady=20)
-    
-    tk.Button(
-        rframe, 
-        text="Submit", 
-        command=submit
-        ).pack()
-
-    # Start with home page
+    # Start on home
     show_frame(main_frame)
 
     root.mainloop()
