@@ -1,4 +1,6 @@
 import tkinter as tk
+import sys
+sys.path.append("C:/Users/Dr.Satyan/Documents/Samrud/Sam Codes/cat-nip/backend")
 from db import add_data
 
 def show_frame(frame):
@@ -8,11 +10,6 @@ def main():
     root = tk.Tk()
     root.title("Cat-Nip")
     root.geometry("800x600")
-    photo=tk.PhotoImage(file="assets/catnipico.png")
-    soto=photo.subsample(4,4)
-    root.iconphoto(False, soto)
-
-
 
     # Main container holding all screens
     container = tk.Frame(root)
@@ -36,7 +33,6 @@ def main():
 
     right_frame = tk.Frame(main_frame, bg="#e6ccb3")
     right_frame.grid(row=0, column=1, sticky="nsew")
-    plc=tk.Label(left_frame,image=soto,bg="#e6ccb3").place(x=100,y=200)
 
     tk.Label(
         left_frame,
@@ -66,18 +62,36 @@ def main():
     # ---------------- LOGIN SCREEN ----------------
     login = tk.Frame(container, bg="#e61f1f")
     login.grid(row=0, column=0, sticky="nsew")
-    login.grid_columnconfigure(0, weight=1)
-    login.grid_columnconfigure(1, weight=1)
-    login.grid_rowconfigure(0, weight=1)
-    lframe = tk.Frame(login, bg="#EA7A0A")
-    lframe.grid(row=0, column=0, sticky="nsew")
-    rframe = tk.Frame(login, bg="#040404")
-    rframe.grid(row=0, column=1, sticky="nsew")
-    ch=tk.StringVar()
-    tk.Radiobutton(lframe, text="User", variable=ch, value="user").pack(pady=10)
-    tk.Radiobutton(lframe, text="Employee", variable=ch, value="employee").pack(pady=10)
-    tk.Radiobutton(lframe, text="Admin", variable=ch, value="admin").pack(pady=10)
-    
+
+    tk.Label(
+        login,
+        text="Login",
+        bg="#e61f1f",
+        fg="white",
+        font=("Arial",24)
+    ).pack(pady=50)
+
+    tk.Button(
+        login,
+        text="User Login",
+        width=15,
+        command=lambda: show_frame(usrlogin)
+    ).pack(pady=20)
+
+    tk.Button(
+        login,
+        text="Employee Login",
+        width=15,
+        command=lambda: show_frame(emplogin)
+    ).pack(pady=20)
+
+    tk.Button(
+        login,
+        text="Admin Login",
+        width=15,
+        command=lambda: show_frame(admlogin)
+    ).pack(pady=20)
+
     tk.Button(
         login,
         text="Back",
@@ -104,35 +118,72 @@ def main():
 
 
     # ---------------- USER SCREEN ----------------
-    
+    usrlogin = tk.Frame(container, bg="#d9f2d9")
+    usrlogin.grid(row=0,column=0,sticky="nsew")
+
+    tk.Label(
+        usrlogin,
+        text="User Login",
+        font=("Arial",24),
+        bg="#d9f2d9"
+    ).pack(pady=50)
+
+    tk.Button(
+        usrlogin,
+        text="Back",
+        command=lambda: show_frame(login)
+    ).place(x=10,y=10)
 
     def submit():
-        username = username_entry.get()
-        password = pwd_entry.get()
-        add_data("login_det", (username, password))   
+        name = name_entry.get()
+        
 
-    tk.Label(
-        rframe,
-        text="Username:",
-        bg="#E6E0E0"
-    ).place(x=80,y=22)
-
-    username_entry = tk.Entry(rframe)
-    username_entry.pack(pady=20)
-
-    tk.Label(
-        rframe,
-        text="Password:",
-        bg="#DCE9DC"
-    ).place(x=80,y=75)
-    pwd_entry = tk.Entry(rframe, show="*")
-    pwd_entry.pack(pady=20)
+    name_entry = tk.Entry(usrlogin)
+    name_entry.pack(pady=20)
     
     tk.Button(
-        rframe, 
+        usrlogin, 
         text="Submit", 
         command=submit
         ).pack()
+
+
+
+    # ---------------- EMPLOYEE SCREEN ----------------
+    emplogin = tk.Frame(container, bg="#d9f2d9")
+    emplogin.grid(row=0,column=0,sticky="nsew")
+
+    tk.Label(
+        emplogin,
+        text="Employee Login",
+        font=("Arial",24),
+        bg="#d9f2d9"
+    ).pack(pady=50)
+
+    tk.Button(
+        emplogin,
+        text="Back",
+        command=lambda: show_frame(login)
+    ).place(x=10,y=10)
+
+    
+    # ---------------- ADMIN SCREEN ----------------
+    admlogin = tk.Frame(container, bg="#d9f2d9")
+    admlogin.grid(row=0,column=0,sticky="nsew")
+
+    tk.Label(
+        admlogin,
+        text="Admin Login",
+        font=("Arial",24),
+        bg="#d9f2d9"
+    ).pack(pady=50)
+
+    tk.Button(
+        admlogin,
+        text="Back",
+        command=lambda: show_frame(login)
+    ).place(x=10,y=10)
+
 
     # Start with home page
     show_frame(main_frame)
