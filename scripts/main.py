@@ -1,6 +1,6 @@
 import tkinter as tk
 from db import add_data
-
+from pillow import Image, ImageTk
 def show_frame(frame):
     frame.tkraise()
 
@@ -113,30 +113,48 @@ def main():
     # ---------------- REGISTER SCREEN ----------------
     register = tk.Frame(container, bg="#b3e6d8")
     register.grid(row=0, column=0, sticky="nsew")
+    #registerbackground
+    bag=Image.open("assets/regbg.png")
+    bag=bag.resize((800,600),Image.ANTIALIAS)
+    bag=ImageTk.PhotoImage(bag)
+    bg_label=tk.Label(register,image=bag)
+    bg_label.place(x=0,y=0,relwidth=1,relheight=1)
+    
+    tk.Label(register, text="Username:", bg="#E6E0E0").pack(pady=5)
+    username_entry = tk.Entry(register)
+    username_entry.pack(pady=10)
 
-    reg_ch = tk.StringVar()
+    tk.Label(register, text="Password:", bg="#E6E0E0").pack(pady=5)
+    password_entry = tk.Entry(register, show="*")
+    password_entry.pack(pady=10)
+    tk.Label(register, text="Confirm Password:", bg="#E6E0E0").pack(pady=5)
+    confirm_entry = tk.Entry(register, show="*")
+    confirm_entry.pack(pady=10)
+    tk.Label(register, text="Email:", bg="#E6E0E0").pack(pady=5)
+    email_entry = tk.Entry(register)
+    email_entry.pack(pady=10)
+    tk.Label(register, text="Phone:", bg="#E6E0E0").pack(pady=5)
+    phone_entry = tk.Entry(register)
+    phone_entry.pack(pady=10)
+    tk.Label(register, text="Address:", bg="#E6E0E0").pack(pady=5)
+    address_entry = tk.Entry(register)
+    address_entry.pack(pady=10)
+    tk.Label(register, text="Gender:", bg="#E6E0E0").pack(pady=5)
+    gender_entry = tk.Entry(register)
+    gender_entry.pack(pady=10)
+    tk.Label(register, text="Date of Birth:", bg="#E6E0E0").pack(pady=5)
+    dob_entry = tk.Entry(register)
+    dob_entry.pack(pady=10)
+    
 
     tk.Label(
         register,
-        text="Register as:",
+        text="Register ",
         font=("Arial",24),
         bg="#b3e6d8"
     ).place(x=100,y=50)
 
-    tk.Radiobutton(
-        register, text="User",
-        variable=reg_ch, value="user"
-    ).place(x=100,y=150)
-
-    tk.Radiobutton(
-        register, text="Employee",
-        variable=reg_ch, value="employee"
-    ).place(x=100,y=200)
-
-    tk.Radiobutton(
-        register, text="Admin",
-        variable=reg_ch, value="admin"
-    ).place(x=100,y=250)
+    
 
     tk.Button(
         register,
