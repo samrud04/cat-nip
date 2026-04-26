@@ -1,6 +1,5 @@
 import tkinter as tk
-from db import add_data
-from pillow import Image, ImageTk
+import db
 def show_frame(frame):
     frame.tkraise()
 
@@ -95,8 +94,9 @@ def main():
         username = username_entry.get()
         password = pwd_entry.get()
 
-        add_data("login_det", (username, password))
-        print("Saved!")
+        logged_In = db.login(ch.get(), username, password)
+        if logged_In:
+            print("Logged in!")
 
     tk.Button(
         rframe,
@@ -114,11 +114,6 @@ def main():
     register = tk.Frame(container, bg="#b3e6d8")
     register.grid(row=0, column=0, sticky="nsew")
     #registerbackground
-    bag=Image.open("assets/regbg.png")
-    bag=bag.resize((800,600),Image.ANTIALIAS)
-    bag=ImageTk.PhotoImage(bag)
-    bg_label=tk.Label(register,image=bag)
-    bg_label.place(x=0,y=0,relwidth=1,relheight=1)
     
     tk.Label(register, text="Username:", bg="#E6E0E0").pack(pady=5)
     username_entry = tk.Entry(register)
