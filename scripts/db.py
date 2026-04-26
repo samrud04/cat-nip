@@ -28,12 +28,20 @@ def add_data(table, input_data):
     cur.execute(query, input_data)
     con.commit()
 
-def login(table, username, password):
+def login(user_type, username, password):
     con, cur = connect()
-    cur.execute("SELECT * FROM %s WHERE username = %s AND password = %s", (table, username, password))
+    cur.execute(f"SELECT * FROM {user_type} WHERE username = %s AND password = %s", (username, password))
     if cur.fetchone() is not None:
         return True
     return False
+
+def register(username, password, email, phone, address, gender, dob):
+    con, cur = connect()
+    cur.execute("SELECT * FROM user WHERE username = %s", (username,))
+    if cur.fetchone() is not None:
+        return False
+    add_data("user", (username, password, email, phone, address, gender, dob))
+    return True
 
 
 

@@ -1,5 +1,8 @@
 import tkinter as tk
+from tkcalendar import DateEntry
 import db
+import re
+
 def show_frame(frame):
     frame.tkraise()
 
@@ -60,7 +63,7 @@ def main():
     lframe = tk.Frame(login, bg="#EA7A0A")
     lframe.grid(row=0, column=0, sticky="nsew")
 
-    rframe = tk.Frame(login, bg="#040404")
+    rframe = tk.Frame(login, bg="white")
     rframe.grid(row=0, column=1, sticky="nsew")
 
     # User type radio buttons
@@ -83,25 +86,25 @@ def main():
 
     # Login fields
     tk.Label(rframe, text="Username:", bg="#E6E0E0").pack(pady=5)
-    username_entry = tk.Entry(rframe)
-    username_entry.pack(pady=10)
+    login_uname_entry = tk.Entry(rframe)
+    login_uname_entry.pack(pady=10)
 
     tk.Label(rframe, text="Password:", bg="#DCE9DC").pack(pady=5)
-    pwd_entry = tk.Entry(rframe, show="*")
-    pwd_entry.pack(pady=10)
+    login_pwd_entry = tk.Entry(rframe, show="*")
+    login_pwd_entry.pack(pady=10)
 
-    def submit():
-        username = username_entry.get()
-        password = pwd_entry.get()
-
-        logged_In = db.login(ch.get(), username, password)
+    def log_submit():
+        username = login_uname_entry.get()
+        password = login_pwd_entry.get()
+        user_type = ch.get()
+        logged_In = db.login(user_type, username, password)
         if logged_In:
-            print("Logged in!")
+            tk.Label(rframe, text="Logged in!", bg="#DCE9DC").pack(pady=5)
 
     tk.Button(
         rframe,
         text="Submit",
-        command=submit
+        command=log_submit
     ).pack(pady=20)
 
     tk.Button(
@@ -116,12 +119,12 @@ def main():
     #registerbackground
     
     tk.Label(register, text="Username:", bg="#E6E0E0").pack(pady=5)
-    username_entry = tk.Entry(register)
-    username_entry.pack(pady=10)
+    register_uname_entry = tk.Entry(register)
+    register_uname_entry.pack(pady=10)
 
     tk.Label(register, text="Password:", bg="#E6E0E0").pack(pady=5)
-    password_entry = tk.Entry(register, show="*")
-    password_entry.pack(pady=10)
+    register_pwd_entry = tk.Entry(register, show="*")
+    register_pwd_entry.pack(pady=10)
     tk.Label(register, text="Confirm Password:", bg="#E6E0E0").pack(pady=5)
     confirm_entry = tk.Entry(register, show="*")
     confirm_entry.pack(pady=10)
@@ -149,11 +152,35 @@ def main():
         bg="#b3e6d8"
     ).place(x=100,y=50)
 
+    def reg_submit():
+        username = register_uname_entry.get()
+        password = register_pwd_entry.get()
+        confirm = confirm_entry.get()
+        email = email_entry.get()
+        phone = phone_entry.get()
+        address = address_entry.get()
+        gender = gender_entry.get()
+        dob = dob_entry.get()
+        pwd_check = password != confirm
+        email_check = re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email) is None
+        phone_check = re.match(r'^[6-9]\d{9}$', phone) is None
+        if pwd_check:
+            tk.Label(register, text="Passwords do not match!", bg="#b3e6d8").place(x=100,y=280)
+        elif email_check:
+            tk.Label(register, text="Invalid email!", bg="#b3e6d8").place(x=100,y=280)
+        elif phone_check:
+            tk.Label(register, text="Invalid phone number!", bg="#b3e6d8").place(x=100,y=280)
+        else:
+            registered = db.register(username, password, email, phone, address, gender, dob)
+            if registered:
+                tk.Label(register, text="Registered!", bg="#b3e6d8").place(x=100,y=280)
+            else:
+                tk.Label(register, text="Username already exists!", bg="#b3e6d8").place(x=100,y=280)
     
-
     tk.Button(
         register,
-        text="Submit"
+        text="Submit",
+        command=reg_submit
     ).place(x=100,y=300)
 
     tk.Button(
