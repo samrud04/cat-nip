@@ -1,7 +1,7 @@
 import tkinter as tk
-from tkcalendar import DateEntry
 import db
 import re
+from PIL import Image, ImageTk
 
 def show_frame(frame):
     frame.tkraise()
@@ -35,23 +35,26 @@ def main():
     main_frame.grid_columnconfigure(1, weight=1)
     main_frame.grid_rowconfigure(0, weight=1)
 
-    left_frame = tk.Frame(main_frame, bg="#804000")
+    left_frame = tk.Frame(main_frame, bg="#ffde59", width=600, height=600, bd=20, pady=30, highlightbackground="white", highlightthickness=20)
     left_frame.grid(row=0, column=0, sticky="nsew")
 
-    right_frame = tk.Frame(main_frame, bg="#e6ccb3")
+    right_frame = tk.Frame(main_frame, bg="#ffe683", width=400, height=600, bd=20, pady=30, highlightbackground="white", highlightthickness=20)
     right_frame.grid(row=0, column=1, sticky="nsew")
 
     # Keep image reference
-    img_label = tk.Label(left_frame, image=soto, bg="#804000")
-    img_label.image = soto
-    img_label.place(x=100, y=200)
+    Icon = Image.open("assets/catnipico.png")
+    Icon = Icon.resize((600, 500))
+    Icon = ImageTk.PhotoImage(Icon)
+    img_label = tk.Label(left_frame, image=Icon, bg="#ffde59")
+    img_label.image = Icon
+    img_label.place(x=80, y=160)
 
     tk.Label(
         left_frame,
         text="Cat-Nip",
-        fg="white",
-        bg="#804000",
-        font=("Arial",24)
+        fg="black",
+        bg="#ffde59",
+        font=("Arial", 54, "bold")
     ).pack(pady=40)
 
 
@@ -63,10 +66,10 @@ def main():
     login.grid_columnconfigure(1, weight=1)
     login.grid_rowconfigure(0, weight=1)
 
-    lframe = tk.Frame(login, bg="#ffde59", bd=20, pady=20, highlightbackground="white", highlightthickness=20)
+    lframe = tk.Frame(login, bg="#ffde59",width=400, height=600, bd=20, pady=20, highlightbackground="white", highlightthickness=20)
     lframe.grid(row=0, column=0, sticky="nsew")
 
-    rframe = tk.Frame(login, bg="#ffe683", bd=20, pady=20, highlightbackground="white", highlightthickness=20)
+    rframe = tk.Frame(login, bg="white", width=400, height=600, bd=20, pady=20)
     rframe.grid(row=0, column=1, sticky="nsew")
 
     tk.Label(lframe, text="Cat-Nip", bg="#ffde59", font=("Arial", 54, "bold")).pack(pady=10)
@@ -96,21 +99,25 @@ def main():
     ).place(x=250, y=400)
 
     # Login fields
-    tk.Label(rframe, text="Username:", bg="#E6E0E0").place(x=300, y=250)
-    login_uname_entry = tk.Entry(rframe)
-    login_uname_entry.place(x=300, y=280)
+    tk.Label(rframe, text="Username:", bg="#ffe683", font=("Arial", 16, "bold")).place(x=300, y=250)
+    login_uname_entry = tk.Entry(rframe, width=50)
+    login_uname_entry.place(x=200, y=280)
 
-    tk.Label(rframe, text="Password:", bg="#DCE9DC").place(x=300, y=330)
-    login_pwd_entry = tk.Entry(rframe, show="*")
-    login_pwd_entry.place(x=300, y=360)
+    tk.Label(rframe, text="Password:", bg="#ffe683", font=("Arial", 16, "bold")).place(x=300, y=330)
+    login_pwd_entry = tk.Entry(rframe, show="*", width=50)
+    login_pwd_entry.place(x=200, y=360)
 
     def log_submit():
         username = login_uname_entry.get()
         password = login_pwd_entry.get()
         user_type = ch.get()
-        logged_In = db.login(user_type, username, password)
-        if logged_In:
-            tk.Label(rframe, text="Logged in!", bg="#DCE9DC").pack(pady=5)
+        if not username or not password or not user_type:
+            tk.Label(rframe, text="Please fill all fields!", bg="#DCE9DC").pack(pady=5)
+            return
+        else:
+            logged_In = db.login(user_type, username, password)
+            if logged_In:
+                tk.Label(rframe, text="Logged in!", bg="#DCE9DC").pack(pady=5)
 
     tk.Button(
         rframe,
@@ -119,7 +126,7 @@ def main():
         bg="#7ed957",
         fg="black",
         font=("Arial", 16, "bold")
-    ).place(x=250, y=450)   
+    ).place(x=300, y=450)   
 
     tk.Button(
         login,
@@ -204,22 +211,24 @@ def main():
         command=lambda: show_frame(main_frame)
     ).place(x=10,y=10)
 
-    # Home buttons
+    # Home buttons               - WHY ARE THESE HERE?
     tk.Button(
         right_frame,
         text="Login",
-        width=15,
-        height=2,
+        width=25,
+        height=5,
+        bg="#b3e6d8",
         command=lambda: show_frame(login)
-    ).pack(pady=30)
+    ).place(x=280,y=150)
 
     tk.Button(
         right_frame,
         text="Register",
-        width=15,
-        height=2,
+        width=25,
+        height=5,
+        bg="#b3e6d8",
         command=lambda: show_frame(register)
-    ).pack(pady=30)
+    ).place(x=280,y=300)
 
     # Start on home
     show_frame(main_frame)
