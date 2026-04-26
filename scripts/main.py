@@ -11,6 +11,7 @@ def main():
     root = tk.Tk()
     root.title("Cat-Nip")
     root.geometry("800x600")
+    root.state("zoomed")
 
     # App icon
     photo = tk.PhotoImage(file="assets/catnipico.png")
@@ -24,6 +25,7 @@ def main():
 
     container.grid_rowconfigure(0, weight=1)
     container.grid_columnconfigure(0, weight=1)
+
 
     # ---------------- HOME SCREEN ----------------
     main_frame = tk.Frame(container, bg="white")
@@ -51,6 +53,7 @@ def main():
         bg="#804000",
         font=("Arial",24)
     ).pack(pady=40)
+
 
     # ---------------- LOGIN SCREEN ----------------
     login = tk.Frame(container, bg="white")
@@ -93,13 +96,13 @@ def main():
     ).place(x=250, y=400)
 
     # Login fields
-    tk.Label(rframe, text="Username:", bg="#E6E0E0").pack(pady=5)
+    tk.Label(rframe, text="Username:", bg="#E6E0E0").place(x=300, y=250)
     login_uname_entry = tk.Entry(rframe)
-    login_uname_entry.pack(pady=10)
+    login_uname_entry.place(x=300, y=280)
 
-    tk.Label(rframe, text="Password:", bg="#DCE9DC").pack(pady=5)
+    tk.Label(rframe, text="Password:", bg="#DCE9DC").place(x=300, y=330)
     login_pwd_entry = tk.Entry(rframe, show="*")
-    login_pwd_entry.pack(pady=10)
+    login_pwd_entry.place(x=300, y=360)
 
     def log_submit():
         username = login_uname_entry.get()
@@ -112,14 +115,18 @@ def main():
     tk.Button(
         rframe,
         text="Submit",
-        command=log_submit
-    ).pack(pady=20)
+        command=log_submit,
+        bg="#7ed957",
+        fg="black",
+        font=("Arial", 16, "bold")
+    ).place(x=250, y=450)   
 
     tk.Button(
         login,
         text="Back",
         command=lambda: show_frame(main_frame)
     ).place(x=10,y=10)
+
 
     # ---------------- REGISTER SCREEN ----------------
     register = tk.Frame(container, bg="#b3e6d8")
