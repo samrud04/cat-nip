@@ -53,36 +53,44 @@ def main():
     ).pack(pady=40)
 
     # ---------------- LOGIN SCREEN ----------------
-    login = tk.Frame(container, bg="#e61f1f")
+    login = tk.Frame(container, bg="white")
     login.grid(row=0, column=0, sticky="nsew")
 
     login.grid_columnconfigure(0, weight=1)
     login.grid_columnconfigure(1, weight=1)
     login.grid_rowconfigure(0, weight=1)
 
-    lframe = tk.Frame(login, bg="#EA7A0A")
+    lframe = tk.Frame(login, bg="#ffde59", bd=20, pady=20, highlightbackground="white", highlightthickness=20)
     lframe.grid(row=0, column=0, sticky="nsew")
 
-    rframe = tk.Frame(login, bg="white")
+    rframe = tk.Frame(login, bg="#ffe683", bd=20, pady=20, highlightbackground="white", highlightthickness=20)
     rframe.grid(row=0, column=1, sticky="nsew")
+
+    tk.Label(lframe, text="Cat-Nip", bg="#ffde59", font=("Arial", 54, "bold")).pack(pady=10)
 
     # User type radio buttons
     ch = tk.StringVar()
 
     tk.Radiobutton(
         lframe, text="User",
-        variable=ch, value="user"
-    ).pack(pady=10)
+        variable=ch, value="user",
+        bg="#f9b746",
+        font=("Arial", 24, "bold")
+    ).place(x=250, y=200)
 
     tk.Radiobutton(
         lframe, text="Employee",
-        variable=ch, value="employee"
-    ).pack(pady=10)
+        variable=ch, value="employee",
+        bg="#f9b746",
+        font=("Arial", 24, "bold")
+    ).place(x=250, y=300)
 
     tk.Radiobutton(
         lframe, text="Admin",
-        variable=ch, value="admin"
-    ).pack(pady=10)
+        variable=ch, value="admin",
+        bg="#f9b746",
+        font=("Arial", 24, "bold")
+    ).place(x=250, y=400)
 
     # Login fields
     tk.Label(rframe, text="Username:", bg="#E6E0E0").pack(pady=5)
