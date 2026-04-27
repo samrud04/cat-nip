@@ -81,21 +81,24 @@ def main():
         lframe, text="User",
         variable=ch, value="user",
         bg="#f9b746",
-        font=("Arial", 24, "bold")
+        font=("Arial", 24, "bold"),
+        borderwidth=0
     ).place(x=250, y=200)
 
     tk.Radiobutton(
         lframe, text="Employee",
         variable=ch, value="employee",
         bg="#f9b746",
-        font=("Arial", 24, "bold")
+        font=("Arial", 24, "bold"),
+        borderwidth=0
     ).place(x=250, y=300)
 
     tk.Radiobutton(
         lframe, text="Admin",
         variable=ch, value="admin",
         bg="#f9b746",
-        font=("Arial", 24, "bold")
+        font=("Arial", 24, "bold"),
+        borderwidth=0
     ).place(x=250, y=400)
 
     # Login fields
@@ -125,50 +128,59 @@ def main():
         command=log_submit,
         bg="#7ed957",
         fg="black",
-        font=("Arial", 16, "bold")
+        font=("Arial", 16, "bold"),
+        borderwidth=0
     ).place(x=300, y=450)   
 
     tk.Button(
         login,
         text="Back",
-        command=lambda: show_frame(main_frame)
-    ).place(x=10,y=10)
+        command=lambda: show_frame(main_frame),
+        bg="tomato",
+        font=("Arial", 16, "bold"),
+        borderwidth=0
+    ).place(x=30,y=30)
 
 
     # ---------------- REGISTER SCREEN ----------------
-    register = tk.Frame(container, bg="#b3e6d8")
-    register.grid(row=0, column=0, sticky="nsew")
+    
+
+    register_frame = tk.Frame(container, bg="#b3e6d8")
+    register_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
     #registerbackground
     
-    tk.Label(register, text="Username:", bg="#E6E0E0").pack(pady=5)
-    register_uname_entry = tk.Entry(register)
-    register_uname_entry.pack(pady=10)
+    tk.Label(register_frame, text="User Registration", bg="#b3e6d8", font=("Arial", 56, "bold")).place(x=750, y=50)
 
-    tk.Label(register, text="Password:", bg="#E6E0E0").pack(pady=5)
-    register_pwd_entry = tk.Entry(register, show="*")
-    register_pwd_entry.pack(pady=10)
-    tk.Label(register, text="Confirm Password:", bg="#E6E0E0").pack(pady=5)
-    confirm_entry = tk.Entry(register, show="*")
-    confirm_entry.pack(pady=10)
-    tk.Label(register, text="Email:", bg="#E6E0E0").pack(pady=5)
-    email_entry = tk.Entry(register)
-    email_entry.pack(pady=10)
-    tk.Label(register, text="Phone:", bg="#E6E0E0").pack(pady=5)
-    phone_entry = tk.Entry(register)
-    phone_entry.pack(pady=10)
-    tk.Label(register, text="Address:", bg="#E6E0E0").pack(pady=5)
-    address_entry = tk.Entry(register)
-    address_entry.pack(pady=10)
-    tk.Label(register, text="Gender:", bg="#E6E0E0").pack(pady=5)
-    gender_entry = tk.Entry(register)
-    gender_entry.pack(pady=10)
-    tk.Label(register, text="Date of Birth:", bg="#E6E0E0").pack(pady=5)
-    dob_entry = tk.Entry(register)
-    dob_entry.pack(pady=10)
+    tk.Label(register_frame, text="Username:", bg="#E6E0E0").place(x=500, y=150)
+    register_uname_entry = tk.Entry(register_frame)
+    register_uname_entry.place(x=500, y=180)
+
+    tk.Label(register_frame, text="Password:", bg="#E6E0E0").place(x=500, y=230)
+    register_pwd_entry = tk.Entry(register_frame, show="*")
+    register_pwd_entry.place(x=500, y=260)
+    
+    tk.Label(register_frame, text="Confirm Password:", bg="#E6E0E0").place(x=500, y=310)
+    confirm_entry = tk.Entry(register_frame, show="*")
+    confirm_entry.place(x=500, y=340)
+    tk.Label(register_frame, text="Email:", bg="#E6E0E0").place(x=500, y=390)
+    email_entry = tk.Entry(register_frame)
+    email_entry.place(x=500, y=420)
+    tk.Label(register_frame, text="Phone:", bg="#E6E0E0").place(x=500, y=470)
+    phone_entry = tk.Entry(register_frame)
+    phone_entry.place(x=500, y=500)
+    tk.Label(register_frame, text="Address:", bg="#E6E0E0").place(x=500, y=550)
+    address_entry = tk.Entry(register_frame)
+    address_entry.place(x=500, y=580)
+    tk.Label(register_frame, text="Gender:", bg="#E6E0E0").place(x=500, y=620)
+    gender_entry = tk.Entry(register_frame)
+    gender_entry.place(x=500, y=650)
+    tk.Label(register_frame, text="Date of Birth:", bg="#E6E0E0").place(x=500, y=520)
+    dob_entry = tk.Entry(register_frame)
+    dob_entry.place(x=500, y=500)
     
 
     tk.Label(
-        register,
+        register_frame,
         text="Register ",
         font=("Arial",24),
         bg="#b3e6d8"
@@ -187,26 +199,26 @@ def main():
         email_check = re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email) is None
         phone_check = re.match(r'^[6-9]\d{9}$', phone) is None
         if pwd_check:
-            tk.Label(register, text="Passwords do not match!", bg="#b3e6d8").place(x=100,y=280)
+            tk.Label(register_frame, text="Passwords do not match!", bg="#b3e6d8").place(x=100,y=280)
         elif email_check:
-            tk.Label(register, text="Invalid email!", bg="#b3e6d8").place(x=100,y=280)
+            tk.Label(register_frame, text="Invalid email!", bg="#b3e6d8").place(x=100,y=280)
         elif phone_check:
-            tk.Label(register, text="Invalid phone number!", bg="#b3e6d8").place(x=100,y=280)
+            tk.Label(register_frame, text="Invalid phone number!", bg="#b3e6d8").place(x=100,y=280)
         else:
             registered = db.register(username, password, email, phone, address, gender, dob)
             if registered:
-                tk.Label(register, text="Registered!", bg="#b3e6d8").place(x=100,y=280)
+                tk.Label(register_frame, text="Registered!", bg="#b3e6d8").place(x=100,y=280)
             else:
-                tk.Label(register, text="Username already exists!", bg="#b3e6d8").place(x=100,y=280)
+                tk.Label(register_frame, text="Username already exists!", bg="#b3e6d8").place(x=100,y=280)
     
     tk.Button(
-        register,
+        register_frame,
         text="Submit",
         command=reg_submit
     ).place(x=100,y=300)
 
     tk.Button(
-        register,
+        register_frame,
         text="Back",
         command=lambda: show_frame(main_frame)
     ).place(x=10,y=10)
@@ -217,7 +229,8 @@ def main():
         text="Login",
         width=25,
         height=5,
-        bg="#b3e6d8",
+        bg="#f9b746",
+        borderwidth=0,
         command=lambda: show_frame(login)
     ).place(x=280,y=150)
 
@@ -226,8 +239,9 @@ def main():
         text="Register",
         width=25,
         height=5,
-        bg="#b3e6d8",
-        command=lambda: show_frame(register)
+        bg="#f9b746",
+        borderwidth=0,
+        command=lambda: show_frame(register_frame)
     ).place(x=280,y=300)
 
     # Start on home
