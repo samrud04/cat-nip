@@ -59,64 +59,64 @@ def main():
     login.grid_columnconfigure(1, weight=1)
     login.grid_rowconfigure(0, weight=1)
 
-    lframe = ctk.CTkFrame(login, fg_color="#ffde59",width=400, height=600)
-    lframe.grid(row=0, column=0, sticky="nsew", pady=20)
+    login_lframe = ctk.CTkFrame(login, fg_color="#ffde59",width=400, height=600)
+    login_lframe.grid(row=0, column=0, sticky="nsew", pady=20)
 
-    rframe = ctk.CTkFrame(login, fg_color="white", width=400, height=600)
-    rframe.grid(row=0, column=1, sticky="nsew", pady=20)
+    login_rframe = ctk.CTkFrame(login, fg_color="white", width=400, height=600)
+    login_rframe.grid(row=0, column=1, sticky="nsew", pady=20)
 
-    ctk.CTkLabel(lframe, text="Cat-Nip", fg_color="#ffde59", font=("Arial", 54, "bold")).pack(pady=10)
+    ctk.CTkLabel(login_lframe, text="Cat-Nip", fg_color="#ffde59", font=("Arial", 54, "bold")).pack(pady=10)
 
     # User type radio buttons
-    ch = ctk.StringVar()
-    ch.set("user")
+    loginch = ctk.StringVar()
+    loginch.set("user")
     ctk.CTkRadioButton(
-        lframe, text="User",
-        variable=ch, value="user",
+        login_lframe, text="User",
+        variable=loginch, value="user",
         fg_color="#f9b746",
         text_color="black",
         font=("Arial", 24, "bold")
     ).place(x=250, y=200)
 
     ctk.CTkRadioButton(
-        lframe, text="Employee",
-        variable=ch, value="employee",
+        login_lframe, text="Employee",
+        variable=loginch, value="employee",
         fg_color="#f9b746",
         text_color="black",
         font=("Arial", 24, "bold")
     ).place(x=250, y=300)
 
     ctk.CTkRadioButton(
-        lframe, text="Admin",
-        variable=ch, value="admin",
+        login_lframe, text="Admin",
+        variable=loginch, value="admin",
         fg_color="#f9b746",
         text_color="black",
         font=("Arial", 24, "bold")
     ).place(x=250, y=400)
 
     # Login fields
-    ctk.CTkLabel(rframe, text="Username:", fg_color="#ffe683", font=("Arial", 16, "bold")).place(x=300, y=250)
-    login_uname_entry = ctk.CTkEntry(rframe, width=50)
+    ctk.CTkLabel(login_rframe, text="Username:", fg_color="#ffe683", font=("Arial", 16, "bold")).place(x=300, y=250)
+    login_uname_entry = ctk.CTkEntry(login_rframe, width=50)
     login_uname_entry.place(x=200, y=280)
 
-    ctk.CTkLabel(rframe, text="Password:", fg_color="#ffe683", font=("Arial", 16, "bold")).place(x=300, y=330)
-    login_pwd_entry = ctk.CTkEntry(rframe, show="*", width=50)
+    ctk.CTkLabel(login_rframe, text="Password:", fg_color="#ffe683", font=("Arial", 16, "bold")).place(x=300, y=330)
+    login_pwd_entry = ctk.CTkEntry(login_rframe, show="*", width=50)
     login_pwd_entry.place(x=200, y=360)
 
     def log_submit():
         username = login_uname_entry.get()
         password = login_pwd_entry.get()
-        user_type = ch.get()
+        user_type = loginch.get()
         if not username or not password or not user_type:
-            ctk.CTkLabel(rframe, text="Please fill all fields!", fg_color="#DCE9DC").pack(pady=5)
+            ctk.CTkLabel(login_rframe, text="Please fill all fields!", fg_color="#DCE9DC").pack(pady=5)
             return
         else:
             logged_In = db.login(user_type, username, password)
             if logged_In:
-                ctk.CTkLabel(rframe, text="Logged in!", fg_color="#DCE9DC").pack(pady=5)
+                ctk.CTkLabel(login_rframe, text="Logged in!", fg_color="#DCE9DC").pack(pady=5)
 
     ctk.CTkButton(
-        rframe,
+        login_rframe,
         text="Submit",
         command=log_submit,
         fg_color="#7ed957",
@@ -134,45 +134,61 @@ def main():
     ).place(x=30,y=30)
 
 
-    # ---------------- REGISTER SCREEN ----------------
     
+    
+    # ---------------- REGISTER SCREEN ----------------
 
     register_frame = ctk.CTkFrame(container, fg_color="#b3e6d8")
-    register_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
-    #registerbackground
-    
-    ctk.CTkLabel(register_frame, text="User Registration", fg_color="#b3e6d8", font=("Arial", 56, "bold")).place(x=750, y=50)
+    register_frame.grid(row=0, column=0, sticky="nsew")
+    register_frame.grid_rowconfigure(0, weight=1)
+    register_frame.grid_columnconfigure(0, weight=1)
 
-    ctk.CTkLabel(register_frame, text="Username:", fg_color="#E6E0E0").place(x=500, y=150)
-    register_uname_entry = ctk.CTkEntry(register_frame)
-    register_uname_entry.place(x=500, y=180)
 
-    ctk.CTkLabel(register_frame, text="Password:", fg_color="#E6E0E0").place(x=500, y=230)
-    register_pwd_entry = ctk.CTkEntry(register_frame, show="*")
-    register_pwd_entry.place(x=500, y=260)
-    
-    ctk.CTkLabel(register_frame, text="Confirm Password:", fg_color="#E6E0E0").place(x=500, y=310)
-    confirm_entry = ctk.CTkEntry(register_frame, show="*")
-    confirm_entry.place(x=500, y=340)
-    ctk.CTkLabel(register_frame, text="Email:", fg_color="#E6E0E0").place(x=500, y=390)
-    email_entry = ctk.CTkEntry(register_frame)
-    email_entry.place(x=500, y=420)
-    ctk.CTkLabel(register_frame, text="Phone:", fg_color="#E6E0E0").place(x=500, y=470)
-    phone_entry = ctk.CTkEntry(register_frame)
-    phone_entry.place(x=500, y=500)
-    ctk.CTkLabel(register_frame, text="Address:", fg_color="#E6E0E0").place(x=500, y=550)
-    address_entry = ctk.CTkEntry(register_frame)
-    address_entry.place(x=500, y=580)
-    ctk.CTkLabel(register_frame, text="Gender:", fg_color="#E6E0E0").place(x=500, y=620)
-    gender_entry = ctk.CTkEntry(register_frame)
-    gender_entry.place(x=500, y=650)
-    ctk.CTkLabel(register_frame, text="Date of Birth:", fg_color="#E6E0E0").place(x=500, y=520)
-    dob_entry = ctk.CTkEntry(register_frame)
-    dob_entry.place(x=500, y=500)
-    
+    scrollable_frame = ctk.CTkScrollableFrame(
+        register_frame,
+        fg_color="#b3e6d8"
+    )
+    scrollable_frame.grid(row=0,column=0,sticky="nsew")
+    ctk.CTkLabel(
+    scrollable_frame,
+    text="User Registration",
+    font=("Arial",56,"bold")
+    ).pack(pady=40)
+
+    ctk.CTkLabel(scrollable_frame, text="Username:").pack(pady=5)
+    register_uname_entry = ctk.CTkEntry(scrollable_frame)
+    register_uname_entry.pack(pady=5)
+
+    ctk.CTkLabel(scrollable_frame, text="Password:").pack(pady=5)
+    register_pwd_entry = ctk.CTkEntry(scrollable_frame, show="*")
+    register_pwd_entry.pack(pady=5)
+
+    ctk.CTkLabel(scrollable_frame,text="Confirm Password:").pack(pady=5)
+    confirm_entry = ctk.CTkEntry(scrollable_frame,show="*")
+    confirm_entry.pack(pady=5)
+
+    ctk.CTkLabel(scrollable_frame,text="Email:").pack(pady=5)
+    email_entry = ctk.CTkEntry(scrollable_frame)
+    email_entry.pack(pady=5)
+
+    ctk.CTkLabel(scrollable_frame,text="Phone:").pack(pady=5)
+    phone_entry = ctk.CTkEntry(scrollable_frame)
+    phone_entry.pack(pady=5)
+
+    ctk.CTkLabel(scrollable_frame,text="Address:").pack(pady=5)
+    address_entry = ctk.CTkEntry(scrollable_frame)
+    address_entry.pack(pady=5)
+
+    ctk.CTkLabel(scrollable_frame,text="Date of Birth:").pack(pady=5)
+    dob_entry = ctk.CTkEntry(scrollable_frame)
+    dob_entry.pack(pady=5)
+
+    ctk.CTkLabel(scrollable_frame,text="Gender:").pack(pady=5)
+    gender_entry = ctk.CTkEntry(scrollable_frame)
+    gender_entry.pack(pady=5)
 
     ctk.CTkLabel(
-        register_frame,
+        scrollable_frame,
         text="Register ",
         font=("Arial",24),
         fg_color="#b3e6d8"
@@ -191,26 +207,26 @@ def main():
         email_check = re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email) is None
         phone_check = re.match(r'^[6-9]\d{9}$', phone) is None
         if pwd_check:
-            ctk.CTkLabel(register_frame, text="Passwords do not match!", fg_color="#b3e6d8").place(x=100,y=280)
+            ctk.CTkLabel(scrollable_frame, text="Passwords do not match!", fg_color="#b3e6d8").place(x=100,y=280)
         elif email_check:
-            ctk.CTkLabel(register_frame, text="Invalid email!", fg_color="#b3e6d8").place(x=100,y=280)
+            ctk.CTkLabel(scrollable_frame, text="Invalid email!", fg_color="#b3e6d8").place(x=100,y=280)
         elif phone_check:
-            ctk.CTkLabel(register_frame, text="Invalid phone number!", fg_color="#b3e6d8").place(x=100,y=280)
+            ctk.CTkLabel(scrollable_frame, text="Invalid phone number!", fg_color="#b3e6d8").place(x=100,y=280)
         else:
             registered = db.register(username, password, email, phone, address, gender, dob)
             if registered:
-                ctk.CTkLabel(register_frame, text="Registered!", fg_color="#b3e6d8").place(x=100,y=280)
+                ctk.CTkLabel(scrollable_frame, text="Registered!", fg_color="#b3e6d8").place(x=100,y=280)
             else:
-                ctk.CTkLabel(register_frame, text="Username already exists!", fg_color="#b3e6d8").place(x=100,y=280)
-    
+                ctk.CTkLabel(scrollable_frame, text="Username already exists!", fg_color="#b3e6d8").place(x=100,y=280)
+
     ctk.CTkButton(
-        register_frame,
+        scrollable_frame,
         text="Submit",
         command=reg_submit
     ).place(x=100,y=300)
 
     ctk.CTkButton(
-        register_frame,
+        scrollable_frame,
         text="Back",
         command=lambda: show_frame(main_frame)
     ).place(x=10,y=10)
@@ -236,6 +252,8 @@ def main():
 
     # Start on home
     show_frame(main_frame)
+    
+    
 
     app.mainloop()
 
