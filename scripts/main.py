@@ -8,17 +8,16 @@ def show_frame(frame):
 
 
 def main():
-    root = ctk.CTk()
-    root.title("Cat-Nip")
-    root.geometry("800x600")
-    root.state("zoomed")
+    app = ctk.CTk()
+    app.title("Cat-Nip")
+    app.geometry("800x600")
+    app.after(0, lambda: app.state('zoomed')) 
 
     # App icon
     Icon = ctk.CTkImage(Image.open("assets/catnipico.png"), size=(600, 500))
-    img_label = ctk.CTkLabel(root, image=Icon, text="")
 
     # Main container
-    container = ctk.CTkFrame(root)
+    container = ctk.CTkFrame(app)
     container.pack(fill="both", expand=True)
 
     container.grid_rowconfigure(0, weight=1)
@@ -34,16 +33,12 @@ def main():
     main_frame.grid_rowconfigure(0, weight=1)
 
     left_frame = ctk.CTkFrame(main_frame, fg_color="#ffde59", width=600, height=600)
-    left_frame.grid(row=0, column=0, sticky="nsew", pady=30)
+    left_frame.grid(row=0, column=0, sticky="nsew", padx=30, pady=30)
 
-    right_frame = ctk.CTkFrame(main_frame, fg_color="#ffe683", width=400, height=600)
-    right_frame.grid(row=0, column=1, sticky="nsew", pady=30)
+    right_frame = ctk.CTkFrame(main_frame, fg_color="#ffe683", width=100, height=600)
+    right_frame.grid(row=0, column=1, sticky="nsew", padx=30, pady=30)
 
-    # Keep image reference
-    Icon = Image.open("assets/catnipico.png")
-    Icon = Icon.resize((600, 500))
-    Icon = ImageTk.PhotoImage(Icon)
-    img_label = ctk.CTkLabel(left_frame, image=Icon, fg_color="#ffde59")
+    img_label = ctk.CTkLabel(left_frame, text="",image=Icon, fg_color="#ffde59")
     img_label.image = Icon
     img_label.place(x=80, y=160)
 
@@ -79,6 +74,7 @@ def main():
         lframe, text="User",
         variable=ch, value="user",
         fg_color="#f9b746",
+        text_color="black",
         font=("Arial", 24, "bold")
     ).place(x=250, y=200)
 
@@ -86,6 +82,7 @@ def main():
         lframe, text="Employee",
         variable=ch, value="employee",
         fg_color="#f9b746",
+        text_color="black",
         font=("Arial", 24, "bold")
     ).place(x=250, y=300)
 
@@ -93,6 +90,7 @@ def main():
         lframe, text="Admin",
         variable=ch, value="admin",
         fg_color="#f9b746",
+        text_color="black",
         font=("Arial", 24, "bold")
     ).place(x=250, y=400)
 
@@ -131,9 +129,8 @@ def main():
         login,
         text="Back",
         command=lambda: show_frame(main_frame),
-        fg_color="tomato",
-        font=("Arial", 16, "bold"),
-        
+        fg_color="green",
+        font=("Arial", 16, "bold")
     ).place(x=30,y=30)
 
 
@@ -240,7 +237,7 @@ def main():
     # Start on home
     show_frame(main_frame)
 
-    root.mainloop()
+    app.mainloop()
 
 
 if __name__ == "__main__":
