@@ -150,40 +150,40 @@ def main():
     )
     scrollable_frame.grid(row=0,column=0,sticky="nsew")
     ctk.CTkLabel(
-    scrollable_frame,
-    text="User Registration",
-    font=("Arial",56,"bold")
+        scrollable_frame,
+        text="User Registration",
+        font=("Arial",56,"bold")
     ).pack(pady=40)
 
-    ctk.CTkLabel(scrollable_frame, text="Username:").pack(pady=5)
+    ctk.CTkLabel(scrollable_frame, text="Username:", text_color="black").pack(pady=5)
     register_uname_entry = ctk.CTkEntry(scrollable_frame)
     register_uname_entry.pack(pady=5)
 
-    ctk.CTkLabel(scrollable_frame, text="Password:").pack(pady=5)
+    ctk.CTkLabel(scrollable_frame, text="Password:", text_color="black").pack(pady=5)
     register_pwd_entry = ctk.CTkEntry(scrollable_frame, show="*")
     register_pwd_entry.pack(pady=5)
 
-    ctk.CTkLabel(scrollable_frame,text="Confirm Password:").pack(pady=5)
+    ctk.CTkLabel(scrollable_frame,text="Confirm Password:", text_color="black").pack(pady=5)
     confirm_entry = ctk.CTkEntry(scrollable_frame,show="*")
     confirm_entry.pack(pady=5)
 
-    ctk.CTkLabel(scrollable_frame,text="Email:").pack(pady=5)
+    ctk.CTkLabel(scrollable_frame,text="Email:", text_color="black").pack(pady=5)
     email_entry = ctk.CTkEntry(scrollable_frame)
     email_entry.pack(pady=5)
 
-    ctk.CTkLabel(scrollable_frame,text="Phone:").pack(pady=5)
+    ctk.CTkLabel(scrollable_frame,text="Phone:", text_color="black").pack(pady=5)
     phone_entry = ctk.CTkEntry(scrollable_frame)
     phone_entry.pack(pady=5)
 
-    ctk.CTkLabel(scrollable_frame,text="Address:").pack(pady=5)
+    ctk.CTkLabel(scrollable_frame,text="Address:", text_color="black").pack(pady=5)
     address_entry = ctk.CTkEntry(scrollable_frame)
     address_entry.pack(pady=5)
 
-    ctk.CTkLabel(scrollable_frame,text="Date of Birth:").pack(pady=5)
+    ctk.CTkLabel(scrollable_frame,text="Date of Birth:", text_color="black").pack(pady=5)
     dob_entry = ctk.CTkEntry(scrollable_frame)
     dob_entry.pack(pady=5)
 
-    ctk.CTkLabel(scrollable_frame,text="Gender:").pack(pady=5)
+    ctk.CTkLabel(scrollable_frame,text="Gender:", text_color="black").pack(pady=5)
     gender_entry = ctk.CTkEntry(scrollable_frame)
     gender_entry.pack(pady=5)
 
@@ -191,7 +191,8 @@ def main():
         scrollable_frame,
         text="Register ",
         font=("Arial",24),
-        fg_color="#b3e6d8"
+        fg_color="#b3e6d8",
+        text_color="black"
     ).place(x=100,y=50)
 
     def reg_submit():
