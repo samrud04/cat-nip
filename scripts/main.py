@@ -40,7 +40,7 @@ def main():
 
     img_label = ctk.CTkLabel(left_frame, text="",image=Icon, fg_color="#ffde59")
     img_label.image = Icon
-    img_label.place(x=80, y=160)
+    img_label.place(x=130, y=160)
 
     ctk.CTkLabel(
         left_frame,
@@ -65,7 +65,7 @@ def main():
     login_rframe = ctk.CTkFrame(login, fg_color="#ffea00", width=100, height=600)
     login_rframe.grid(row=0, column=1, sticky="nsew",padx=40, pady=40)
 
-    ctk.CTkLabel(login_lframe, text="Cat-Nip", fg_color="#ffde59", font=("Arial", 54, "bold")).pack(pady=10)
+    ctk.CTkLabel(login_lframe, text="Cat-Nip", fg_color="#ffde59", text_color="black", font=("Arial", 54, "bold")).pack(pady=10)
 
     # User type radio buttons
     loginch = ctk.StringVar()
@@ -95,11 +95,11 @@ def main():
     ).place(x=250, y=400)
 
     # Login fields
-    ctk.CTkLabel(login_rframe, text="Username:", fg_color="#ffea00", font=("Arial", 16, "bold")).place(x=150, y=180)
+    ctk.CTkLabel(login_rframe, text="Username:",text_color="black", fg_color="#ffea00", font=("Arial", 16, "bold")).place(x=150, y=180)
     login_uname_entry = ctk.CTkEntry(login_rframe, width=150)
     login_uname_entry.place(x=250, y=180)
 
-    ctk.CTkLabel(login_rframe, text="Password:", fg_color="#ffea00", font=("Arial", 16, "bold")).place(x=150, y=260)
+    ctk.CTkLabel(login_rframe, text="Password:",text_color="black", fg_color="#ffea00", font=("Arial", 16, "bold")).place(x=150, y=260)
     login_pwd_entry = ctk.CTkEntry(login_rframe, show="*", width=150)
     login_pwd_entry.place(x=250, y=260)
 
@@ -121,6 +121,7 @@ def main():
         command=log_submit,
         fg_color="#7ed957",
         text_color="black",
+        hover_color="#99D980",
         font=("Arial", 16, "bold"),
         
     ).place(x=200, y=350)   
@@ -129,9 +130,14 @@ def main():
         login,
         text="Back",
         command=lambda: show_frame(main_frame),
-        fg_color="green",
+        width=100,
+        height=40,
+        fg_color="tomato",
+        text_color="black",
+        hover_color="#FC846F",
+        bg_color="#ffde59",
         font=("Arial", 16, "bold")
-    ).place(x=30,y=30)
+    ).place(x=50,y=50)
 
 
     
@@ -148,7 +154,8 @@ def main():
     ctk.CTkLabel(
         register_frame,
         text="User Registration",
-        font=("Arial",56,"bold")
+        font=("Arial",56,"bold"),
+        text_color="black"
     ).place(x=350,y=50)
 
     ctk.CTkLabel(register_frame, text="Username:", text_color="black").place(x=100,y=150)
@@ -214,14 +221,25 @@ def main():
     ctk.CTkButton(
         register_frame,
         text="Submit",
-        command=reg_submit,fg_color="#7ed957",font=("Arial", 16, "bold")    
+        command=reg_submit,
+        text_color="black",
+        fg_color="#7ed957",
+        hover_color="#99D980",
+        font=("Arial", 16, "bold")    
     ).place(x=450,y=400)
 
     ctk.CTkButton(
         register_frame,
         text="Back",
-        command=lambda: show_frame(main_frame)
-    ).place(x=10,y=10)
+        command=lambda: show_frame(main_frame),
+        width=100,
+        height=40,
+        fg_color="tomato",
+        text_color="black",
+        hover_color="#FC846F",
+        bg_color="#ffea00",
+        font=("Arial", 16, "bold")
+    ).place(x=50,y=50)
 
     # Home buttons               - WHY ARE THESE HERE?
     ctk.CTkButton(
@@ -230,6 +248,8 @@ def main():
         width=200,
         height=70,
         fg_color="#f9b746",
+        hover_color="#FCCD77",
+        text_color="black",
         command=lambda: show_frame(login)
     ).place(x=200,y=150)
 
@@ -239,6 +259,8 @@ def main():
         width=200,
         height=70,
         fg_color="#f9b746",
+        hover_color="#FCCD77",
+        text_color="black",
         command=lambda: show_frame(register_frame)
     ).place(x=200,y=300)
 
