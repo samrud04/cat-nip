@@ -6,7 +6,8 @@ def connect():
         host="localhost",
         user="root",
         password="admin",
-        database="catnip"
+        database="catnip",
+        auth_plugin="mysql_native_password"
     )
     cur = con.cursor()
     return con, cur
