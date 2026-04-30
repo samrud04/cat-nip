@@ -203,18 +203,20 @@ def main():
         pwd_check = password != confirm
         email_check = re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email) is None
         phone_check = re.match(r'^[6-9]\d{9}$', phone) is None
-        if pwd_check:
-            ctk.CTkLabel(register_frame, text="Passwords do not match!", fg_color="#b3e6d8").place(x=100,y=280)
+        if not username or not password or not confirm or not email or not phone or not address or not gender or not dob:
+            ctk.CTkLabel(register_frame, text="Please fill all fields!", text_color="red", fg_color="#ffde59").place(x=840,y=460)
+        elif pwd_check:
+            ctk.CTkLabel(register_frame, text="Passwords do not match!", text_color="red", fg_color="#ffde59").place(x=100,y=280)
         elif email_check:
-            ctk.CTkLabel(register_frame, text="Invalid email!", fg_color="#b3e6d8").place(x=100,y=280)
-        elif phone_check:
-            ctk.CTkLabel(register_frame, text="Invalid phone number!", fg_color="#b3e6d8").place(x=100,y=280)
+            ctk.CTkLabel(register_frame, text="Invalid email!", text_color="red", fg_color="#ffde59").place(x=100,y=280)
+        elif phone_check:   
+            ctk.CTkLabel(register_frame, text="Invalid phone number!", text_color="red", fg_color="#ffde59").place(x=100,y=280)
         else:
             registered = db.register(username, password, email, phone, address, gender, dob)
             if registered:
-                ctk.CTkLabel(register_frame, text="Registered!", fg_color="#b3e6d8").place(x=100,y=280)
+                ctk.CTkLabel(register_frame, text="Registered!", text_color="green", fg_color="#ffde59").place(x=100,y=280)
             else:
-                ctk.CTkLabel(register_frame, text="Username already exists!", fg_color="#b3e6d8").place(x=100,y=280)
+                ctk.CTkLabel(register_frame, text="Username already exists!", text_color="red", fg_color="#ffde59").place(x=100,y=280)
 
     ctk.CTkButton(
         register_frame,
