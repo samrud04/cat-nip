@@ -32,23 +32,23 @@ def main():
     main_frame.grid_columnconfigure(1, weight=1)
     main_frame.grid_rowconfigure(0, weight=1)
 
-    left_frame = ctk.CTkFrame(main_frame, fg_color="#ffde59", width=600, height=600)
-    left_frame.grid(row=0, column=0, sticky="nsew", padx=30, pady=30)
+    left_frame = ctk.CTkFrame(main_frame, fg_color="#ffde59", width=300, height=300)
+    left_frame.grid(row=0, column=0, sticky="nsew", padx=40, pady=40)
 
-    right_frame = ctk.CTkFrame(main_frame, fg_color="#ffffff", width=100, height=600)
-    right_frame.grid(row=0, column=1, sticky="nsew", padx=30, pady=30)
+    right_frame = ctk.CTkFrame(main_frame, fg_color="#ffffff", width=200, height=300)
+    right_frame.grid(row=0, column=1, sticky="nsew", padx=40, pady=40)
 
     img_label = ctk.CTkLabel(left_frame, text="",image=Icon, fg_color="#ffde59")
     img_label.image = Icon
-    img_label.place(x=130, y=160)
+    img_label.place(x=120, y=230)
 
     ctk.CTkLabel(
         left_frame,
         text="Cat-Nip",
         text_color="black",
         fg_color="#ffde59",
-        font=("Arial", 54, "bold")
-    ).pack(pady=40)
+        font=("Arial", 84, "bold")
+    ).place(x=210, y=100)
 
 
     # ---------------- LOGIN SCREEN ----------------
@@ -59,13 +59,13 @@ def main():
     login.grid_columnconfigure(1, weight=1)
     login.grid_rowconfigure(0, weight=1)
 
-    login_lframe = ctk.CTkFrame(login, fg_color="#ffde59",width=400, height=300)
+    login_lframe = ctk.CTkFrame(login, fg_color="#ffde59",width=200, height=300)
     login_lframe.grid(row=0, column=0, sticky="nsew",padx=40, pady=40)
 
-    login_rframe = ctk.CTkFrame(login, fg_color="#ffea00", width=100, height=600)
+    login_rframe = ctk.CTkFrame(login, fg_color="#ffe683", width=300, height=600)
     login_rframe.grid(row=0, column=1, sticky="nsew",padx=40, pady=40)
 
-    ctk.CTkLabel(login_lframe, text="Cat-Nip", fg_color="#ffde59", text_color="black", font=("Arial", 54, "bold")).pack(pady=10)
+    ctk.CTkLabel(login_lframe, text="Login", fg_color="#ffde59", text_color="black", font=("Arial", 64, "bold")).place(x=220, y=100)
 
     # User type radio buttons
     loginch = ctk.StringVar()
@@ -76,7 +76,7 @@ def main():
         fg_color="#f9b746",
         text_color="black",
         font=("Arial", 24, "bold")
-    ).place(x=250, y=200)
+    ).place(x=250, y=250)
 
     ctk.CTkRadioButton(
         login_lframe, text="Employee",
@@ -84,7 +84,7 @@ def main():
         fg_color="#f9b746",
         text_color="black",
         font=("Arial", 24, "bold")
-    ).place(x=250, y=300)
+    ).place(x=250, y=350)
 
     ctk.CTkRadioButton(
         login_lframe, text="Admin",
@@ -92,16 +92,16 @@ def main():
         fg_color="#f9b746",
         text_color="black",
         font=("Arial", 24, "bold")
-    ).place(x=250, y=400)
+    ).place(x=250, y=450)
 
     # Login fields
-    ctk.CTkLabel(login_rframe, text="Username:",text_color="black", fg_color="#ffea00", font=("Arial", 16, "bold")).place(x=150, y=180)
+    ctk.CTkLabel(login_rframe, text="Username:",text_color="black", fg_color="#ffe683", font=("Arial", 34, "bold")).place(x=180, y=250)
     login_uname_entry = ctk.CTkEntry(login_rframe, width=150)
-    login_uname_entry.place(x=250, y=180)
+    login_uname_entry.place(x=420, y=257)
 
-    ctk.CTkLabel(login_rframe, text="Password:",text_color="black", fg_color="#ffea00", font=("Arial", 16, "bold")).place(x=150, y=260)
+    ctk.CTkLabel(login_rframe, text="Password:",text_color="black", fg_color="#ffe683", font=("Arial", 34, "bold")).place(x=180, y=320)
     login_pwd_entry = ctk.CTkEntry(login_rframe, show="*", width=150)
-    login_pwd_entry.place(x=250, y=260)
+    login_pwd_entry.place(x=420, y=327)
 
     def log_submit():
         username = login_uname_entry.get()
@@ -122,9 +122,8 @@ def main():
         fg_color="#7ed957",
         text_color="black",
         hover_color="#99D980",
-        font=("Arial", 16, "bold"),
-        
-    ).place(x=200, y=350)   
+        font=("Arial", 16, "bold")
+    ).place(x=280, y=400)   
 
     ctk.CTkButton(
         login,
@@ -137,59 +136,58 @@ def main():
         hover_color="#FC846F",
         bg_color="#ffde59",
         font=("Arial", 16, "bold")
-    ).place(x=50,y=50)
+    ).place(x=80,y=80)
 
 
     
     
     # ---------------- REGISTER SCREEN ----------------
 
-    register_frame = ctk.CTkFrame(container, fg_color="#ffea00", width=800, height=600)
-    register_frame.grid(row=0, column=0, sticky="nsew")
+    register_frame = ctk.CTkFrame(container, fg_color="#ffde59", bg_color="white", width=800, height=600)
+    register_frame.grid(row=0, column=0, sticky="nsew",padx=40, pady=40)
     register_frame.grid_rowconfigure(0, weight=1)
     register_frame.grid_columnconfigure(0, weight=1)
 
 
-    
     ctk.CTkLabel(
         register_frame,
         text="User Registration",
         font=("Arial",56,"bold"),
         text_color="black"
-    ).place(x=350,y=50)
+    ).place(x=800,y=80)
 
-    ctk.CTkLabel(register_frame, text="Username:", text_color="black").place(x=100,y=150)
-    register_uname_entry = ctk.CTkEntry(register_frame)
-    register_uname_entry.place(x=250,y=150)
+    ctk.CTkLabel(register_frame, text="Username:", text_color="black",font=("Arial",29)).place(x=200,y=150)
+    register_uname_entry = ctk.CTkEntry(register_frame, width=250)
+    register_uname_entry.place(x=370,y=153)
 
-    ctk.CTkLabel(register_frame, text="Password:", text_color="black").place(x=100,y=200)
-    register_pwd_entry = ctk.CTkEntry(register_frame, show="*")
-    register_pwd_entry.place(x=250,y=200)
+    ctk.CTkLabel(register_frame, text="Password:", text_color="black",font=("Arial",29)).place(x=200,y=230)
+    register_pwd_entry = ctk.CTkEntry(register_frame, show="*", width=250)
+    register_pwd_entry.place(x=370,y=233)
 
-    ctk.CTkLabel(register_frame,text="Confirm Password:", text_color="black").place(x=400,y=200)
-    confirm_entry = ctk.CTkEntry(register_frame,show="*")
-    confirm_entry.place(x=450,y=200)
+    ctk.CTkLabel(register_frame,text="Confirm Password:", text_color="black",font=("Arial",29)).place(x=670,y=230)
+    confirm_entry = ctk.CTkEntry(register_frame,show="*", width=250)
+    confirm_entry.place(x=920,y=233)
 
-    ctk.CTkLabel(register_frame,text="Email:", text_color="black").place(x=100,y=250)
-    email_entry = ctk.CTkEntry(register_frame)
-    email_entry.place(x=250,y=250)
+    ctk.CTkLabel(register_frame,text="Email:", text_color="black",font=("Arial",29)).place(x=200,y=310)
+    email_entry = ctk.CTkEntry(register_frame, width=250)
+    email_entry.place(x=370,y=313)
 
-    ctk.CTkLabel(register_frame,text="Phone:", text_color="black").place(x=400,y=250)
-    phone_entry = ctk.CTkEntry(register_frame)
-    phone_entry.place(x=450,y=250)
+    ctk.CTkLabel(register_frame,text="Phone:", text_color="black",font=("Arial",29)).place(x=670,y=310)
+    phone_entry = ctk.CTkEntry(register_frame, width=100)
+    phone_entry.place(x=780,y=313)
 
-    ctk.CTkLabel(register_frame,text="Address:", text_color="black").place(x=100,y=300)
-    address_entry = ctk.CTkEntry(register_frame, width=400)
-    address_entry.place(x=250,y=300)
+    ctk.CTkLabel(register_frame,text="Address:", text_color="black",font=("Arial",29)).place(x=200,y=390)
+    address_entry = ctk.CTkEntry(register_frame, width=800)
+    address_entry.place(x=370,y=393)
 
-    ctk.CTkLabel(register_frame,text="Date of Birth:", text_color="black").place(x=100,y=350)
-    dob_entry = ctk.CTkEntry(register_frame)
-    dob_entry.place(x=250,y=350)
-    ctk.CTkLabel(register_frame,text="(YYYY-MM-DD)", text_color="black").place(x=400,y=350)
+    ctk.CTkLabel(register_frame,text="Date of Birth:", text_color="black",font=("Arial",29)).place(x=200,y=470)
+    dob_entry = ctk.CTkEntry(register_frame, width=80)
+    dob_entry.place(x=370,y=473)
+    ctk.CTkLabel(register_frame,text="(YYYY-MM-DD)", text_color="black",font=("Arial",22)).place(x=200,y=510)
 
-    ctk.CTkLabel(register_frame,text="Gender:", text_color="black").place(x=100,y=400)
-    gender_entry = ctk.CTkEntry(register_frame)
-    gender_entry.place(x=250,y=400)
+    ctk.CTkLabel(register_frame,text="Gender:", text_color="black",font=("Arial",29)).place(x=200,y=570)
+    gender_entry = ctk.CTkEntry(register_frame, width=250)
+    gender_entry.place(x=370,y=573)
 
     
 
@@ -225,8 +223,10 @@ def main():
         text_color="black",
         fg_color="#7ed957",
         hover_color="#99D980",
-        font=("Arial", 16, "bold")    
-    ).place(x=450,y=400)
+        width=200,
+        height=40,
+        font=("Arial", 26, "bold")    
+    ).place(x=800,y=500)
 
     ctk.CTkButton(
         register_frame,
@@ -245,24 +245,26 @@ def main():
     ctk.CTkButton(
         right_frame,
         text="Login",
-        width=200,
-        height=70,
-        fg_color="#f9b746",
+        width=300,
+        height=80,
+        fg_color="#fbe58c",
         hover_color="#FCCD77",
         text_color="black",
+        font=("Arial", 41),
         command=lambda: show_frame(login)
-    ).place(x=200,y=150)
+    ).place(x=150,y=200)
 
     ctk.CTkButton(
         right_frame,
         text="Register",
-        width=200,
-        height=70,
-        fg_color="#f9b746",
+        width=300,
+        height=80,
+        fg_color="#fbe58c",
         hover_color="#FCCD77",
         text_color="black",
+        font=("Arial", 41),
         command=lambda: show_frame(register_frame)
-    ).place(x=200,y=300)
+    ).place(x=150,y=350)
 
     # Start on home
     show_frame(main_frame)
