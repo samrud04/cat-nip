@@ -117,6 +117,7 @@ def main():
                 ctk.CTkLabel(login_rframe, text="Logged in!", text_color="black", fg_color="#ffe683").pack(pady=5)
             else:
                 ctk.CTkLabel(login_rframe, text="Invalid credentials!", text_color="black", fg_color="#ffe683").pack(pady=5)
+            
 
     ctk.CTkButton(
         login_rframe,
@@ -140,6 +141,19 @@ def main():
         bg_color="#ffde59",
         font=("Arial", 16, "bold")
     ).place(x=80,y=80)
+
+    ctk.CTkButton(
+        login_rframe,  
+        text="user screen",
+        command=lambda: show_frame(user_screen),
+        width=150,
+        height=40,
+        fg_color="#7ed957",
+        text_color="black",
+        hover_color="#99D980",
+        font=("Arial", 16, "bold")
+    ).place(x=280, y=450)
+
 
 
     
@@ -273,8 +287,48 @@ def main():
         command=lambda: show_frame(register_frame)
     ).place(x=150,y=370)
 
+    
+
+    #--------user scrn----------------
+    user_screen = ctk.CTkFrame(container, fg_color="white", width=800, height=600)
+    user_screen.grid(row=0, column=0, sticky="nsew")   
+    user_screen.grid_rowconfigure(0, weight=1)
+    user_screen.grid_columnconfigure(0, weight=1)
+
+    ctk.CTkButton(
+        user_screen,
+        text="Back",
+        command=lambda: show_frame(login),
+        width=100,
+        height=40,
+        fg_color="tomato",
+        text_color="black",
+        hover_color="#FC846F",
+        bg_color="#ffea00",
+        font=("Arial", 16, "bold")
+    ).place(x=50,y=50)
+
+    ctk.CTkLabel(
+        user_screen,
+        text="Welcome, User!",
+        font=("Arial", 56, "bold"),
+        text_color="black",
+        fg_color="white"
+    ).place(x=400, y=100, anchor="center")
+    ctk.CTkLabel(
+        user_screen,
+        text="This is the user screen.",
+        font=("Arial", 24),
+        text_color="black",
+        fg_color="white"
+    ).place(x=400, y=200, anchor="center")
+
+
+
     # Start on home
     show_frame(main_frame)
+
+
     
     app.mainloop()
 
