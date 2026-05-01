@@ -108,12 +108,14 @@ def main():
         password = login_pwd_entry.get()
         user_type = loginch.get()
         if not username or not password or not user_type:
-            ctk.CTkLabel(login_rframe, text="Please fill all fields!", fg_color="#DCE9DC").pack(pady=5)
+            ctk.CTkLabel(login_rframe, text="Please fill all fields!", text_color="black", fg_color="#ffe683").pack(pady=5)
             return
         else:
             logged_In = db.login(user_type, username, password)
             if logged_In:
-                ctk.CTkLabel(login_rframe, text="Logged in!", fg_color="#DCE9DC").pack(pady=5)
+                ctk.CTkLabel(login_rframe, text="Logged in!", text_color="black", fg_color="#ffe683").pack(pady=5)
+            else:
+                ctk.CTkLabel(login_rframe, text="Invalid credentials!", text_color="black", fg_color="#ffe683").pack(pady=5)
 
     ctk.CTkButton(
         login_rframe,
@@ -254,7 +256,7 @@ def main():
         text_color="black",
         font=("Arial", 41),
         command=lambda: show_frame(login)
-    ).place(x=150,y=200)
+    ).place(x=150,y=220)
 
     ctk.CTkButton(
         right_frame,
@@ -266,7 +268,7 @@ def main():
         text_color="black",
         font=("Arial", 41),
         command=lambda: show_frame(register_frame)
-    ).place(x=150,y=350)
+    ).place(x=150,y=370)
 
     # Start on home
     show_frame(main_frame)
