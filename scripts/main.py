@@ -1,5 +1,6 @@
 from turtle import color
 import customtkinter as ctk
+import tkinter as tk
 import db
 import re
 from PIL import Image, ImageTk
@@ -109,15 +110,14 @@ def main():
         password = login_pwd_entry.get()
         user_type = loginch.get()
         if not username or not password or not user_type:
-            ctk.CTkLabel(login_rframe, text="Please fill all fields!", text_color="black", fg_color="#ffe683").pack(pady=5)
+            tk.messagebox.showerror("Error", "Please fill all fields!")
             return
         else:
             logged_In = db.login(user_type, username, password)
             if logged_In:
-                ctk.CTkLabel(login_rframe, text="Logged in!", text_color="black", fg_color="#ffe683").pack(pady=5)
+                tk.messagebox.showinfo("Login Successful", f"Welcome, {username}!")
             else:
-                ctk.CTkLabel(login_rframe, text="Invalid credentials!", text_color="black", fg_color="#ffe683").pack(pady=5)
-            
+                tk.messagebox.showerror("Error", "Invalid credentials!")
 
     ctk.CTkButton(
         login_rframe,
@@ -222,20 +222,20 @@ def main():
         email_check = re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email) is None
         phone_check = re.match(r'^[6-9]\d{9}$', phone) is None
         if not username or not password or not confirm or not email or not phone or not address or not gender or not dob:
-            textbox.insert("end", "Please fill all fields!\n")
+            tk.messagebox.showerror("Error", "Please fill all fields!")
         elif pwd_check:
-            textbox.insert("0.0", "Passwords do not match!\n")
+            tk.messagebox.showerror("Error", "Passwords do not match!")
         elif email_check:
             textbox.insert("0.0", "Invalid email!\n")
         elif phone_check:   
-            textbox.insert("0.0", "Invalid phone number!\n")
+            tk.messagebox.showerror("Error", "Invalid phone number! Must be 10 digits starting with 6-9.")
         else:
             registered = db.register(username, password, email, phone, address, gender, dob)
             if registered:
-                textbox.insert("0.0", "Registered!\n")
+                tk.messagebox.showinfo("Success", "Registration successful! You can now log in.")
             else:
-                textbox.insert("0.0", "Username already exists!\n")
-        textbox.place(x=200,y=500)
+                tk.messagebox.showerror("Error", "Username already exists! Please choose a different one.")
+        
 
     ctk.CTkButton(
         register_frame,
