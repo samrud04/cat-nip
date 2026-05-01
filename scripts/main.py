@@ -1,3 +1,4 @@
+from turtle import color
 import customtkinter as ctk
 import db
 import re
@@ -191,9 +192,10 @@ def main():
     gender_entry = ctk.CTkEntry(register_frame, width=250)
     gender_entry.place(x=370,y=573)
 
-    
+    textbox = ctk.CTkTextbox(register_frame, width=200, height=50, text_color="tomato", fg_color="white", border_color="tomato")
 
     def reg_submit():
+        textbox.delete("0.0", "end")
         username = register_uname_entry.get()
         password = register_pwd_entry.get()
         confirm = confirm_entry.get()
@@ -206,19 +208,20 @@ def main():
         email_check = re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email) is None
         phone_check = re.match(r'^[6-9]\d{9}$', phone) is None
         if not username or not password or not confirm or not email or not phone or not address or not gender or not dob:
-            ctk.CTkLabel(register_frame, text="Please fill all fields!", text_color="red", fg_color="#ffde59").place(x=840,y=460)
+            textbox.insert("end", "Please fill all fields!\n")
         elif pwd_check:
-            ctk.CTkLabel(register_frame, text="Passwords do not match!", text_color="red", fg_color="#ffde59").place(x=100,y=280)
+            textbox.insert("0.0", "Passwords do not match!\n")
         elif email_check:
-            ctk.CTkLabel(register_frame, text="Invalid email!", text_color="red", fg_color="#ffde59").place(x=100,y=280)
+            textbox.insert("0.0", "Invalid email!\n")
         elif phone_check:   
-            ctk.CTkLabel(register_frame, text="Invalid phone number!", text_color="red", fg_color="#ffde59").place(x=100,y=280)
+            textbox.insert("0.0", "Invalid phone number!\n")
         else:
             registered = db.register(username, password, email, phone, address, gender, dob)
             if registered:
-                ctk.CTkLabel(register_frame, text="Registered!", text_color="green", fg_color="#ffde59").place(x=100,y=280)
+                textbox.insert("0.0", "Registered!\n")
             else:
-                ctk.CTkLabel(register_frame, text="Username already exists!", text_color="red", fg_color="#ffde59").place(x=100,y=280)
+                textbox.insert("0.0", "Username already exists!\n")
+        textbox.place(x=200,y=500)
 
     ctk.CTkButton(
         register_frame,
@@ -273,8 +276,6 @@ def main():
     # Start on home
     show_frame(main_frame)
     
-    
-
     app.mainloop()
 
 
