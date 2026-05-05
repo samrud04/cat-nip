@@ -62,10 +62,10 @@ def main():
     login.grid_rowconfigure(0, weight=1)
 
     login_lframe = ctk.CTkFrame(login, fg_color="#ffde59",width=200, height=300)
-    login_lframe.grid(row=0, column=0, sticky="nsew",padx=40, pady=40)
+    login_lframe.grid(row=0, column=0, sticky="nsew",padx=(40,40), pady=40)
 
     login_rframe = ctk.CTkFrame(login, fg_color="#ffe683", width=300, height=600)
-    login_rframe.grid(row=0, column=1, sticky="nsew",padx=40, pady=40)
+    login_rframe.grid(row=0, column=1, sticky="nsew",padx=(0,40), pady=40)
 
     ctk.CTkLabel(login_lframe, text="Login", fg_color="#ffde59", text_color="black", font=("Arial", 64, "bold")).place(x=220, y=100)
 
@@ -115,7 +115,7 @@ def main():
         else:
             logged_In = db.login(user_type, username, password)
             if logged_In:
-                tk.messagebox.showinfo("Login Successful", f"Welcome, {username}!")
+                show_frame(user_screen)
             else:
                 tk.messagebox.showerror("Error", "Invalid credentials!")
 
@@ -289,11 +289,21 @@ def main():
 
     
 
-    #--------user scrn----------------
+    #----------------user screen----------------
     user_screen = ctk.CTkFrame(container, fg_color="white", width=800, height=600)
     user_screen.grid(row=0, column=0, sticky="nsew")   
     user_screen.grid_rowconfigure(0, weight=1)
     user_screen.grid_columnconfigure(0, weight=1)
+
+    user_screen_main = ctk.CTkFrame(user_screen, fg_color="#feefb5", width=800, height=450, corner_radius=20)
+    user_screen_main.grid(row=0, column=0, sticky="nsew", padx=(30, 30), pady=(30, 20))   
+    user_screen_main.grid_rowconfigure(0, weight=1)
+    user_screen_main.grid_columnconfigure(0, weight=1)
+
+    user_screen_nav = ctk.CTkFrame(user_screen, fg_color="#fbe58c", width=800, height=150, corner_radius=20)
+    user_screen_nav.grid(row=1, column=0, sticky="nsew", padx=(30, 30), pady=(0, 30))   
+    user_screen_nav.grid_rowconfigure(0, weight=1)
+    user_screen_nav.grid_columnconfigure(0, weight=1)
 
     ctk.CTkButton(
         user_screen,
@@ -308,22 +318,56 @@ def main():
         font=("Arial", 16, "bold")
     ).place(x=50,y=50)
 
-    ctk.CTkLabel(
-        user_screen,
-        text="Welcome, User!",
-        font=("Arial", 56, "bold"),
-        text_color="black",
-        fg_color="white"
-    ).place(x=400, y=100, anchor="center")
-    ctk.CTkLabel(
-        user_screen,
-        text="This is the user screen.",
-        font=("Arial", 24),
-        text_color="black",
-        fg_color="white"
-    ).place(x=400, y=200, anchor="center")
+    order_icon = ctk.CTkImage(Image.open("./assets/order_icon.png"), size=(20, 20))
 
+    order_button = ctk.CTkButton(
+        user_screen_nav,
+        text=" Order",
+        image=order_icon,
+        compound="left",
+        font=("Arial", 16, "bold"),
+        corner_radius=12,
+        fg_color="#f9b746", 
+        text_color="black",
+        hover_color="#e0a73d",
+        width=220,
+        height=50
+    )
+    order_button.grid(row=0, column=0,sticky="w", padx=60, pady=10)
 
+    book_icon = ctk.CTkImage(Image.open("./assets/book_icon.png"), size=(20, 20))
+
+    book_button = ctk.CTkButton(
+        user_screen_nav,
+        text=" Book",
+        image=book_icon,
+        compound="left",
+        font=("Arial", 16, "bold"),
+        corner_radius=12,
+        fg_color="#f9b746", 
+        text_color="black",
+        hover_color="#e0a73d",
+        width=220,
+        height=50
+    )
+    book_button.grid(row=0, column=1,sticky="w", padx=10, pady=10)
+
+    settings_icon = ctk.CTkImage(Image.open("./assets/settings_icon.png"), size=(20, 20))
+
+    settings_button = ctk.CTkButton(
+        user_screen_nav,
+        text=" Settings",
+        image=settings_icon,
+        compound="left",
+        font=("Arial", 16, "bold"),
+        corner_radius=12,
+        fg_color="#f9b746", 
+        text_color="black",
+        hover_color="#e0a73d",
+        width=220,
+        height=50
+    )
+    settings_button.grid(row=0, column=2,sticky="w", padx=60, pady=10)
 
     # Start on home
     show_frame(main_frame)
