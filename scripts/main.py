@@ -61,13 +61,13 @@ def main():
     login.grid_columnconfigure(1, weight=1)
     login.grid_rowconfigure(0, weight=1)
 
-    login_lframe = ctk.CTkFrame(login, fg_color="#ffde59",width=200, height=300)
+    login_lframe = ctk.CTkFrame(login, fg_color="#ffe683",width=200, height=300)
     login_lframe.grid(row=0, column=0, sticky="nsew",padx=(40,40), pady=40)
 
-    login_rframe = ctk.CTkFrame(login, fg_color="#ffe683", width=300, height=600)
+    login_rframe = ctk.CTkFrame(login, fg_color="#feefb5", width=300, height=600)
     login_rframe.grid(row=0, column=1, sticky="nsew",padx=(0,40), pady=40)
 
-    ctk.CTkLabel(login_lframe, text="Login", fg_color="#ffde59", text_color="black", font=("Arial", 64, "bold")).place(x=220, y=100)
+    ctk.CTkLabel(login_lframe, text="Login", fg_color="#ffe683", text_color="black", font=("Arial", 64, "bold")).place(x=220, y=100)
 
     # User type radio buttons
     loginch = ctk.StringVar()
@@ -75,7 +75,7 @@ def main():
     ctk.CTkRadioButton(
         login_lframe, text="User",
         variable=loginch, value="user",
-        fg_color="#f9b746",
+        fg_color="light blue",
         text_color="black",
         font=("Arial", 24, "bold")
     ).place(x=250, y=250)
@@ -83,7 +83,7 @@ def main():
     ctk.CTkRadioButton(
         login_lframe, text="Employee",
         variable=loginch, value="employee",
-        fg_color="#f9b746",
+        fg_color="light blue",
         text_color="black",
         font=("Arial", 24, "bold")
     ).place(x=250, y=350)
@@ -91,18 +91,18 @@ def main():
     ctk.CTkRadioButton(
         login_lframe, text="Admin",
         variable=loginch, value="admin",
-        fg_color="#f9b746",
+        fg_color="light blue",
         text_color="black",
         font=("Arial", 24, "bold")
     ).place(x=250, y=450)
 
     # Login fields
-    ctk.CTkLabel(login_rframe, text="Username:",text_color="black", fg_color="#ffe683", font=("Arial", 34, "bold")).place(x=180, y=250)
-    login_uname_entry = ctk.CTkEntry(login_rframe, width=150)
+    ctk.CTkLabel(login_rframe, text="Username:",text_color="black", fg_color="#feefb5", font=("Arial", 34, "bold")).place(x=180, y=250)
+    login_uname_entry = ctk.CTkEntry(login_rframe, width=150, fg_color="white", text_color="black")
     login_uname_entry.place(x=420, y=257)
 
-    ctk.CTkLabel(login_rframe, text="Password:",text_color="black", fg_color="#ffe683", font=("Arial", 34, "bold")).place(x=180, y=320)
-    login_pwd_entry = ctk.CTkEntry(login_rframe, show="*", width=150)
+    ctk.CTkLabel(login_rframe, text="Password:",text_color="black", fg_color="#feefb5", font=("Arial", 34, "bold")).place(x=180, y=320)
+    login_pwd_entry = ctk.CTkEntry(login_rframe, show="*", width=150, fg_color="white", text_color="black")
     login_pwd_entry.place(x=420, y=327)
 
     def log_submit():
@@ -174,36 +174,36 @@ def main():
     ).place(x=800,y=80)
 
     ctk.CTkLabel(register_frame, text="Username:", text_color="black",font=("Arial",29)).place(x=200,y=150)
-    register_uname_entry = ctk.CTkEntry(register_frame, width=250)
+    register_uname_entry = ctk.CTkEntry(register_frame, width=250, fg_color="white", text_color="black")
     register_uname_entry.place(x=370,y=153)
 
     ctk.CTkLabel(register_frame, text="Password:", text_color="black",font=("Arial",29)).place(x=200,y=230)
-    register_pwd_entry = ctk.CTkEntry(register_frame, show="*", width=250)
+    register_pwd_entry = ctk.CTkEntry(register_frame, show="*", width=250, fg_color="white", text_color="black")
     register_pwd_entry.place(x=370,y=233)
 
     ctk.CTkLabel(register_frame,text="Confirm Password:", text_color="black",font=("Arial",29)).place(x=670,y=230)
-    confirm_entry = ctk.CTkEntry(register_frame,show="*", width=250)
+    confirm_entry = ctk.CTkEntry(register_frame,show="*", width=250, fg_color="white", text_color="black")
     confirm_entry.place(x=920,y=233)
 
     ctk.CTkLabel(register_frame,text="Email:", text_color="black",font=("Arial",29)).place(x=200,y=310)
-    email_entry = ctk.CTkEntry(register_frame, width=250)
+    email_entry = ctk.CTkEntry(register_frame, width=250, fg_color="white", text_color="black")
     email_entry.place(x=370,y=313)
 
     ctk.CTkLabel(register_frame,text="Phone:", text_color="black",font=("Arial",29)).place(x=670,y=310)
-    phone_entry = ctk.CTkEntry(register_frame, width=100)
+    phone_entry = ctk.CTkEntry(register_frame, width=100, fg_color="white", text_color="black")
     phone_entry.place(x=780,y=313)
 
     ctk.CTkLabel(register_frame,text="Address:", text_color="black",font=("Arial",29)).place(x=200,y=390)
-    address_entry = ctk.CTkEntry(register_frame, width=800)
+    address_entry = ctk.CTkEntry(register_frame, width=800, fg_color="white", text_color="black")
     address_entry.place(x=370,y=393)
 
     ctk.CTkLabel(register_frame,text="Date of Birth:", text_color="black",font=("Arial",29)).place(x=200,y=470)
-    dob_entry = ctk.CTkEntry(register_frame, width=80)
+    dob_entry = ctk.CTkEntry(register_frame, width=80, fg_color="white", text_color="black")
     dob_entry.place(x=370,y=473)
     ctk.CTkLabel(register_frame,text="(YYYY-MM-DD)", text_color="black",font=("Arial",22)).place(x=200,y=510)
 
     ctk.CTkLabel(register_frame,text="Gender:", text_color="black",font=("Arial",29)).place(x=200,y=570)
-    gender_entry = ctk.CTkEntry(register_frame, width=250)
+    gender_entry = ctk.CTkEntry(register_frame, width=250, fg_color="white", text_color="black")
     gender_entry.place(x=370,y=573)
 
     textbox = ctk.CTkTextbox(register_frame, width=200, height=50, text_color="tomato", fg_color="white", border_color="tomato")
@@ -295,15 +295,17 @@ def main():
     user_screen.grid_rowconfigure(0, weight=1)
     user_screen.grid_columnconfigure(0, weight=1)
 
-    user_screen_main = ctk.CTkFrame(user_screen, fg_color="#feefb5", width=800, height=450, corner_radius=20)
+    user_screen_main = ctk.CTkScrollableFrame(user_screen, fg_color="#feefb5", width=800, height=520, corner_radius=20)
     user_screen_main.grid(row=0, column=0, sticky="nsew", padx=(30, 30), pady=(30, 20))   
-    user_screen_main.grid_rowconfigure(0, weight=1)
-    user_screen_main.grid_columnconfigure(0, weight=1)
+    user_screen_main.grid_rowconfigure(0, weight=0)
+    user_screen_main.grid_columnconfigure(0, weight=0)
+    user_screen_main.grid_columnconfigure(1, weight=0)
 
-    user_screen_nav = ctk.CTkFrame(user_screen, fg_color="#fbe58c", width=800, height=150, corner_radius=20)
+    user_screen_nav = ctk.CTkFrame(user_screen, fg_color="#fbe58c", width=800, height=80, corner_radius=20)
     user_screen_nav.grid(row=1, column=0, sticky="nsew", padx=(30, 30), pady=(0, 30))   
-    user_screen_nav.grid_rowconfigure(0, weight=1)
-    user_screen_nav.grid_columnconfigure(0, weight=1)
+    user_screen_nav.grid_rowconfigure(0, weight=0)
+    user_screen_nav.grid_columnconfigure(0, weight=0)
+    user_screen_nav.grid_columnconfigure(1, weight=0)
 
     ctk.CTkButton(
         user_screen,
@@ -319,6 +321,8 @@ def main():
     ).place(x=50,y=50)
 
     order_icon = ctk.CTkImage(Image.open("./assets/order_icon.png"), size=(20, 20))
+    book_icon = ctk.CTkImage(Image.open("./assets/book_icon.png"), size=(20, 20))
+    settings_icon = ctk.CTkImage(Image.open("./assets/settings_icon.png"), size=(20, 20))
 
     order_button = ctk.CTkButton(
         user_screen_nav,
@@ -330,12 +334,9 @@ def main():
         fg_color="#f9b746", 
         text_color="black",
         hover_color="#e0a73d",
-        width=220,
-        height=50
-    )
-    order_button.grid(row=0, column=0,sticky="w", padx=60, pady=10)
-
-    book_icon = ctk.CTkImage(Image.open("./assets/book_icon.png"), size=(20, 20))
+        width=250,
+        height=60
+    ).place(x=50, y=10)
 
     book_button = ctk.CTkButton(
         user_screen_nav,
@@ -347,12 +348,9 @@ def main():
         fg_color="#f9b746", 
         text_color="black",
         hover_color="#e0a73d",
-        width=220,
-        height=50
-    )
-    book_button.grid(row=0, column=1,sticky="w", padx=10, pady=10)
-
-    settings_icon = ctk.CTkImage(Image.open("./assets/settings_icon.png"), size=(20, 20))
+        width=250,
+        height=60
+    ).place(x=620, y=10)
 
     settings_button = ctk.CTkButton(
         user_screen_nav,
@@ -364,16 +362,33 @@ def main():
         fg_color="#f9b746", 
         text_color="black",
         hover_color="#e0a73d",
-        width=220,
-        height=50
+        width=250,
+        height=60
+    ).place(x=1200, y=10)
+
+    ctk.CTkLabel(
+        user_screen_main, 
+        text="Search:", 
+        font=("Arial", 24), 
+        text_color="black", 
+        fg_color="#feefb5"
+    ).grid(row=0, column=0, sticky="w",padx=10, pady=120)
+
+    user_search_entry_order = ctk.CTkEntry(
+        user_screen_main,
+        placeholder_text="eg: Cat Food",
+        width=400,
+        height=35,
+        fg_color="white",
+        text_color="black",
+        font=("Arial", 16)
     )
-    settings_button.grid(row=0, column=2,sticky="w", padx=60, pady=10)
+    user_search_entry_order.grid(row=0, column=1, sticky="w", pady=120)
+    
 
     # Start on home
-    show_frame(main_frame)
+    show_frame(user_screen)
 
-
-    
     app.mainloop()
 
 
