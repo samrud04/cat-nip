@@ -380,9 +380,41 @@ def main():
         height=35,
         fg_color="white",
         text_color="black",
-        font=("Arial", 16)
-    )
+        font=("Arial", 16))
+    
+    
+
+
     user_search_entry_order.grid(row=0, column=1, sticky="w", pady=120)
+    ctk.CTkLabel(
+        user_screen_main, 
+        text="CATEGORY:", 
+        font=("Arial", 16), 
+        text_color="black", 
+        fg_color="#feefb5"
+    ).grid(row=1, column=0, sticky="w", padx=10)
+    category=tk.Spinbox(
+        user_screen_main,
+        values=[" Food", "Toys", "Accessories"],
+        width=20,
+        font=("Arial", 14)
+    )
+    category.grid(row=1, column=1, sticky="w", pady=10)
+    def categ():
+        global category
+        category = category.get()
+        if category == "pet Food":
+            user_search_entry_order.configure(placeholder_text="eg: Whiskas, Meow Mix")
+        elif category == "Toys":
+            user_search_entry_order.configure(placeholder_text="eg: Catnip Mouse, Feather Wand")
+        elif category == "Accessories":
+            user_search_entry_order.configure(placeholder_text="eg: Cat Bed, Scratching Post")
+    category.bind("<<ComboboxSelected>>", lambda e: categ())
+    ctk.CTkButton(
+        user_screen_main,
+        text="DONE",
+        command=categ
+    ).grid(row=2, column=1, sticky="w", pady=10)
     
 
     # Start on home
