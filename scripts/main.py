@@ -34,13 +34,13 @@ def main():
     main_frame.grid_columnconfigure(1, weight=1)
     main_frame.grid_rowconfigure(0, weight=1)
 
-    left_frame = ctk.CTkFrame(main_frame, fg_color="#ffde59", width=300, height=300)
+    left_frame = ctk.CTkFrame(main_frame, fg_color="#ffe683", width=300, height=300)
     left_frame.grid(row=0, column=0, sticky="nsew", padx=40, pady=40)
 
     right_frame = ctk.CTkFrame(main_frame, fg_color="#ffffff", width=200, height=300)
     right_frame.grid(row=0, column=1, sticky="nsew", padx=40, pady=40)
 
-    img_label = ctk.CTkLabel(left_frame, text="",image=Icon, fg_color="#ffde59")
+    img_label = ctk.CTkLabel(left_frame, text="",image=Icon, fg_color="#ffe683")
     img_label.image = Icon
     img_label.place(x=120, y=230)
 
@@ -48,9 +48,34 @@ def main():
         left_frame,
         text="Cat-Nip",
         text_color="black",
-        fg_color="#ffde59",
+        fg_color="#ffe683",
         font=("Arial", 84, "bold")
     ).place(x=210, y=100)
+
+    # Home buttons 
+    ctk.CTkButton(
+        right_frame,
+        text="Login",
+        width=300,
+        height=80,
+        fg_color="#fbe58c",
+        hover_color="#FCCD77",
+        text_color="black",
+        font=("Arial", 41),
+        command=lambda: show_frame(login)
+    ).place(x=150,y=220)
+
+    ctk.CTkButton(
+        right_frame,
+        text="Register",
+        width=300,
+        height=80,
+        fg_color="#fbe58c",
+        hover_color="#FCCD77",
+        text_color="black",
+        font=("Arial", 41),
+        command=lambda: show_frame(register_frame)
+    ).place(x=150,y=370)
 
 
     # ---------------- LOGIN SCREEN ----------------
@@ -160,7 +185,7 @@ def main():
     
     # ---------------- REGISTER SCREEN ----------------
 
-    register_frame = ctk.CTkFrame(container, fg_color="#ffde59", bg_color="white", width=800, height=600)
+    register_frame = ctk.CTkFrame(container, fg_color="#ffe683", bg_color="white", width=800, height=600)
     register_frame.grid(row=0, column=0, sticky="nsew",padx=40, pady=40)
     register_frame.grid_rowconfigure(0, weight=1)
     register_frame.grid_columnconfigure(0, weight=1)
@@ -261,32 +286,6 @@ def main():
         bg_color="#ffea00",
         font=("Arial", 16, "bold")
     ).place(x=50,y=50)
-
-    # Home buttons               - WHY ARE THESE HERE?
-    ctk.CTkButton(
-        right_frame,
-        text="Login",
-        width=300,
-        height=80,
-        fg_color="#fbe58c",
-        hover_color="#FCCD77",
-        text_color="black",
-        font=("Arial", 41),
-        command=lambda: show_frame(login)
-    ).place(x=150,y=220)
-
-    ctk.CTkButton(
-        right_frame,
-        text="Register",
-        width=300,
-        height=80,
-        fg_color="#fbe58c",
-        hover_color="#FCCD77",
-        text_color="black",
-        font=("Arial", 41),
-        command=lambda: show_frame(register_frame)
-    ).place(x=150,y=370)
-
     
 
     #----------------user screen----------------
