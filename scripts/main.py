@@ -180,9 +180,6 @@ def main():
     ).place(x=280, y=450)
 
 
-
-    
-    
     # ---------------- REGISTER SCREEN ----------------
 
     register_frame = ctk.CTkFrame(container, fg_color="#ffe683", bg_color="white", width=800, height=600)
