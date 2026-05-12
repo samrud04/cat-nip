@@ -291,14 +291,14 @@ def main():
     user_screen.grid_rowconfigure(0, weight=1)
     user_screen.grid_columnconfigure(0, weight=1)
 
-    user_screen_main = ctk.CTkScrollableFrame(user_screen, fg_color="#feefb5", width=800, height=520, corner_radius=20)
-    user_screen_main.grid(row=0, column=0, sticky="nsew", padx=(30, 30), pady=(30, 20))   
+    user_screen_main = ctk.CTkScrollableFrame(user_screen, fg_color="#feefb5", width=800, height=520)
+    user_screen_main.grid(row=0, column=0, sticky="nsew", padx=(40, 40), pady=(40, 10))   
     user_screen_main.grid_rowconfigure(0, weight=0)
     user_screen_main.grid_columnconfigure(0, weight=0)
     user_screen_main.grid_columnconfigure(1, weight=0)
 
-    user_screen_nav = ctk.CTkFrame(user_screen, fg_color="#fbe58c", width=800, height=80, corner_radius=20)
-    user_screen_nav.grid(row=1, column=0, sticky="nsew", padx=(30, 30), pady=(0, 30))   
+    user_screen_nav = ctk.CTkFrame(user_screen, fg_color="#fbe58c", width=800, height=80)
+    user_screen_nav.grid(row=1, column=0, sticky="nsew", padx=(40, 40), pady=(0, 40))   
     user_screen_nav.grid_rowconfigure(0, weight=0)
     user_screen_nav.grid_columnconfigure(0, weight=0)
     user_screen_nav.grid_columnconfigure(1, weight=0)
@@ -314,7 +314,7 @@ def main():
         hover_color="#FC846F",
         bg_color="#ffea00",
         font=("Arial", 16, "bold")
-    ).place(x=50,y=50)
+    ).place(x=80,y=80)
 
     order_icon = ctk.CTkImage(Image.open("./assets/order_icon.png"), size=(20, 20))
     book_icon = ctk.CTkImage(Image.open("./assets/book_icon.png"), size=(20, 20))
@@ -378,11 +378,9 @@ def main():
         fg_color="white",
         text_color="black",
         font=("Arial", 16))
-    
-    
-
 
     user_search_entry_order.grid(row=0, column=1, sticky="w", pady=120)
+
     ctk.CTkLabel(
         user_screen_main, 
         text="CATEGORY:", 
@@ -397,6 +395,7 @@ def main():
         font=("Arial", 14)
     )
     category.grid(row=1, column=1, sticky="w", pady=10)
+
     def categ():
         global category
         category = category.get()
@@ -406,7 +405,9 @@ def main():
             user_search_entry_order.configure(placeholder_text="eg: Catnip Mouse, Feather Wand")
         elif category == "Accessories":
             user_search_entry_order.configure(placeholder_text="eg: Cat Bed, Scratching Post")
+
     category.bind("<<ComboboxSelected>>", lambda e: categ())
+    
     ctk.CTkButton(
         user_screen_main,
         text="DONE",
