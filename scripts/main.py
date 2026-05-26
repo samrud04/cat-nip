@@ -27,20 +27,20 @@ def main():
 
 
     # ---------------- HOME SCREEN ----------------
-    main_frame = ctk.CTkFrame(container, fg_color="white")
+    main_frame = ctk.CTkFrame(container, fg_color="#003566")
     main_frame.grid(row=0, column=0, sticky="nsew")
 
     main_frame.grid_columnconfigure(0, weight=1)
     main_frame.grid_columnconfigure(1, weight=1)
     main_frame.grid_rowconfigure(0, weight=1)
 
-    left_frame = ctk.CTkFrame(main_frame, fg_color="#ffe683", width=300, height=300)
+    left_frame = ctk.CTkFrame(main_frame, fg_color="#69dfff", width=300, height=300, corner_radius=100)
     left_frame.grid(row=0, column=0, sticky="nsew", padx=40, pady=40)
 
-    right_frame = ctk.CTkFrame(main_frame, fg_color="#ffffff", width=200, height=300)
+    right_frame = ctk.CTkFrame(main_frame, fg_color="#003566", width=200, height=300)
     right_frame.grid(row=0, column=1, sticky="nsew", padx=40, pady=40)
 
-    img_label = ctk.CTkLabel(left_frame, text="",image=Icon, fg_color="#ffe683")
+    img_label = ctk.CTkLabel(left_frame, text="",image=Icon, fg_color="#69dfff")
     img_label.image = Icon
     img_label.place(x=120, y=230)
 
@@ -48,7 +48,7 @@ def main():
         left_frame,
         text="Cat-Nip",
         text_color="black",
-        fg_color="#ffe683",
+        fg_color="#69dfff",
         font=("Arial", 84, "bold")
     ).place(x=210, y=100)
 
@@ -58,6 +58,7 @@ def main():
         text="Login",
         width=300,
         height=80,
+        corner_radius=100,
         fg_color="#fbe58c",
         hover_color="#FCCD77",
         text_color="black",
@@ -70,6 +71,7 @@ def main():
         text="Register",
         width=300,
         height=80,
+        corner_radius=100,
         fg_color="#fbe58c",
         hover_color="#FCCD77",
         text_color="black",
@@ -286,138 +288,434 @@ def main():
     
 
     #----------------user screen----------------
-    user_screen = ctk.CTkFrame(container, fg_color="white", width=800, height=600)
-    user_screen.grid(row=0, column=0, sticky="nsew")   
+    ctk.set_appearance_mode("light")
+    ctk.set_default_color_theme("blue")
+
+    app = ctk.CTk()
+    app.geometry("1600x900")
+    app.title("Pet Shop")
+
+    # =========================
+    # PRODUCT DATA
+    # =========================
+
+    products = [
+        {"name": "Cat Food", "price": 250, "category": "Food"},
+        {"name": "Fish Food", "price": 180, "category": "Food"},
+        {"name": "Dog Collar", "price": 350, "category": "Accessories"},
+        {"name": "Cat Treats", "price": 120, "category": "Food"},
+        {"name": "Feather Toy", "price": 90, "category": "Toys"},
+        {"name": "Scratching Post", "price": 550, "category": "Accessories"},
+        {"name": "Dog Biscuits", "price": 200, "category": "Food"},
+        {"name": "Cat Bed", "price": 700, "category": "Accessories"},
+    ]
+
+    cart = {}
+
+    # =========================
+    # MAIN USER SCREEN
+    # =========================
+
+    user_screen = ctk.CTkFrame(app, fg_color="white")
+    user_screen.pack(fill="both", expand=True)
+
     user_screen.grid_rowconfigure(0, weight=1)
     user_screen.grid_columnconfigure(0, weight=1)
 
-    user_screen_main = ctk.CTkScrollableFrame(user_screen, fg_color="#feefb5", width=800, height=520)
-    user_screen_main.grid(row=0, column=0, sticky="nsew", padx=(40, 40), pady=(40, 10))   
-    user_screen_main.grid_rowconfigure(0, weight=0)
-    user_screen_main.grid_rowconfigure(1, weight=0)
-    user_screen_main.grid_columnconfigure(0, weight=0)
-    user_screen_main.grid_columnconfigure(1, weight=0)
+    # =========================
+    # CONTENT FRAME
+    # =========================
 
-    user_screen_nav = ctk.CTkFrame(user_screen, fg_color="#fbe58c", width=800, height=80)
-    user_screen_nav.grid(row=1, column=0, sticky="nsew", padx=(40, 40), pady=(0, 40))   
-    user_screen_nav.grid_rowconfigure(0, weight=0)
-    user_screen_nav.grid_columnconfigure(0, weight=0)
-    user_screen_nav.grid_columnconfigure(1, weight=0)
-
-    ctk.CTkButton(
+    content_frame = ctk.CTkFrame(
         user_screen,
-        text="Back",
-        command=lambda: show_frame(login),
-        width=100,
-        height=40,
-        fg_color="tomato",
-        text_color="black",
-        hover_color="#FC846F",
-        bg_color="#ffea00",
-        font=("Arial", 16, "bold")
-    ).place(x=80,y=80)
+        fg_color="#feefb5"
+    )
 
-    order_icon = ctk.CTkImage(Image.open("./assets/order_icon.png"), size=(20, 20))
-    book_icon = ctk.CTkImage(Image.open("./assets/book_icon.png"), size=(20, 20))
-    settings_icon = ctk.CTkImage(Image.open("./assets/settings_icon.png"), size=(20, 20))
+    content_frame.grid(
+        row=0,
+        column=0,
+        sticky="nsew",
+        padx=40,
+        pady=(40, 10)
+    )
+
+    content_frame.grid_rowconfigure(0, weight=1)
+    content_frame.grid_columnconfigure(0, weight=1)
+
+    # =========================
+    # DIFFERENT SCREENS
+    # =========================
+
+    order_frame = ctk.CTkScrollableFrame(
+        content_frame,
+        fg_color="#feefb5"
+    )
+
+    book_frame = ctk.CTkFrame(
+        content_frame,
+        fg_color="#feefb5"
+    )
+
+    settings_frame = ctk.CTkFrame(
+        content_frame,
+        fg_color="#feefb5"
+    )
+
+    order_frame.grid(row=0, column=0, sticky="nsew")
+
+    # =========================
+    # NAVIGATION BAR
+    # =========================
+
+    user_screen_nav = ctk.CTkFrame(
+        user_screen,
+        fg_color="#fbe58c",
+        height=80
+    )
+
+    user_screen_nav.grid(
+        row=1,
+        column=0,
+        sticky="ew",
+        padx=40,
+        pady=(0, 40)
+    )
+
+    # =========================
+    # NAVIGATION FUNCTION
+    # =========================
+
+    def show_screen(screen):
+
+        order_frame.grid_forget()
+        book_frame.grid_forget()
+        settings_frame.grid_forget()
+
+        screen.grid(row=0, column=0, sticky="nsew")
+
+    # =========================
+    # NAV BUTTONS
+    # =========================
 
     order_button = ctk.CTkButton(
         user_screen_nav,
-        text=" Order",
-        image=order_icon,
-        compound="left",
-        font=("Arial", 16, "bold"),
-        corner_radius=12,
-        fg_color="#f9b746", 
+        text="Order",
+        font=("Arial", 18, "bold"),
+        width=250,
+        height=60,
+        fg_color="#f9b746",
         text_color="black",
         hover_color="#e0a73d",
-        width=250,
-        height=60
-    ).place(x=50, y=10)
+        command=lambda: show_screen(order_frame)
+    )
+
+    order_button.pack(side="left", padx=40, pady=10)
 
     book_button = ctk.CTkButton(
         user_screen_nav,
-        text=" Book",
-        image=book_icon,
-        compound="left",
-        font=("Arial", 16, "bold"),
-        corner_radius=12,
-        fg_color="#f9b746", 
+        text="Book",
+        font=("Arial", 18, "bold"),
+        width=250,
+        height=60,
+        fg_color="#f9b746",
         text_color="black",
         hover_color="#e0a73d",
-        width=250,
-        height=60
-    ).place(x=620, y=10)
+        command=lambda: show_screen(book_frame)
+    )
+
+    book_button.pack(side="left", padx=40, pady=10)
 
     settings_button = ctk.CTkButton(
         user_screen_nav,
-        text=" Settings",
-        image=settings_icon,
-        compound="left",
-        font=("Arial", 16, "bold"),
-        corner_radius=12,
-        fg_color="#f9b746", 
+        text="Settings",
+        font=("Arial", 18, "bold"),
+        width=250,
+        height=60,
+        fg_color="#f9b746",
         text_color="black",
         hover_color="#e0a73d",
-        width=250,
-        height=60
-    ).place(x=1200, y=10)
-
-    ctk.CTkLabel(
-        user_screen_main, 
-        text="Search:", 
-        font=("Arial", 24), 
-        text_color="black", 
-        fg_color="#feefb5"
-    ).grid(row=0, column=0, sticky="w",padx=10, pady=120)
-
-    user_search_entry_order = ctk.CTkEntry(
-        user_screen_main,
-        placeholder_text="eg: Cat Food",
-        width=400,
-        height=35,
-        fg_color="white",
-        text_color="black",
-        font=("Arial", 16))
-
-    user_search_entry_order.grid(row=0, column=1, sticky="w", pady=120)
-
-    ctk.CTkLabel(
-        user_screen_main, 
-        text="CATEGORY:", 
-        font=("Arial", 16), 
-        text_color="black", 
-        fg_color="#feefb5"
-    ).grid(row=1, column=0, sticky="w", padx=10)
-    category=tk.Spinbox(
-        user_screen_main,
-        values=[" Food", "Toys", "Accessories"],
-        width=20,
-        font=("Arial", 14)
+        command=lambda: show_screen(settings_frame)
     )
-    category.grid(row=1, column=1, sticky="w", pady=10)
 
-    def categ():
-        global category
-        category = category.get()
-        if category == "pet Food":
-            user_search_entry_order.configure(placeholder_text="eg: Whiskas, Meow Mix")
-        elif category == "Toys":
-            user_search_entry_order.configure(placeholder_text="eg: Catnip Mouse, Feather Wand")
-        elif category == "Accessories":
-            user_search_entry_order.configure(placeholder_text="eg: Cat Bed, Scratching Post")
+    settings_button.pack(side="left", padx=40, pady=10)
 
-    category.bind("<<ComboboxSelected>>", lambda e: categ())
-    
-    ctk.CTkButton(
-        user_screen_main,
-        text="DONE",
-        command=categ
-    ).grid(row=2, column=1, sticky="w", pady=10)
-    
+    # =========================
+    # SEARCH SECTION
+    # =========================
+
+    top_section = ctk.CTkFrame(
+        order_frame,
+        fg_color="#feefb5"
+    )
+
+    top_section.pack(fill="x", pady=20)
+
+    search_label = ctk.CTkLabel(
+        top_section,
+        text="Search:",
+        font=("Arial", 24, "bold"),
+        text_color="black"
+    )
+
+    search_label.pack(side="left", padx=10)
+
+    search_entry = ctk.CTkEntry(
+        top_section,
+        placeholder_text="Search products...",
+        width=400,
+        height=40,
+        font=("Arial", 16)
+    )
+
+    search_entry.pack(side="left", padx=20)
+
+    # =========================
+    # MAIN SHOP AREA
+    # =========================
+
+    shop_container = ctk.CTkFrame(
+        order_frame,
+        fg_color="#feefb5"
+    )
+
+    shop_container.pack(fill="both", expand=True)
+
+    # =========================
+    # PRODUCTS AREA
+    # =========================
+
+    products_frame = ctk.CTkFrame(
+        shop_container,
+        fg_color="#feefb5"
+    )
+
+    products_frame.pack(side="left", fill="both", expand=True)
+
+    # =========================
+    # CART AREA
+    # =========================
+
+    cart_frame = ctk.CTkFrame(
+        shop_container,
+        width=350,
+        fg_color="#fff4cc",
+        corner_radius=20
+    )
+
+    cart_frame.pack(side="right", fill="y", padx=20, pady=20)
+
+    cart_title = ctk.CTkLabel(
+        cart_frame,
+        text="Your Cart",
+        font=("Arial", 28, "bold"),
+        text_color="black"
+    )
+
+    cart_title.pack(pady=20)
+
+    cart_items_frame = ctk.CTkScrollableFrame(
+        cart_frame,
+        width=300,
+        height=500,
+        fg_color="#fff4cc"
+    )
+
+    cart_items_frame.pack(padx=10, pady=10)
+
+    total_label = ctk.CTkLabel(
+        cart_frame,
+        text="Total: ₹0",
+        font=("Arial", 22, "bold"),
+        text_color="green"
+    )
+
+    total_label.pack(pady=20)
+
+    # =========================
+    # CART FUNCTIONS
+    # =========================
+
+    def update_cart():
+
+        for widget in cart_items_frame.winfo_children():
+            widget.destroy()
+
+        total = 0
+
+        for product_name, details in cart.items():
+
+            qty = details["qty"]
+            price = details["price"]
+
+            subtotal = qty * price
+            total += subtotal
+
+            item_frame = ctk.CTkFrame(
+                cart_items_frame,
+                fg_color="white",
+                corner_radius=10
+            )
+
+            item_frame.pack(fill="x", pady=5, padx=5)
+
+            item_label = ctk.CTkLabel(
+                item_frame,
+                text=f"{product_name}\n₹{price} x {qty} = ₹{subtotal}",
+                font=("Arial", 14),
+                text_color="black",
+                justify="left"
+            )
+
+            item_label.pack(anchor="w", padx=10, pady=10)
+
+        total_label.configure(text=f"Total: ₹{total}")
+
+    # =========================
+    # ADD / REMOVE FUNCTIONS
+    # =========================
+
+    def add_to_cart(product):
+
+        name = product["name"]
+
+        if name not in cart:
+            cart[name] = {
+                "price": product["price"],
+                "qty": 1
+            }
+        else:
+            cart[name]["qty"] += 1
+
+        update_cart()
+
+    def remove_from_cart(product):
+
+        name = product["name"]
+
+        if name in cart:
+
+            cart[name]["qty"] -= 1
+
+            if cart[name]["qty"] <= 0:
+                del cart[name]
+
+        update_cart()
+
+    # =========================
+    # PRODUCT CARD FUNCTION
+    # =========================
+
+    def create_product_card(parent, product):
+
+        card = ctk.CTkFrame(
+            parent,
+            width=320,
+            height=220,
+            fg_color="white",
+            corner_radius=20
+        )
+
+        card.pack(padx=20, pady=20)
+
+        # PRODUCT NAME
+        name_label = ctk.CTkLabel(
+            card,
+            text=product["name"],
+            font=("Arial", 24, "bold"),
+            text_color="black"
+        )
+
+        name_label.pack(pady=(20, 10))
+
+        # CATEGORY
+        category_label = ctk.CTkLabel(
+            card,
+            text=product["category"],
+            font=("Arial", 16),
+            text_color="gray"
+        )
+
+        category_label.pack()
+
+        # PRICE
+        price_label = ctk.CTkLabel(
+            card,
+            text=f"₹{product['price']}",
+            font=("Arial", 22, "bold"),
+            text_color="green"
+        )
+
+        price_label.pack(pady=10)
+
+        # BUTTON AREA
+        button_frame = ctk.CTkFrame(
+            card,
+            fg_color="transparent"
+        )
+
+        button_frame.pack(pady=20)
+
+        minus_button = ctk.CTkButton(
+            button_frame,
+            text="-",
+            width=50,
+            height=40,
+            font=("Arial", 20, "bold"),
+            fg_color="tomato",
+            hover_color="#ff5c5c",
+            command=lambda: remove_from_cart(product)
+        )
+
+        minus_button.pack(side="left", padx=10)
+
+        plus_button = ctk.CTkButton(
+            button_frame,
+            text="+",
+            width=50,
+            height=40,
+            font=("Arial", 20, "bold"),
+            fg_color="green",
+            hover_color="#009933",
+            command=lambda: add_to_cart(product)
+        )
+
+        plus_button.pack(side="left", padx=10)
+
+    # =========================
+    # DISPLAY PRODUCTS
+    # =========================
+
+    for item in products:
+        create_product_card(products_frame, item)
+
+    # =========================
+    # BOOK SCREEN
+    # =========================
+
+    book_label = ctk.CTkLabel(
+        book_frame,
+        text="BOOK SCREEN",
+        font=("Arial", 42, "bold"),
+        text_color="black"
+    )
+
+    book_label.pack(pady=300)
+
+    # =========================
+    # SETTINGS SCREEN
+    # =========================
+
+    settings_label = ctk.CTkLabel(
+        settings_frame,
+        text="SETTINGS SCREEN",
+        font=("Arial", 42, "bold"),
+        text_color="black"
+    )
+
+    settings_label.pack(pady=300)
 
     # Start on home
-    show_frame(user_screen)
+    show_frame(main_frame)
 
     app.mainloop()
 
