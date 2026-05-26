@@ -44,7 +44,6 @@ def register(username, password, email, phone, address, gender, dob):
     add_data("user", (username, password, email, phone, address, gender, dob))
     return True
 
-
-
-
-
+def get_products():
+    con, cur = connect()
+    cur.execute("SELECT * FROM products;")
