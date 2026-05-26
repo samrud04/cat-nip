@@ -294,6 +294,7 @@ def main():
     user_screen_main = ctk.CTkScrollableFrame(user_screen, fg_color="#feefb5", width=800, height=520)
     user_screen_main.grid(row=0, column=0, sticky="nsew", padx=(40, 40), pady=(40, 10))   
     user_screen_main.grid_rowconfigure(0, weight=0)
+    user_screen_main.grid_rowconfigure(1, weight=0)
     user_screen_main.grid_columnconfigure(0, weight=0)
     user_screen_main.grid_columnconfigure(1, weight=0)
 
