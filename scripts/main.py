@@ -5,17 +5,20 @@ import re
 from PIL import Image, ImageTk
 import login
 import register
+import user
 
 def show_frame(frame):
     frame.tkraise()
 
-
 def main():
+    # Setup
+    ctk.set_appearance_mode("light")
+    ctk.set_default_color_theme("blue")
     app = ctk.CTk()
     app.title("Cat-Nip")
     app.geometry("800x600")
-    app.after(0, lambda: app.state('zoomed')) 
-
+    app.after(0, lambda: app.state('zoomed'))
+    
     # App icon
     Icon = ctk.CTkImage(Image.open("assets/catnipico.png"), size=(500, 400))
 
@@ -26,8 +29,7 @@ def main():
     container.grid_rowconfigure(0, weight=1)
     container.grid_columnconfigure(0, weight=1)
 
-
-    # ---------------- HOME SCREEN ----------------
+    # Home Screen
     main_frame = ctk.CTkFrame(container, fg_color="#003566")
     main_frame.grid(row=0, column=0, sticky="nsew")
 
@@ -81,14 +83,14 @@ def main():
     ).place(x=150,y=370)
 
 
-    # ---------------- LOGIN SCREEN ----------------
+    # Login Screen
     login_frame = login.login_screen(container, main_frame, show_frame)
 
-    # ---------------- REGISTER SCREEN ----------------
+    # Register Screen
     register_frame = register.register_screen(container, main_frame, show_frame)
 
-    #----------------user screen----------------
-    
+    # User Screen
+    user_frame = user.user_screen(container)
 
     # Start on home
     show_frame(main_frame)

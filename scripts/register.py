@@ -1,7 +1,6 @@
 import customtkinter as ctk
 import re
 import tkinter as tk
-from tkinter import messagebox
 import db
 from datetime import datetime
 

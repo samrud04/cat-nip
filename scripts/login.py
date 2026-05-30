@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import tkinter as tk
 import db
+import user
 
 def login_screen(container, main_frame, show_frame):
     login = ctk.CTkFrame(container, fg_color="white", width=800, height=600)
@@ -94,7 +95,7 @@ def login_screen(container, main_frame, show_frame):
     ctk.CTkButton(
         rframe,  
         text="user screen",
-        command=lambda: show_frame(user_screen),
+        command=lambda: show_frame(user.user_screen(container)),
         width=150,
         height=40,
         fg_color="#7ed957",

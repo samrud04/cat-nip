@@ -1,36 +1,4 @@
-ctk.set_appearance_mode("light")
-    ctk.set_default_color_theme("blue")
 
-    app = ctk.CTk()
-    app.geometry("1600x900")
-    app.title("Pet Shop")
-
-    # =========================
-    # PRODUCT DATA
-    # =========================
-
-    products = [
-        {"name": "Cat Food", "price": 250, "category": "Food"},
-        {"name": "Fish Food", "price": 180, "category": "Food"},
-        {"name": "Dog Collar", "price": 350, "category": "Accessories"},
-        {"name": "Cat Treats", "price": 120, "category": "Food"},
-        {"name": "Feather Toy", "price": 90, "category": "Toys"},
-        {"name": "Scratching Post", "price": 550, "category": "Accessories"},
-        {"name": "Dog Biscuits", "price": 200, "category": "Food"},
-        {"name": "Cat Bed", "price": 700, "category": "Accessories"},
-    ]
-
-    cart = {}
-
-    # =========================
-    # MAIN USER SCREEN
-    # =========================
-
-    user_screen = ctk.CTkFrame(app, fg_color="white")
-    user_screen.pack(fill="both", expand=True)
-
-    user_screen.grid_rowconfigure(0, weight=1)
-    user_screen.grid_columnconfigure(0, weight=1)
 
     # =========================
     # CONTENT FRAME

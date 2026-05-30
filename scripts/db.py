@@ -12,7 +12,6 @@ def connect():
     cur = con.cursor()
     return con, cur
 
-
 def add_data(table, input_data):
     con, cur = connect()
     # generate a random id
@@ -29,6 +28,16 @@ def add_data(table, input_data):
     cur.execute(query, input_data)
     con.commit()
 
+def add_product(input_data):
+    con, cur = connect()
+    cur.execute("INSERT INTO products (name, price, brand, category, stock) VALUES (%s, %s, %s, %s, %s)", input_data)
+    con.commit()
+
+def get_products():
+    con, cur = connect()
+    cur.execute("SELECT * FROM products;")
+    return cur.fetchall()
+
 def login(user_type, username, password):
     con, cur = connect()
     cur.execute(f"SELECT * FROM {user_type} WHERE username = %s AND password = %s", (username, password))
@@ -44,6 +53,3 @@ def register(username, password, email, phone, address, gender, dob):
     add_data("user", (username, password, email, phone, address, gender, dob))
     return True
 
-def get_products():
-    con, cur = connect()
-    cur.execute("SELECT * FROM products;")
