@@ -5,7 +5,7 @@ def connect():
     con = sql.connect(
         host="localhost",
         user="root",
-        password="admin",
+        password="acrobatics",
         database="catnip",
         auth_plugin="mysql_native_password"
     )
