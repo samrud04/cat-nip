@@ -90,10 +90,10 @@ def main():
     register_frame = register.register_screen(container, main_frame, show_frame)
 
     # User Screen
-    user_frame = user.user_screen(container)
+    user_frame = user.user_screen(container, db.get_products())
 
     # Start on home
-    show_frame(main_frame)
+    show_frame(user_frame)
 
     app.mainloop()
 
