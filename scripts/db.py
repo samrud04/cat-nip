@@ -35,8 +35,18 @@ def add_product(input_data):
 
 def get_products():
     con, cur = connect()
-    cur.execute("SELECT * FROM products;")
-    return cur.fetchall()
+
+    cur.execute("""
+        SELECT id, name, price, brand, category, stock
+        FROM products
+        ORDER BY id
+    """)
+
+    products = cur.fetchall()
+
+    con.close()
+
+    return products
 
 def login(user_type, username, password):
     con, cur = connect()
@@ -53,3 +63,40 @@ def register(username, password, email, phone, address, gender, dob):
     add_data("user", (username, password, email, phone, address, gender, dob))
     return True
 
+def delete_product(product_id):
+    con, cur = connect()
+
+    cur.execute(
+        "DELETE FROM products WHERE id = %s",
+        (product_id,)
+    )
+
+    con.commit()
+    con.close()
+
+
+def update_stock(product_id, new_stock):
+    con, cur = connect()
+
+    cur.execute(
+        "UPDATE products SET stock = %s WHERE id = %s",
+        (new_stock, product_id)
+    )
+
+    con.commit()
+    con.close()
+
+
+def get_product(product_id):
+    con, cur = connect()
+
+    cur.execute(
+        "SELECT * FROM products WHERE id = %s",
+        (product_id,)
+    )
+
+    product = cur.fetchone()
+
+    con.close()
+
+    return product

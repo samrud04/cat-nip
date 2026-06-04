@@ -6,7 +6,7 @@ from PIL import Image, ImageTk
 import login
 import register
 import user
-
+import admin
 def show_frame(frame):
     frame.tkraise()
 
@@ -92,8 +92,11 @@ def main():
     # User Screen
     user_frame = user.user_screen(container)
 
+    # Admin Screen
+    admin_frame = admin.admin_screen(container)
+
     # Start on home
-    show_frame(main_frame)
+    show_frame(admin_frame)
 
     app.mainloop()
 
