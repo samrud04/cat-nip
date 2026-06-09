@@ -248,7 +248,7 @@ def create_order_page(
 
     order_frame = ctk.CTkScrollableFrame(
         parent,
-        fg_color="#EAF4FF"
+        fg_color="#ffe7d6"
     )
 
     order_frame.pack(
@@ -287,7 +287,7 @@ def create_navbar(parent):
     navbar = ctk.CTkFrame(
         parent,
         height=70,
-        fg_color="#B9D9FF",
+        fg_color="#ff6b29",
         corner_radius=0
     )
 
@@ -295,9 +295,9 @@ def create_navbar(parent):
 
     ctk.CTkLabel(
         navbar,
-        text="🐾 Cat-Nip",
+        text="🐾 Pet Supplies",
         font=("Arial", 28, "bold"),
-        text_color="#1F3B5B"
+        text_color="white"
     ).pack(
         side="left",
         padx=20,
@@ -316,17 +316,24 @@ def create_navbar(parent):
 
     ctk.CTkButton(
         btn_frame,
-        text="Order"
+        text="Order",
+        fg_color="white",
+        text_color="#ff6b29",
+        font=("Arial", 34, "bold")
     ).pack(side="left", padx=5)
 
     ctk.CTkButton(
         btn_frame,
-        text="Book"
+        text="Book",
+        fg_color="white",
+        text_color="#ff6b29"
     ).pack(side="left", padx=5)
 
     ctk.CTkButton(
         btn_frame,
-        text="Settings"
+        text="Settings",
+        fg_color="white",
+        text_color="#ff6b29"
     ).pack(side="left", padx=5)
 
 
@@ -383,7 +390,7 @@ def user_screen(container, products):
 
     page = ctk.CTkFrame(
         container,
-        fg_color="#EAF4FF"
+        fg_color="white"
     )
 
     page.grid(

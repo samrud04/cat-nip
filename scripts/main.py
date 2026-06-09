@@ -30,30 +30,30 @@ def main():
     container.grid_columnconfigure(0, weight=1)
 
     # Home Screen
-    main_frame = ctk.CTkFrame(container, fg_color="#003566")
+    main_frame = ctk.CTkFrame(container, fg_color="#ffe7d6")
     main_frame.grid(row=0, column=0, sticky="nsew")
 
     main_frame.grid_columnconfigure(0, weight=1)
     main_frame.grid_columnconfigure(1, weight=1)
     main_frame.grid_rowconfigure(0, weight=1)
 
-    left_frame = ctk.CTkFrame(main_frame, fg_color="#69dfff", width=300, height=300, corner_radius=100)
+    left_frame = ctk.CTkFrame(main_frame, fg_color="#ff6b29", width=300, height=300, corner_radius=100)
     left_frame.grid(row=0, column=0, sticky="nsew", padx=40, pady=40)
 
-    right_frame = ctk.CTkFrame(main_frame, fg_color="#003566", width=200, height=300)
+    right_frame = ctk.CTkFrame(main_frame, fg_color="#fb7b43", width=200, height=300, corner_radius=100)
     right_frame.grid(row=0, column=1, sticky="nsew", padx=40, pady=40)
 
-    img_label = ctk.CTkLabel(left_frame, text="",image=Icon, fg_color="#69dfff")
+    img_label = ctk.CTkLabel(left_frame, text="",image=Icon, fg_color="#ff6b29")
     img_label.image = Icon
     img_label.place(x=120, y=230)
 
     ctk.CTkLabel(
         left_frame,
-        text="Cat-Nip",
+        text="🐾 Pet Supplies",
         text_color="black",
-        fg_color="#69dfff",
-        font=("Arial", 84, "bold")
-    ).place(x=210, y=100)
+        fg_color="#ff6b29",
+        font=("Arial", 64, "bold")
+    ).place(x=120, y=100)
 
     # Home buttons 
     ctk.CTkButton(
@@ -62,12 +62,12 @@ def main():
         width=300,
         height=80,
         corner_radius=100,
-        fg_color="#fbe58c",
-        hover_color="#FCCD77",
+        fg_color="#fd9e74",
+        hover_color="#fdb797",
         text_color="black",
-        font=("Arial", 41),
+        font=("Arial", 41, "bold"),
         command=lambda: show_frame(login_frame)
-    ).place(x=150,y=220)
+    ).place(x=170,y=220)
 
     ctk.CTkButton(
         right_frame,
@@ -75,12 +75,12 @@ def main():
         width=300,
         height=80,
         corner_radius=100,
-        fg_color="#fbe58c",
-        hover_color="#FCCD77",
+        fg_color="#fd9e74",
+        hover_color="#fdb797",
         text_color="black",
-        font=("Arial", 41),
+        font=("Arial", 41, "bold"),
         command=lambda: show_frame(register_frame)
-    ).place(x=150,y=370)
+    ).place(x=170,y=370)
 
 
     # Login Screen
