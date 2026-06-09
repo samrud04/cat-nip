@@ -93,9 +93,10 @@ def main():
     user_frame = user.user_screen(container, db.get_products())
 
     # Admin Screen
+    # admin_frame = admin.admin_screen(container)   THIS HAS A LOT OF ERRORS. FIX ADMIN SCREEN FIRST.
 
     # Start on home
-    show_frame(user_frame)
+    show_frame(main_frame)
 
     app.mainloop()
 
