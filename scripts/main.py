@@ -37,13 +37,13 @@ def main():
     main_frame.grid_columnconfigure(1, weight=1)
     main_frame.grid_rowconfigure(0, weight=1)
 
-    left_frame = ctk.CTkFrame(main_frame, fg_color="#ff6b29", width=300, height=300, corner_radius=100)
+    left_frame = ctk.CTkFrame(main_frame, fg_color="#ff8736", width=300, height=300, corner_radius=100)
     left_frame.grid(row=0, column=0, sticky="nsew", padx=40, pady=40)
 
-    right_frame = ctk.CTkFrame(main_frame, fg_color="#fb7b43", width=200, height=300, corner_radius=100)
+    right_frame = ctk.CTkFrame(main_frame, fg_color="#fca265", width=200, height=300, corner_radius=100)
     right_frame.grid(row=0, column=1, sticky="nsew", padx=40, pady=40)
 
-    img_label = ctk.CTkLabel(left_frame, text="",image=Icon, fg_color="#ff6b29")
+    img_label = ctk.CTkLabel(left_frame, text="",image=Icon, fg_color="#ff8736")
     img_label.image = Icon
     img_label.place(x=120, y=230)
 
@@ -51,7 +51,7 @@ def main():
         left_frame,
         text="🐾 Pet Supplies",
         text_color="black",
-        fg_color="#ff6b29",
+        fg_color="#ff8736",
         font=("Arial", 64, "bold")
     ).place(x=120, y=100)
 

@@ -319,7 +319,7 @@ def create_navbar(parent):
         text="Order",
         fg_color="white",
         text_color="#ff6b29",
-        font=("Arial", 34, "bold")
+        font=("Arial", 24, "bold")
     ).pack(side="left", padx=5)
 
     ctk.CTkButton(
