@@ -287,7 +287,7 @@ def create_navbar(parent):
     navbar = ctk.CTkFrame(
         parent,
         height=70,
-        fg_color="#ff6b29",
+        fg_color="#FA9A85",
         corner_radius=0
     )
 
@@ -318,22 +318,27 @@ def create_navbar(parent):
         btn_frame,
         text="Order",
         fg_color="white",
-        text_color="#ff6b29",
-        font=("Arial", 24, "bold")
+        text_color="#FA9A85",
+        hover_color="#f9d8d1",
+        font=("Arial", 20, "bold")
     ).pack(side="left", padx=5)
 
     ctk.CTkButton(
         btn_frame,
         text="Book",
         fg_color="white",
-        text_color="#ff6b29"
+        text_color="#FA9A85",
+        hover_color="#f9d8d1",
+        font=("Arial", 20, "bold")
     ).pack(side="left", padx=5)
 
     ctk.CTkButton(
         btn_frame,
         text="Settings",
         fg_color="white",
-        text_color="#ff6b29"
+        text_color="#FA9A85",
+        hover_color="#f9d8d1",
+        font=("Arial", 20, "bold")
     ).pack(side="left", padx=5)
 
 

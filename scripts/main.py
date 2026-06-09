@@ -71,8 +71,8 @@ def main():
         width=300,
         height=80,
         corner_radius=100,
-        fg_color="#fd9e74",
-        hover_color="#fdb797",
+        fg_color="#fed9bf",
+        hover_color="#ffd0af",
         text_color="black",
         font=("Arial", 41, "bold"),
         command=lambda: show_frame(login_frame)
@@ -84,8 +84,8 @@ def main():
         width=300,
         height=80,
         corner_radius=100,
-        fg_color="#fd9e74",
-        hover_color="#fdb797",
+        fg_color="#fed9bf",
+        hover_color="#ffd0af",
         text_color="black",
         font=("Arial", 41, "bold"),
         command=lambda: show_frame(register_frame)
@@ -105,8 +105,8 @@ def main():
     # admin_frame = admin.admin_screen(container)   THIS HAS A LOT OF ERRORS. FIX ADMIN SCREEN FIRST.
 
     # Start on home
-    show_frame(admin_frame)
 
+    show_frame(admin_frame)
     app.mainloop()
 
 
