@@ -29,6 +29,14 @@ def main():
     container.grid_rowconfigure(0, weight=1)
     container.grid_columnconfigure(0, weight=1)
 
+    #admin screen
+    admin_frame = admin.create_admin_frame(container)
+
+    admin_frame.grid(
+        row=0,
+        column=0,
+        sticky="nsew"
+    )
     # Home Screen
     main_frame = ctk.CTkFrame(container, fg_color="#ffe7d6")
     main_frame.grid(row=0, column=0, sticky="nsew")
@@ -39,6 +47,7 @@ def main():
 
     left_frame = ctk.CTkFrame(main_frame, fg_color="#FA9A85", width=300, height=300, corner_radius=100)
     left_frame.grid(row=0, column=0, sticky="nsew", padx=40, pady=40)
+
 
     right_frame = ctk.CTkFrame(main_frame, fg_color="#fca265", width=200, height=300, corner_radius=100)
     right_frame.grid(row=0, column=1, sticky="nsew", padx=40, pady=40)
@@ -96,7 +105,7 @@ def main():
     # admin_frame = admin.admin_screen(container)   THIS HAS A LOT OF ERRORS. FIX ADMIN SCREEN FIRST.
 
     # Start on home
-    show_frame(main_frame)
+    show_frame(admin_frame)
 
     app.mainloop()
 
