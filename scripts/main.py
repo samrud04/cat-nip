@@ -100,11 +100,9 @@ def main():
     # User Screen
     user_frame = user.user_screen(container, db.get_products())
 
-    # Admin Screen
-    admin_frame = admin.create_admin_frame(container)
 
     # Start on home
-    show_frame(admin_frame)
+    show_frame(user_frame)
     app.mainloop()
 
 

@@ -111,7 +111,7 @@ def register_screen(container, main_frame, show_frame):
         width=200,
         height=40,
         font=("Arial", 26, "bold")    
-    ).place(x=800,y=600)
+    ).place(x=900,y=500)
 
     ctk.CTkButton(
         register_frame,
@@ -122,8 +122,9 @@ def register_screen(container, main_frame, show_frame):
         fg_color="tomato",
         text_color="black",
         hover_color="#FC846F",
-        bg_color="#ffea00",
-        font=("Arial", 16, "bold")
+        bg_color="#fca265",
+        font=("Arial", 16, "bold"),
+        corner_radius=100
     ).place(x=50,y=50)
     
     return register_frame
