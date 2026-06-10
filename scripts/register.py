@@ -5,7 +5,7 @@ import db
 from datetime import datetime
 
 def register_screen(container, main_frame, show_frame):
-    register_frame = ctk.CTkFrame(container, fg_color="#ffe683", bg_color="white", width=800, height=600)
+    register_frame = ctk.CTkFrame(container, fg_color="#FA9A85", bg_color="white", width=800, height=600)
     register_frame.grid(row=0, column=0, sticky="nsew",padx=40, pady=40)
     register_frame.grid_rowconfigure(0, weight=1)
     register_frame.grid_columnconfigure(0, weight=1)

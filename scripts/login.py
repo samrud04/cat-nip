@@ -11,13 +11,13 @@ def login_screen(container, main_frame, show_frame):
     login.grid_columnconfigure(1, weight=1)
     login.grid_rowconfigure(0, weight=1)
 
-    lframe = ctk.CTkFrame(login, fg_color="#ffe683",width=200, height=300)
+    lframe = ctk.CTkFrame(login, fg_color="#FA9A85",width=200, height=300)
     lframe.grid(row=0, column=0, sticky="nsew",padx=(40,40), pady=40)
 
-    rframe = ctk.CTkFrame(login, fg_color="#feefb5", width=300, height=600)
+    rframe = ctk.CTkFrame(login, fg_color="#fca265", width=300, height=600)
     rframe.grid(row=0, column=1, sticky="nsew",padx=(0,40), pady=40)
 
-    ctk.CTkLabel(lframe, text="Login", fg_color="#ffe683", text_color="black", font=("Arial", 64, "bold")).place(x=220, y=100)
+    ctk.CTkLabel(lframe, text="Login", fg_color="#FA9A85", text_color="black", font=("Arial", 64, "bold")).place(x=220, y=100)
 
     # User type radio buttons
     loginch = ctk.StringVar()
@@ -47,11 +47,11 @@ def login_screen(container, main_frame, show_frame):
     ).place(x=250, y=450)
 
     # Login fields
-    ctk.CTkLabel(rframe, text="Username:",text_color="black", fg_color="#feefb5", font=("Arial", 34, "bold")).place(x=180, y=250)
+    ctk.CTkLabel(rframe, text="Username:",text_color="black", fg_color="#fca265", font=("Arial", 34, "bold")).place(x=180, y=250)
     login_uname_entry = ctk.CTkEntry(rframe, width=150, fg_color="white", text_color="black")
     login_uname_entry.place(x=420, y=257)
 
-    ctk.CTkLabel(rframe, text="Password:",text_color="black", fg_color="#feefb5", font=("Arial", 34, "bold")).place(x=180, y=320)
+    ctk.CTkLabel(rframe, text="Password:",text_color="black", fg_color="#fca265", font=("Arial", 34, "bold")).place(x=180, y=320)
     login_pwd_entry = ctk.CTkEntry(rframe, show="*", width=150, fg_color="white", text_color="black")
     login_pwd_entry.place(x=420, y=327)
 
@@ -73,9 +73,9 @@ def login_screen(container, main_frame, show_frame):
         rframe,
         text="Submit",
         command=log_submit,
-        fg_color="#7ed957",
+        fg_color="#fed9bf",
         text_color="black",
-        hover_color="#99D980",
+        hover_color="#fed9bf",
         font=("Arial", 16, "bold")
     ).place(x=280, y=400)   
 
@@ -88,10 +88,10 @@ def login_screen(container, main_frame, show_frame):
         fg_color="tomato",
         text_color="black",
         hover_color="#FC846F",
-        bg_color="#ffde59",
+        bg_color="#fed9bf",
         font=("Arial", 16, "bold")
     ).place(x=80,y=80)
-
+    '''
     ctk.CTkButton(
         rframe,  
         text="user screen",
@@ -103,6 +103,6 @@ def login_screen(container, main_frame, show_frame):
         hover_color="#99D980",
         font=("Arial", 16, "bold")
     ).place(x=280, y=450)
-    
+    '''
     return login
 
