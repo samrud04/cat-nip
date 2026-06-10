@@ -5,7 +5,7 @@ import db
 from datetime import datetime
 
 def register_screen(container, main_frame, show_frame):
-    register_frame = ctk.CTkFrame(container, fg_color="#ffe683", bg_color="white", width=800, height=600)
+    register_frame = ctk.CTkFrame(container, fg_color="#fca265", bg_color="#ffe7d6", width=800, height=600, corner_radius=100)
     register_frame.grid(row=0, column=0, sticky="nsew",padx=40, pady=40)
     register_frame.grid_rowconfigure(0, weight=1)
     register_frame.grid_columnconfigure(0, weight=1)
@@ -24,42 +24,34 @@ def register_screen(container, main_frame, show_frame):
     register_uname_entry = ctk.CTkEntry(register_frame, width=250, fg_color="white", text_color="black")
     register_uname_entry.place(x=370,y=153)
 
-    ctk.CTkLabel(register_frame, text="First Name:", text_color="black",font=("Arial",29)).place(x=200,y=230)
-    first_name_entry = ctk.CTkEntry(register_frame, width=250, fg_color="white", text_color="black")
-    first_name_entry.place(x=370,y=233)
-
-    ctk.CTkLabel(register_frame, text="Last Name:", text_color="black",font=("Arial",29)).place(x=670,y=230)
-    last_name_entry = ctk.CTkEntry(register_frame, width=250, fg_color="white", text_color="black")
-    last_name_entry.place(x=840,y=233)
-
-    ctk.CTkLabel(register_frame, text="Password:", text_color="black",font=("Arial",29)).place(x=200,y=310)
+    ctk.CTkLabel(register_frame, text="Password:", text_color="black",font=("Arial",29)).place(x=200,y=230)
     register_pwd_entry = ctk.CTkEntry(register_frame, show="*", width=250, fg_color="white", text_color="black")
-    register_pwd_entry.place(x=370,y=313)
+    register_pwd_entry.place(x=370,y=233)
 
-    ctk.CTkLabel(register_frame,text="Confirm Password:", text_color="black",font=("Arial",29)).place(x=670,y=310)
+    ctk.CTkLabel(register_frame,text="Confirm Password:", text_color="black",font=("Arial",29)).place(x=700,y=230)
     confirm_entry = ctk.CTkEntry(register_frame,show="*", width=250, fg_color="white", text_color="black")
-    confirm_entry.place(x=920,y=313)
+    confirm_entry.place(x=950,y=233)
 
-    ctk.CTkLabel(register_frame,text="Email:", text_color="black",font=("Arial",29)).place(x=200,y=390)
+    ctk.CTkLabel(register_frame,text="Email:", text_color="black",font=("Arial",29)).place(x=200,y=310)
     email_entry = ctk.CTkEntry(register_frame, width=250, fg_color="white", text_color="black")
-    email_entry.place(x=370,y=393)
+    email_entry.place(x=370,y=313)
 
-    ctk.CTkLabel(register_frame,text="Phone:", text_color="black",font=("Arial",29)).place(x=670,y=390)
+    ctk.CTkLabel(register_frame,text="Phone:", text_color="black",font=("Arial",29)).place(x=750,y=310)
     phone_entry = ctk.CTkEntry(register_frame, width=100, fg_color="white", text_color="black")
-    phone_entry.place(x=780,y=393)
+    phone_entry.place(x=850,y=313)
 
-    ctk.CTkLabel(register_frame,text="Address:", text_color="black",font=("Arial",29)).place(x=200,y=470)
+    ctk.CTkLabel(register_frame,text="Address:", text_color="black",font=("Arial",29)).place(x=200,y=390)
     address_entry = ctk.CTkEntry(register_frame, width=800, fg_color="white", text_color="black")
-    address_entry.place(x=370,y=473)
+    address_entry.place(x=370,y=393)
 
-    ctk.CTkLabel(register_frame,text="Date of Birth:", text_color="black",font=("Arial",29)).place(x=200,y=550)
+    ctk.CTkLabel(register_frame,text="Date of Birth:", text_color="black",font=("Arial",29)).place(x=200,y=470)
     dob_entry = ctk.CTkEntry(register_frame, width=80, fg_color="white", text_color="black")
-    dob_entry.place(x=370,y=553)
-    ctk.CTkLabel(register_frame,text="(YYYY-MM-DD)", text_color="black",font=("Arial",22)).place(x=200,y=590)
+    dob_entry.place(x=370,y=473)
+    ctk.CTkLabel(register_frame,text="(DD-MM-YYYY)", text_color="black",font=("Arial",22)).place(x=200,y=510)
 
-    ctk.CTkLabel(register_frame,text="Gender:", text_color="black",font=("Arial",29)).place(x=200,y=630)
+    ctk.CTkLabel(register_frame,text="Gender:", text_color="black",font=("Arial",29)).place(x=200,y=550)
     gender_entry = ctk.CTkEntry(register_frame, width=250, fg_color="white", text_color="black")
-    gender_entry.place(x=370,y=633)
+    gender_entry.place(x=370,y=553)
 
     # Textbox
     textbox = ctk.CTkTextbox(register_frame, width=200, height=50, text_color="tomato", fg_color="white", border_color="tomato")

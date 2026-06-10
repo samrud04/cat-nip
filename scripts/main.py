@@ -104,7 +104,7 @@ def main():
     admin_frame = admin.create_admin_frame(container)
 
     # Start on home
-    show_frame(main_frame)
+    show_frame(admin_frame)
     app.mainloop()
 
 
