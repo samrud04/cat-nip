@@ -102,7 +102,7 @@ def main():
 
 
     # Start on home
-    show_frame(user_frame)
+    show_frame(main_frame)
     app.mainloop()
 
 

@@ -281,6 +281,24 @@ def create_order_page(
 
     return order_frame
 
+def show_order():
+
+    book_frame.pack_forget()
+
+    order_frame.pack(
+        fill="both",
+        expand=True
+    )
+
+
+def show_book():
+
+    order_frame.pack_forget()
+
+    book_frame.pack(
+        fill="both",
+        expand=True
+    )
 
 def create_navbar(parent):
 
@@ -320,7 +338,8 @@ def create_navbar(parent):
         fg_color="white",
         text_color="#FA9A85",
         hover_color="#f9d8d1",
-        font=("Arial", 20, "bold")
+        font=("Arial", 20, "bold"),
+        command=show_order
     ).pack(side="left", padx=5)
 
     ctk.CTkButton(
@@ -329,7 +348,8 @@ def create_navbar(parent):
         fg_color="white",
         text_color="#FA9A85",
         hover_color="#f9d8d1",
-        font=("Arial", 20, "bold")
+        font=("Arial", 20, "bold"),
+        command=show_book
     ).pack(side="left", padx=5)
 
     ctk.CTkButton(
