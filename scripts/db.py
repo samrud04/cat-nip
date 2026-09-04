@@ -63,6 +63,14 @@ def register(username, password, email, phone, address, gender, dob):
     add_data("user", (username, password, email, phone, address, gender, dob))
     return True
 
+def get_user_id(username):
+    """Get user_id from username"""
+    con, cur = connect()
+    cur.execute("SELECT id FROM user WHERE username = %s", (username,))
+    result = cur.fetchone()
+    con.close()
+    return result[0] if result else None
+
 def delete_product(product_id):
     con, cur = connect()
 

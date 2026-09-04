@@ -10,6 +10,15 @@ import admin
 def show_frame(frame):
     frame.tkraise()
 
+def check_logged_in():
+    """Check if user was previously logged in"""
+    try:
+        with open("session.txt", "r") as f:
+            user_id = int(f.read().strip())
+            return user_id
+    except:
+        return None  # No session found
+
 def main():
     # Setup
     ctk.set_appearance_mode("light")
@@ -92,17 +101,22 @@ def main():
 
 
     # Login Screen
-    login_frame = login.login_screen(container, main_frame, show_frame)
+    login_frame = login.login_screen(container, main_frame, show_frame, app)
 
     # Register Screen
     register_frame = register.register_screen(container, main_frame, show_frame)
 
     # User Screen
-    user_frame = user.user_screen(container, db.get_products())
+    user_frame = user.user_screen(container, db.get_products(), app)
 
-
-    # Start on home
-    show_frame(main_frame)
+    # Start on appropriate screen
+    logged_in_user = check_logged_in()
+    if logged_in_user:
+        # Show user page directly
+        show_frame(user_frame)
+    else:
+        # Show main page
+        show_frame(main_frame)
     app.mainloop()
 
 
