@@ -107,4 +107,23 @@ def get_product(product_id):
 
     con.close()
 
+
     return product
+def update_product(product_id, name, price, brand, category, stock):
+    con, cur = connect()
+
+    cur.execute(
+        """
+        UPDATE products
+        SET name = %s,
+            price = %s,
+            brand = %s,
+            category = %s,
+            stock = %s
+        WHERE id = %s
+        """,
+        (name, price, brand, category, stock, product_id)
+    )
+
+    con.commit()
+    con.close()
