@@ -113,10 +113,10 @@ def main():
     logged_in_user = check_logged_in()
     if logged_in_user:
         # Show user page directly
-        show_frame(user_frame)
+        show_frame(admin_frame)
     else:
         # Show main page
-        show_frame(main_frame)
+        show_frame(admin_frame)
     app.mainloop()
 
 
