@@ -1,9 +1,15 @@
 import customtkinter as ctk
-import tkinter as tk
 from tkinter import messagebox
-import main, login
+import os
+import db
+
+
+# =====================================================
+# CART
+# =====================================================
 
 cart = {}
+
 
 def refresh_cart(cart_frame, total_label, products):
 
@@ -22,7 +28,7 @@ def refresh_cart(cart_frame, total_label, products):
 
         pid = product[0]
         name = product[1]
-        price = product[2]
+        price = float(product[2])
 
         if pid in cart and cart[pid] > 0:
 
@@ -38,11 +44,11 @@ def refresh_cart(cart_frame, total_label, products):
 
             ctk.CTkLabel(
                 cart_frame,
-                text=f"₹{subtotal}"
+                text=f"₹{subtotal:.2f}"
             ).pack(anchor="w", padx=20)
 
     total_label.configure(
-        text=f"Total: ₹{total}"
+        text=f"Total: ₹{total:.2f}"
     )
 
 
@@ -57,10 +63,12 @@ def add_to_cart(
     current_qty = cart.get(product_id, 0)
 
     if current_qty >= stock:
+
         messagebox.showwarning(
             "Stock Limit",
             "Cannot add more than available stock."
         )
+
         return
 
     cart[product_id] = current_qty + 1
@@ -100,6 +108,10 @@ def remove_from_cart(
     )
 
 
+# =====================================================
+# PRODUCT CARD
+# =====================================================
+
 def create_product_card(
         parent,
         product,
@@ -111,10 +123,10 @@ def create_product_card(
 
     pid = product[0]
     name = product[1]
-    price = product[2]
+    price = float(product[2])
     brand = product[3]
     category = product[4]
-    stock = product[5]
+    stock = int(product[5])
 
     card = ctk.CTkFrame(
         parent,
@@ -145,53 +157,72 @@ def create_product_card(
 
     image_frame.pack_propagate(False)
 
+
+    # CATEGORY ICON
+
     if category == "Food":
-        ctk.CTkLabel(
-            image_frame,
-            text="🍖",
-            font=("Arial", 48)
-        ).pack(expand=True)
+
+        emoji = "🍖"
+
     elif category == "Toy":
-        ctk.CTkLabel(
-            image_frame,
-            text="🧸",
-            font=("Arial", 48)
-        ).pack(expand=True)
+
+        emoji = "🧸"
+
     elif category == "Accessory":
-        ctk.CTkLabel(
-            image_frame,
-            text="🎀",
-            font=("Arial", 48)
-        ).pack(expand=True)
+
+        emoji = "🎀"
+
     else:
-        ctk.CTkLabel(
-            image_frame,
-            text="🛍️",
-            font=("Arial", 48)
-        ).pack(expand=True)
+
+        emoji = "🛍️"
+
+
+    ctk.CTkLabel(
+        image_frame,
+        text=emoji,
+        font=("Arial", 48)
+    ).pack(expand=True)
+
+
+    # PRODUCT NAME
 
     ctk.CTkLabel(
         card,
         text=name,
-        font=("Arial", 18, "bold")
+        font=("Arial", 18, "bold"),
+        text_color="black"
     ).pack()
+
+
+    # BRAND
 
     ctk.CTkLabel(
         card,
-        text=f"Brand: {brand}"
+        text=f"Brand: {brand}",
+        text_color="black"
     ).pack()
+
+
+    # CATEGORY
 
     ctk.CTkLabel(
         card,
-        text=f"Type: {category}"
+        text=f"Type: {category}",
+        text_color="black"
     ).pack()
+
+
+    # PRICE
 
     ctk.CTkLabel(
         card,
-        text=f"₹{price}",
+        text=f"₹{price:.2f}",
         font=("Arial", 18, "bold"),
         text_color="green"
     ).pack(pady=5)
+
+
+    # STOCK STATUS
 
     if stock <= 0:
 
@@ -208,11 +239,17 @@ def create_product_card(
         stock_text = "Available"
         stock_color = "green"
 
+
     ctk.CTkLabel(
         card,
         text=stock_text,
         text_color=stock_color
     ).pack()
+
+
+    # =================================================
+    # QUANTITY CONTROLS
+    # =================================================
 
     qty_frame = ctk.CTkFrame(
         card,
@@ -221,18 +258,19 @@ def create_product_card(
 
     qty_frame.pack(pady=10)
 
+
     qty_label = ctk.CTkLabel(
         qty_frame,
-        text="0",
+        text=str(cart.get(pid, 0)),
         width=30
     )
+
 
     minus_btn = ctk.CTkButton(
         qty_frame,
         text="-",
         width=35,
-        command=lambda:
-        remove_from_cart(
+        command=lambda: remove_from_cart(
             pid,
             qty_label,
             cart_frame,
@@ -241,12 +279,12 @@ def create_product_card(
         )
     )
 
+
     plus_btn = ctk.CTkButton(
         qty_frame,
         text="+",
         width=35,
-        command=lambda:
-        add_to_cart(
+        command=lambda: add_to_cart(
             pid,
             stock,
             qty_label,
@@ -256,10 +294,26 @@ def create_product_card(
         )
     )
 
-    minus_btn.pack(side="left", padx=5)
-    qty_label.pack(side="left", padx=5)
-    plus_btn.pack(side="left", padx=5)
 
+    minus_btn.pack(
+        side="left",
+        padx=5
+    )
+
+    qty_label.pack(
+        side="left",
+        padx=5
+    )
+
+    plus_btn.pack(
+        side="left",
+        padx=5
+    )
+
+
+# =====================================================
+# ORDER PAGE
+# =====================================================
 
 def create_order_page(
         parent,
@@ -272,18 +326,13 @@ def create_order_page(
         fg_color="#ffe7d6"
     )
 
-    order_frame.pack(
-        fill="both",
-        expand=True,
-        padx=10,
-        pady=10
-    )
-
     for col in range(4):
+
         order_frame.grid_columnconfigure(
             col,
             weight=1
         )
+
 
     for index, product in enumerate(products):
 
@@ -302,276 +351,43 @@ def create_order_page(
 
     return order_frame
 
-def logout(show_frame, login_screen, container, main_frame):
-    """Delete session and go back to login"""
-    import os
-    if os.path.exists("session.txt"):
-        os.remove("session.txt")
-    
-    show_frame(login_screen(container, main_frame, show_frame))
 
-
-def create_settings_page(parent, show_frame, login_screen, container, main_frame, user_id):
-    """
-    Create settings page with user info and logout button
-    parent: container to pack into
-    show_frame: function to switch frames
-    login_screen: login screen function
-    container: main container
-    main_frame: main frame reference
-    user_id: current logged in user's ID
-    """
-    
-    settings_frame = ctk.CTkScrollableFrame(
-        parent,
-        fg_color="#ffe7d6"
-    )
-    
-    settings_frame.pack(
-        fill="both",
-        expand=True,
-        padx=10,
-        pady=10
-    )
-    
-    # ============ TITLE ============
-    ctk.CTkLabel(
-        settings_frame,
-        text="Settings",
-        text_color="black",
-        fg_color="#ffe7d6",
-        font=("Arial", 36, "bold")
-    ).pack(pady=(30, 20))
-    
-    # ============ ACCOUNT SECTION ============
-    account_frame = ctk.CTkFrame(
-        settings_frame,
-        fg_color="white",
-        corner_radius=15
-    )
-    account_frame.pack(
-        fill="x",
-        padx=20,
-        pady=15
-    )
-    
-    ctk.CTkLabel(
-        account_frame,
-        text="Account Information",
-        text_color="black",
-        fg_color="white",
-        font=("Arial", 18, "bold")
-    ).pack(anchor="w", padx=20, pady=(15, 10))
-    
-    # User ID display
-    ctk.CTkLabel(
-        account_frame,
-        text=f"User ID: {user_id}",
-        text_color="#666",
-        fg_color="white",
-        font=("Arial", 12)
-    ).pack(anchor="w", padx=20, pady=5)
-    
-    # Username (you can fetch from DB if needed)
-    ctk.CTkLabel(
-        account_frame,
-        text="Username: (Your username here)",
-        text_color="#666",
-        fg_color="white",
-        font=("Arial", 12)
-    ).pack(anchor="w", padx=20, pady=(5, 15))
-    
-    # ============ PREFERENCES SECTION ============
-    prefs_frame = ctk.CTkFrame(
-        settings_frame,
-        fg_color="white",
-        corner_radius=15
-    )
-    prefs_frame.pack(
-        fill="x",
-        padx=20,
-        pady=15
-    )
-    
-    ctk.CTkLabel(
-        prefs_frame,
-        text="Preferences",
-        text_color="black",
-        fg_color="white",
-        font=("Arial", 18, "bold")
-    ).pack(anchor="w", padx=20, pady=(15, 10))
-    
-    # Notifications toggle
-    notif_frame = ctk.CTkFrame(prefs_frame, fg_color="white")
-    notif_frame.pack(fill="x", padx=20, pady=10)
-    
-    ctk.CTkLabel(
-        notif_frame,
-        text="Enable Notifications",
-        text_color="black",
-        fg_color="white",
-        font=("Arial", 12)
-    ).pack(side="left")
-    
-    notif_switch = ctk.CTkSwitch(
-        notif_frame,
-        text="",
-        fg_color="#FA9A85",
-        progress_color="#7ed957"
-    )
-    notif_switch.pack(side="right", padx=10)
-    
-    # Email preferences toggle
-    email_frame = ctk.CTkFrame(prefs_frame, fg_color="white")
-    email_frame.pack(fill="x", padx=20, pady=10)
-    
-    ctk.CTkLabel(
-        email_frame,
-        text="Email Updates",
-        text_color="black",
-        fg_color="white",
-        font=("Arial", 12)
-    ).pack(side="left")
-    
-    email_switch = ctk.CTkSwitch(
-        email_frame,
-        text="",
-        fg_color="#FA9A85",
-        progress_color="#7ed957"
-    )
-    email_switch.pack(side="right", padx=10)
-    
-    # ============ HELP SECTION ============
-    help_frame = ctk.CTkFrame(
-        settings_frame,
-        fg_color="white",
-        corner_radius=15
-    )
-    help_frame.pack(
-        fill="x",
-        padx=20,
-        pady=15
-    )
-    
-    ctk.CTkLabel(
-        help_frame,
-        text="Help & Support",
-        text_color="black",
-        fg_color="white",
-        font=("Arial", 18, "bold")
-    ).pack(anchor="w", padx=20, pady=(15, 10))
-    
-    # About button
-    ctk.CTkButton(
-        help_frame,
-        text="About App",
-        fg_color="#FA9A85",
-        text_color="white",
-        hover_color="#E67D68",
-        font=("Arial", 12),
-        corner_radius=10,
-        height=35,
-        command=lambda: show_about_popup()
-    ).pack(fill="x", padx=20, pady=5)
-    
-    # Contact button
-    ctk.CTkButton(
-        help_frame,
-        text="Contact Support",
-        fg_color="#FA9A85",
-        text_color="white",
-        hover_color="#E67D68",
-        font=("Arial", 12),
-        corner_radius=10,
-        height=35,
-        command=lambda: show_contact_popup()
-    ).pack(fill="x", padx=20, pady=5)
-    
-    # FAQ button
-    ctk.CTkButton(
-        help_frame,
-        text="FAQ",
-        fg_color="#FA9A85",
-        text_color="white",
-        hover_color="#E67D68",
-        font=("Arial", 12),
-        corner_radius=10,
-        height=35,
-        command=lambda: show_faq_popup()
-    ).pack(fill="x", padx=20, pady=(5, 15))
-    
-    # ============ DANGER ZONE ============
-    danger_frame = ctk.CTkFrame(
-        settings_frame,
-        fg_color="white",
-        corner_radius=15
-    )
-    danger_frame.pack(
-        fill="x",
-        padx=20,
-        pady=15
-    )
-    
-    ctk.CTkLabel(
-        danger_frame,
-        text="Account",
-        text_color="black",
-        fg_color="white",
-        font=("Arial", 18, "bold")
-    ).pack(anchor="w", padx=20, pady=(15, 10))
-    
-    # Logout button
-    ctk.CTkButton(
-        danger_frame,
-        text="Logout",
-        fg_color="tomato",
-        text_color="white",
-        hover_color="#FC846F",
-        font=("Arial", 14, "bold"),
-        corner_radius=10,
-        height=45,
-        command=lambda: logout(show_frame, login_screen, container, main_frame)
-    ).pack(fill="x", padx=20, pady=10)
-    
-    # Delete account button (optional - uncomment if you want it)
-    # ctk.CTkButton(
-    #     danger_frame,
-    #     text="Delete Account",
-    #     fg_color="#C0392B",
-    #     text_color="white",
-    #     hover_color="#A93226",
-    #     font=("Arial", 12),
-    #     corner_radius=10,
-    #     height=35,
-    #     command=lambda: confirm_delete_account()
-    # ).pack(fill="x", padx=20, pady=(10, 15))
-    
-    return settings_frame
-
-
-# ============ POPUP HELPER FUNCTIONS ============
+# =====================================================
+# SETTINGS
+# =====================================================
 
 def show_about_popup():
-    """Show about app popup"""
+
     popup = ctk.CTkToplevel()
-    popup.geometry("400x300")
-    popup.title("About")
+    popup.focus()
+    popup.grab_set()
+
     
+
+    popup.geometry("400x300")
+
+    popup.title("About")
+
+
     ctk.CTkLabel(
         popup,
         text="Pet Goods & Services",
-        text_color="black",
         font=("Arial", 18, "bold")
     ).pack(pady=20)
-    
+
+
     ctk.CTkLabel(
         popup,
-        text="Version 1.0\n\nYour one-stop shop for all pet needs.\nBrowse products, book services, and more!",
-        text_color="#666",
+        text=(
+            "Version 1.0\n\n"
+            "Your one-stop shop for all pet needs.\n"
+            "Browse products, book services, and more!"
+        ),
         font=("Arial", 11),
         justify="center"
     ).pack(pady=20)
-    
+
+
     ctk.CTkButton(
         popup,
         text="Close",
@@ -580,26 +396,35 @@ def show_about_popup():
 
 
 def show_contact_popup():
-    """Show contact support popup"""
+
     popup = ctk.CTkToplevel()
+    popup.focus()
+    popup.grab_set()
+
     popup.geometry("400x300")
+
     popup.title("Contact Support")
-    
+
+
     ctk.CTkLabel(
         popup,
         text="Contact Support",
-        text_color="black",
         font=("Arial", 18, "bold")
     ).pack(pady=20)
-    
+
+
     ctk.CTkLabel(
         popup,
-        text="Email: support@petshop.com\nPhone: +1 (800) PET-SHOP\nLive Chat: Available 9AM-6PM",
-        text_color="#666",
+        text=(
+            "Email: support@petshop.com\n"
+            "Phone: +91 XXXXX XXXXX\n"
+            "Support: Available during business hours"
+        ),
         font=("Arial", 11),
         justify="center"
     ).pack(pady=20)
-    
+
+
     ctk.CTkButton(
         popup,
         text="Close",
@@ -608,50 +433,319 @@ def show_contact_popup():
 
 
 def show_faq_popup():
-    """Show FAQ popup"""
+
     popup = ctk.CTkToplevel()
+    popup.focus()
+    popup.grab_set()
+
     popup.geometry("450x400")
+
     popup.title("FAQ")
-    
+
+
     ctk.CTkLabel(
         popup,
         text="Frequently Asked Questions",
-        text_color="black",
         font=("Arial", 16, "bold")
     ).pack(pady=15)
-    
+
+
     faq_text = """Q: How do I place an order?
-A: Click on any product, select quantity, and add to cart.
+A: Select products using + and add them to your cart.
 
 Q: How do I book a service?
-A: Go to Services tab, select service, and choose date.
+A: Go to the Book section.
 
-Q: Can I cancel my order?
-A: Yes, within 24 hours of placing it.
+Q: Can I change product quantity?
+A: Yes, use the + and - buttons.
 
-Q: What payment methods do you accept?
-A: We accept all major credit/debit cards.
+Q: What payment methods are accepted?
+A: Contact the store for payment details."""
 
-Q: How long does delivery take?
-A: 3-5 business days for most orders."""
-    
+
     ctk.CTkLabel(
         popup,
         text=faq_text,
-        text_color="#666",
         font=("Arial", 10),
         justify="left"
-    ).pack(pady=15, padx=15)
-    
+    ).pack(
+        pady=15,
+        padx=15
+    )
+
+
     ctk.CTkButton(
         popup,
         text="Close",
         command=popup.destroy
     ).pack(pady=10)
 
-def show_order(order_frame, book_frame, settings_frame):
+
+def create_settings_page(
+        parent,
+        show_frame):
+
+    settings_content = ctk.CTkScrollableFrame(
+        parent,
+        fg_color="#ffe7d6"
+    )
+
+    settings_content.pack(
+        fill="both",
+        expand=True
+    )
+
+
+    # TITLE
+
+    ctk.CTkLabel(
+        settings_content,
+        text="Settings",
+        text_color="black",
+        font=("Arial", 36, "bold")
+    ).pack(pady=(30, 20))
+
+
+    # ACCOUNT
+
+    account_frame = ctk.CTkFrame(
+        settings_content,
+        fg_color="white",
+        corner_radius=15
+    )
+
+    account_frame.pack(
+        fill="x",
+        padx=20,
+        pady=15
+    )
+
+
+    ctk.CTkLabel(
+        account_frame,
+        text="Account Information",
+        text_color="black",
+        font=("Arial", 18, "bold")
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(15, 10)
+    )
+
+
+    ctk.CTkLabel(
+        account_frame,
+        text="Pet Store Customer",
+        text_color="#666"
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(5, 15)
+    )
+
+
+    # PREFERENCES
+
+    prefs_frame = ctk.CTkFrame(
+        settings_content,
+        fg_color="white",
+        corner_radius=15
+    )
+
+    prefs_frame.pack(
+        fill="x",
+        padx=20,
+        pady=15
+    )
+
+
+    ctk.CTkLabel(
+        prefs_frame,
+        text="Preferences",
+        text_color="black",
+        font=("Arial", 18, "bold")
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(15, 10)
+    )
+
+
+    notif_frame = ctk.CTkFrame(
+        prefs_frame,
+        fg_color="white"
+    )
+
+    notif_frame.pack(
+        fill="x",
+        padx=20,
+        pady=10
+    )
+
+
+    ctk.CTkLabel(
+        notif_frame,
+        text="Enable Notifications",
+        text_color="black"
+    ).pack(side="left")
+
+
+    ctk.CTkSwitch(
+        notif_frame,
+        text="",
+        fg_color="#FA9A85",
+        progress_color="#7ed957"
+    ).pack(
+        side="right",
+        padx=10
+    )
+
+
+    # HELP
+
+    help_frame = ctk.CTkFrame(
+        settings_content,
+        fg_color="white",
+        corner_radius=15
+    )
+
+    help_frame.pack(
+        fill="x",
+        padx=20,
+        pady=15
+    )
+
+
+    ctk.CTkLabel(
+        help_frame,
+        text="Help & Support",
+        text_color="black",
+        font=("Arial", 18, "bold")
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(15, 10)
+    )
+
+
+    ctk.CTkButton(
+        help_frame,
+        text="About App",
+        command=show_about_popup,
+        fg_color="#FA9A85"
+    ).pack(
+        fill="x",
+        padx=20,
+        pady=5
+    )
+
+
+    ctk.CTkButton(
+        help_frame,
+        text="Contact Support",
+        command=show_contact_popup,
+        fg_color="#FA9A85"
+    ).pack(
+        fill="x",
+        padx=20,
+        pady=5
+    )
+
+
+    ctk.CTkButton(
+        help_frame,
+        text="FAQ",
+        command=show_faq_popup,
+        fg_color="#FA9A85"
+    ).pack(
+        fill="x",
+        padx=20,
+        pady=(5, 15)
+    )
+
+
+    # =================================================
+    # LOGOUT
+    # =================================================
+
+    def logout():
+
+        confirm = messagebox.askyesno(
+            "Logout",
+            "Are you sure you want to logout?"
+        )
+
+        if not confirm:
+            return
+
+
+        if os.path.exists("session.txt"):
+
+            os.remove("session.txt")
+
+
+        # Clear cart
+
+        cart.clear()
+
+
+        # Go to login screen
+
+        show_frame("login")
+
+
+    danger_frame = ctk.CTkFrame(
+        settings_content,
+        fg_color="white",
+        corner_radius=15
+    )
+
+    danger_frame.pack(
+        fill="x",
+        padx=20,
+        pady=15
+    )
+
+
+    ctk.CTkLabel(
+        danger_frame,
+        text="Account",
+        text_color="black",
+        font=("Arial", 18, "bold")
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(15, 10)
+    )
+
+
+    ctk.CTkButton(
+        danger_frame,
+        text="Logout",
+        fg_color="tomato",
+        hover_color="#FC846F",
+        text_color="white",
+        font=("Arial", 14, "bold"),
+        height=45,
+        command=logout
+    ).pack(
+        fill="x",
+        padx=20,
+        pady=(0, 15)
+    )
+
+
+# =====================================================
+# PAGE SWITCHING INSIDE USER SCREEN
+# =====================================================
+
+def show_order(
+        order_frame,
+        book_frame,
+        settings_frame):
 
     book_frame.pack_forget()
+
     settings_frame.pack_forget()
 
     order_frame.pack(
@@ -659,34 +753,14 @@ def show_order(order_frame, book_frame, settings_frame):
         expand=True
     )
 
-def show_settings(page, app, order_frame, book_frame, settings_frame, products, cart_frame, total_label):
+
+def show_book(
+        order_frame,
+        book_frame,
+        settings_frame):
 
     order_frame.pack_forget()
-    book_frame.pack_forget()
 
-    # Clear old settings content if any
-    for widget in settings_frame.winfo_children():
-        widget.destroy()
-
-    user_id = main.check_logged_in()
-
-    settings_content = create_settings_page(
-        parent=settings_frame,
-        show_frame=main.show_frame,
-        login_screen=login.login_screen,
-        container=app,
-        main_frame=page,
-        user_id=user_id
-    )
-
-    settings_frame.pack(
-        fill="both",
-        expand=True
-    )
-
-def show_book(order_frame, book_frame, settings_frame):
-
-    order_frame.pack_forget()
     settings_frame.pack_forget()
 
     book_frame.pack(
@@ -694,7 +768,45 @@ def show_book(order_frame, book_frame, settings_frame):
         expand=True
     )
 
-def create_navbar(parent, app, order_frame, book_frame, settings_frame, products, cart_frame, total_label):
+
+def show_settings(
+        order_frame,
+        book_frame,
+        settings_frame,
+        show_frame):
+
+    order_frame.pack_forget()
+
+    book_frame.pack_forget()
+
+
+    for widget in settings_frame.winfo_children():
+
+        widget.destroy()
+
+
+    create_settings_page(
+        settings_frame,
+        show_frame
+    )
+
+
+    settings_frame.pack(
+        fill="both",
+        expand=True
+    )
+
+
+# =====================================================
+# NAVBAR
+# =====================================================
+
+def create_navbar(
+        parent,
+        order_frame,
+        book_frame,
+        settings_frame,
+        show_frame):
 
     navbar = ctk.CTkFrame(
         parent,
@@ -704,6 +816,7 @@ def create_navbar(parent, app, order_frame, book_frame, settings_frame, products
     )
 
     navbar.pack(fill="x")
+
 
     ctk.CTkLabel(
         navbar,
@@ -716,6 +829,7 @@ def create_navbar(parent, app, order_frame, book_frame, settings_frame, products
         pady=15
     )
 
+
     btn_frame = ctk.CTkFrame(
         navbar,
         fg_color="transparent"
@@ -726,6 +840,7 @@ def create_navbar(parent, app, order_frame, book_frame, settings_frame, products
         padx=20
     )
 
+
     ctk.CTkButton(
         btn_frame,
         text="Order",
@@ -733,8 +848,16 @@ def create_navbar(parent, app, order_frame, book_frame, settings_frame, products
         text_color="#FA9A85",
         hover_color="#f9d8d1",
         font=("Arial", 20, "bold"),
-        command=lambda: show_order(order_frame, book_frame, settings_frame)
-    ).pack(side="left", padx=5)
+        command=lambda: show_order(
+            order_frame,
+            book_frame,
+            settings_frame
+        )
+    ).pack(
+        side="left",
+        padx=5
+    )
+
 
     ctk.CTkButton(
         btn_frame,
@@ -743,8 +866,16 @@ def create_navbar(parent, app, order_frame, book_frame, settings_frame, products
         text_color="#FA9A85",
         hover_color="#f9d8d1",
         font=("Arial", 20, "bold"),
-        command=lambda: show_book(order_frame, book_frame, settings_frame)
-    ).pack(side="left", padx=5)
+        command=lambda: show_book(
+            order_frame,
+            book_frame,
+            settings_frame
+        )
+    ).pack(
+        side="left",
+        padx=5
+    )
+
 
     ctk.CTkButton(
         btn_frame,
@@ -753,9 +884,21 @@ def create_navbar(parent, app, order_frame, book_frame, settings_frame, products
         text_color="#FA9A85",
         hover_color="#f9d8d1",
         font=("Arial", 20, "bold"),
-        command=lambda: show_settings(parent, app, order_frame, book_frame, settings_frame, products, cart_frame, total_label)
-    ).pack(side="left", padx=5)
+        command=lambda: show_settings(
+            order_frame,
+            book_frame,
+            settings_frame,
+            show_frame
+        )
+    ).pack(
+        side="left",
+        padx=5
+    )
 
+
+# =====================================================
+# CART SIDEBAR
+# =====================================================
 
 def create_cart_sidebar(parent):
 
@@ -772,6 +915,7 @@ def create_cart_sidebar(parent):
         pady=10
     )
 
+
     cart_items_frame = ctk.CTkScrollableFrame(
         sidebar,
         width=240,
@@ -785,6 +929,7 @@ def create_cart_sidebar(parent):
         pady=10
     )
 
+
     total_label = ctk.CTkLabel(
         sidebar,
         text="Total: ₹0",
@@ -793,31 +938,67 @@ def create_cart_sidebar(parent):
 
     total_label.pack(pady=10)
 
+
+    def checkout():
+
+        if not cart or sum(cart.values()) == 0:
+
+            messagebox.showwarning(
+                "Cart Empty",
+                "Please add products to your cart first."
+            )
+
+            return
+
+
+        messagebox.showinfo(
+            "Checkout",
+            "Your order has been placed successfully!"
+        )
+
+        cart.clear()
+
+
     ctk.CTkButton(
         sidebar,
         text="Checkout",
-        height=40
+        height=40,
+        command=checkout
     ).pack(
         fill="x",
         padx=10,
         pady=10
     )
 
+
     return cart_items_frame, total_label
 
 
-def user_screen(container, products, app):
+# =====================================================
+# MAIN USER SCREEN
+# =====================================================
+
+def user_screen(container, show_frame):
+
+    # Get latest products from database
+
+    products = db.get_products()
+
 
     page = ctk.CTkFrame(
         container,
         fg_color="white"
     )
 
+
     page.grid(
         row=0,
         column=0,
         sticky="nsew"
     )
+
+
+    # NAVBAR FIRST
 
     body = ctk.CTkFrame(
         page,
@@ -829,9 +1010,15 @@ def user_screen(container, products, app):
         expand=True
     )
 
+
+    # CART
+
     cart_frame, total_label = create_cart_sidebar(
         body
     )
+
+
+    # PRODUCTS AREA
 
     products_container = ctk.CTkFrame(
         body,
@@ -844,6 +1031,9 @@ def user_screen(container, products, app):
         expand=True
     )
 
+
+    # ORDER PAGE
+
     order_frame = create_order_page(
         products_container,
         products,
@@ -851,12 +1041,15 @@ def user_screen(container, products, app):
         total_label
     )
 
-    # Create book frame (services booking page - placeholder for now)
+
+    # BOOK PAGE
+
     book_frame = ctk.CTkFrame(
-        body,
+        products_container,
         fg_color="#ffe7d6"
     )
-    
+
+
     ctk.CTkLabel(
         book_frame,
         text="Services Coming Soon",
@@ -864,12 +1057,24 @@ def user_screen(container, products, app):
         text_color="black"
     ).pack(pady=50)
 
-    # Create settings frame (will be filled by show_settings)
+
+    # SETTINGS PAGE
+
     settings_frame = ctk.CTkFrame(
-        body,
-        width=1300,
+        products_container,
         fg_color="#ffe7d6"
     )
+
+
+    # SHOW ORDER FIRST
+
+    order_frame.pack(
+        fill="both",
+        expand=True
+    )
+
+
+    # REFRESH CART
 
     refresh_cart(
         cart_frame,
@@ -877,7 +1082,16 @@ def user_screen(container, products, app):
         products
     )
 
-    # Create navbar FIRST so it's on top
-    create_navbar(page, app, order_frame, book_frame, settings_frame, products, cart_frame, total_label)
+
+    # NAVBAR
+
+    create_navbar(
+        page,
+        order_frame,
+        book_frame,
+        settings_frame,
+        show_frame
+    )
+
 
     return page

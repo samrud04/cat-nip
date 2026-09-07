@@ -1,68 +1,135 @@
-from turtle import color
 import customtkinter as ctk
+from PIL import Image
+
 import db
-import re
-from PIL import Image, ImageTk
 import login
 import register
 import user
 import admin
-def show_frame(frame):
-    frame.tkraise()
 
-def check_logged_in():
-    """Check if user was previously logged in"""
-    try:
-        with open("session.txt", "r") as f:
-            user_id = int(f.read().strip())
-            return user_id
-    except:
-        return None  # No session found
 
 def main():
-    # Setup
+
+    # ================= APP SETUP =================
+
     ctk.set_appearance_mode("light")
     ctk.set_default_color_theme("blue")
-    app = ctk.CTk()
-    app.title("Cat-Nip")
-    app.geometry("800x600")
-    app.after(0, lambda: app.state('zoomed'))
-    
-    # App icon
-    Icon = ctk.CTkImage(Image.open("assets/catnipico.png"), size=(500, 400))
 
-    # Main container
+    app = ctk.CTk()
+
+    app.title("Cat-Nip")
+
+    app.geometry("800x600")
+
+    app.after(0, lambda: app.state("zoomed"))
+
+
+    # ================= ICON =================
+
+    icon = ctk.CTkImage(
+        Image.open("assets/catnipico.png"),
+        size=(500, 400)
+    )
+
+
+    # ================= MAIN CONTAINER =================
+
     container = ctk.CTkFrame(app)
-    container.pack(fill="both", expand=True)
+
+    container.pack(
+        fill="both",
+        expand=True
+    )
 
     container.grid_rowconfigure(0, weight=1)
     container.grid_columnconfigure(0, weight=1)
 
-    #admin screen
-    admin_frame = admin.create_admin_frame(container)
 
-    admin_frame.grid(
+    # ================= FRAMES DICTIONARY =================
+
+    frames = {}
+
+
+    def show_frame(name):
+
+        frames[name].tkraise()
+
+
+    # =====================================================
+    # HOME SCREEN
+    # =====================================================
+
+    main_frame = ctk.CTkFrame(
+        container,
+        fg_color="#ffe7d6"
+    )
+
+    main_frame.grid(
         row=0,
         column=0,
         sticky="nsew"
     )
-    # Home Screen
-    main_frame = ctk.CTkFrame(container, fg_color="#ffe7d6")
-    main_frame.grid(row=0, column=0, sticky="nsew")
+
+    frames["main"] = main_frame
+
 
     main_frame.grid_columnconfigure(0, weight=1)
     main_frame.grid_columnconfigure(1, weight=1)
     main_frame.grid_rowconfigure(0, weight=1)
 
-    left_frame = ctk.CTkFrame(main_frame, fg_color="#FA9A85", width=300, height=300, corner_radius=100)
-    left_frame.grid(row=0, column=0, sticky="nsew", padx=40, pady=40)
 
-    right_frame = ctk.CTkFrame(main_frame, fg_color="#fca265", width=200, height=300, corner_radius=100)
-    right_frame.grid(row=0, column=1, sticky="nsew", padx=40, pady=40)
+    # LEFT SIDE
 
-    img_label = ctk.CTkLabel(left_frame, text="",image=Icon, fg_color="#FA9A85")
-    img_label.image = Icon
-    img_label.place(x=120, y=230)
+    left_frame = ctk.CTkFrame(
+        main_frame,
+        fg_color="#FA9A85",
+        corner_radius=100
+    )
+
+    left_frame.grid(
+        row=0,
+        column=0,
+        sticky="nsew",
+        padx=40,
+        pady=40
+    )
+
+
+    # RIGHT SIDE
+
+    right_frame = ctk.CTkFrame(
+        main_frame,
+        fg_color="#fca265",
+        corner_radius=100
+    )
+
+    right_frame.grid(
+        row=0,
+        column=1,
+        sticky="nsew",
+        padx=40,
+        pady=40
+    )
+
+
+    # LOGO
+
+    img_label = ctk.CTkLabel(
+        left_frame,
+        text="",
+        image=icon,
+        fg_color="#FA9A85"
+    )
+
+    img_label.image = icon
+
+    img_label.place(
+        x=120,
+        y=230
+    )
+
+
+    # TITLE
 
     ctk.CTkLabel(
         left_frame,
@@ -70,9 +137,14 @@ def main():
         text_color="black",
         fg_color="#FA9A85",
         font=("Arial", 64, "bold")
-    ).place(x=120, y=100)
+    ).place(
+        x=120,
+        y=100
+    )
 
-    # Home buttons 
+
+    # LOGIN BUTTON
+
     ctk.CTkButton(
         right_frame,
         text="Login",
@@ -83,8 +155,14 @@ def main():
         hover_color="#ffd0af",
         text_color="black",
         font=("Arial", 41, "bold"),
-        command=lambda: show_frame(login_frame)
-    ).place(x=170,y=220)
+        command=lambda: show_frame("login")
+    ).place(
+        x=170,
+        y=220
+    )
+
+
+    # REGISTER BUTTON
 
     ctk.CTkButton(
         right_frame,
@@ -96,27 +174,91 @@ def main():
         hover_color="#ffd0af",
         text_color="black",
         font=("Arial", 41, "bold"),
-        command=lambda: show_frame(register_frame)
-    ).place(x=170,y=370)
+        command=lambda: show_frame("register")
+    ).place(
+        x=170,
+        y=370
+    )
 
 
-    # Login Screen
-    login_frame = login.login_screen(container, main_frame, show_frame, app)
+    # =====================================================
+    # CREATE LOGIN SCREEN
+    # =====================================================
 
-    # Register Screen
-    register_frame = register.register_screen(container, main_frame, show_frame)
+    login_frame = login.login_screen(
+        container,
+        show_frame
+    )
 
-    # User Screen
-    user_frame = user.user_screen(container, db.get_products(), app)
+    login_frame.grid(
+        row=0,
+        column=0,
+        sticky="nsew"
+    )
 
-    # Start on appropriate screen
-    logged_in_user = check_logged_in()
-    if logged_in_user:
-        # Show user page directly
-        show_frame(admin_frame)
-    else:
-        # Show main page
-        show_frame(admin_frame)
+    frames["login"] = login_frame
+
+
+    # =====================================================
+    # CREATE REGISTER SCREEN
+    # =====================================================
+
+    register_frame = register.register_screen(
+        container,
+        show_frame
+    )
+
+    register_frame.grid(
+        row=0,
+        column=0,
+        sticky="nsew"
+    )
+
+    frames["register"] = register_frame
+
+
+    # =====================================================
+    # CREATE USER SCREEN
+    # =====================================================
+
+    user_frame = user.user_screen(
+    container,
+    show_frame
+    )
+
+    user_frame.grid(
+        row=0,
+        column=0,
+        sticky="nsew"
+    )
+
+    frames["user"] = user_frame
+
+
+    # =====================================================
+    # CREATE ADMIN SCREEN
+    # =====================================================
+
+    admin_frame = admin.create_admin_frame(
+        container,
+        show_frame
+    )
+
+    admin_frame.grid(
+        row=0,
+        column=0,
+        sticky="nsew"
+    )
+
+    frames["admin"] = admin_frame
+
+
+    # =====================================================
+    # START APPLICATION
+    # =====================================================
+
+    show_frame("main")
+
     app.mainloop()
 
 

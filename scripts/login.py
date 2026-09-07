@@ -1,92 +1,234 @@
 import customtkinter as ctk
 import tkinter as tk
+from tkinter import messagebox
 import db
-import user, register
 
-def login_screen(container, main_frame, show_frame, app):
-    login = ctk.CTkFrame(container, fg_color="#ffe7d6", width=800, height=600)
-    login.grid(row=0, column=0, sticky="nsew")
 
-    register_frame = register.register_screen(container, main_frame, show_frame)
+def login_screen(container, show_frame):
+
+    # =====================================================
+    # LOGIN FRAME
+    # =====================================================
+
+    login = ctk.CTkFrame(
+        container,
+        fg_color="#ffe7d6"
+    )
+
 
     login.grid_columnconfigure(0, weight=1)
     login.grid_columnconfigure(1, weight=1)
     login.grid_rowconfigure(0, weight=1)
 
-    # ============ LEFT FRAME - FEATURES ============
-    left_frame = ctk.CTkFrame(login, fg_color="#FA9A85", corner_radius=100)
-    left_frame.grid(row=0, column=0, sticky="nsew", padx=(40, 20), pady=40)
 
-    # Logo/Emoji
+    # =====================================================
+    # LOGIN HANDLER
+    # =====================================================
+
+    def log_submit():
+
+        username = login_uname_entry.get().strip()
+        password = login_pwd_entry.get()
+
+
+        # CHECK EMPTY FIELDS
+
+        if not username or not password:
+
+            messagebox.showerror(
+                "Error",
+                "Please fill all fields!"
+            )
+
+            return
+
+
+        # =================================================
+        # ADMIN LOGIN
+        # =================================================
+
+        if username == "admin" and password == "admin123":
+
+            login_uname_entry.delete(0, "end")
+            login_pwd_entry.delete(0, "end")
+
+            show_frame("admin")
+
+            return
+
+
+        # =================================================
+        # NORMAL USER LOGIN
+        # =================================================
+
+        logged_in = db.login(
+            "user",
+            username,
+            password
+        )
+
+
+        if logged_in:
+
+            user_id = db.get_user_id(username)
+
+
+            # SAVE USER SESSION
+
+            with open("session.txt", "w") as f:
+
+                f.write(str(user_id))
+
+
+            # CLEAR ENTRIES
+
+            login_uname_entry.delete(0, "end")
+            login_pwd_entry.delete(0, "end")
+
+
+            # SHOW USER SCREEN
+
+            show_frame("user")
+
+
+        else:
+
+            messagebox.showerror(
+                "Error",
+                "Invalid credentials!"
+            )
+
+
+    # =====================================================
+    # LEFT FRAME - FEATURES
+    # =====================================================
+
+    left_frame = ctk.CTkFrame(
+        login,
+        fg_color="#FA9A85",
+        corner_radius=100
+    )
+
+    left_frame.grid(
+        row=0,
+        column=0,
+        sticky="nsew",
+        padx=(40, 20),
+        pady=40
+    )
+
+
+    # LOGO
+
     ctk.CTkLabel(
-        left_frame, 
-        text="🐾", 
-        text_color="black", 
-        fg_color="#FA9A85", 
+        left_frame,
+        text="🐾",
+        text_color="black",
         font=("Arial", 80)
-    ).pack(pady=(30, 10))
+    ).pack(
+        pady=(30, 10)
+    )
 
-    # Brand Name
+
+    # BRAND NAME
+
     ctk.CTkLabel(
         left_frame,
         text="Pet Goods &\nServices",
         text_color="black",
-        fg_color="#FA9A85",
         font=("Arial", 40, "bold"),
         justify="center"
-    ).pack(pady=(0, 30))
+    ).pack(
+        pady=(0, 30)
+    )
 
-    # Features List
+
+    # FEATURES
+
     features = [
+
         "✓ Browse Pet Products",
         "✓ Book Grooming Services",
         "✓ Track Your Orders",
         "✓ Manage Your Pets"
+
     ]
 
+
     for feature in features:
+
         ctk.CTkLabel(
             left_frame,
             text=feature,
             text_color="black",
-            fg_color="#FA9A85",
-            font=("Arial", 25),
-            justify="center"
-        ).pack(pady=8, anchor="w", padx=30)
+            font=("Arial", 25)
+        ).pack(
+            pady=8,
+            anchor="w",
+            padx=30
+        )
 
-    # Tagline at bottom
+
+    # TAGLINE
+
     ctk.CTkLabel(
         left_frame,
         text="Join thousands of happy\npet owners today!",
         text_color="#fff5f0",
-        fg_color="#FA9A85",
         font=("Arial", 28),
         justify="center"
-    ).pack(pady=(50, 30))
+    ).pack(
+        pady=(50, 30)
+    )
 
-    # ============ RIGHT FRAME - LOGIN FORM ============
-    right_frame = ctk.CTkFrame(login, fg_color="#ffe7d6", corner_radius=30)
-    right_frame.grid(row=0, column=1, sticky="nsew", padx=(20, 40), pady=40)
 
-    # Title
+    # =====================================================
+    # RIGHT FRAME - LOGIN FORM
+    # =====================================================
+
+    right_frame = ctk.CTkFrame(
+        login,
+        fg_color="#ffe7d6",
+        corner_radius=30
+    )
+
+    right_frame.grid(
+        row=0,
+        column=1,
+        sticky="nsew",
+        padx=(20, 40),
+        pady=40
+    )
+
+
+    # TITLE
+
     ctk.CTkLabel(
         right_frame,
         text="Login",
         text_color="black",
-        fg_color="#ffe7d6",
         font=("Arial", 48, "bold")
-    ).pack(pady=(40, 30))
+    ).pack(
+        pady=(40, 30)
+    )
 
-    # Username Label
+
+    # =====================================================
+    # USERNAME
+    # =====================================================
+
     ctk.CTkLabel(
         right_frame,
         text="Username:",
         text_color="black",
-        fg_color="#ffe7d6",
         font=("Arial", 16, "bold")
-    ).pack(anchor="w", padx=40, pady=(10, 0))
+    ).pack(
+        anchor="w",
+        padx=40,
+        pady=(10, 0)
+    )
 
-    # Username Entry
+
     login_uname_entry = ctk.CTkEntry(
         right_frame,
         width=250,
@@ -96,18 +238,28 @@ def login_screen(container, main_frame, show_frame, app):
         border_width=2,
         font=("Arial", 13)
     )
-    login_uname_entry.pack(padx=40, pady=(5, 20))
 
-    # Password Label
+    login_uname_entry.pack(
+        padx=40,
+        pady=(5, 20)
+    )
+
+
+    # =====================================================
+    # PASSWORD
+    # =====================================================
+
     ctk.CTkLabel(
         right_frame,
         text="Password:",
         text_color="black",
-        fg_color="#ffe7d6",
         font=("Arial", 16, "bold")
-    ).pack(anchor="w", padx=40, pady=(0, 0))
+    ).pack(
+        anchor="w",
+        padx=40
+    )
 
-    # Password Entry
+
     login_pwd_entry = ctk.CTkEntry(
         right_frame,
         width=250,
@@ -118,31 +270,17 @@ def login_screen(container, main_frame, show_frame, app):
         border_width=2,
         font=("Arial", 13)
     )
-    login_pwd_entry.pack(padx=40, pady=(5, 30))
 
-    # Login handler
-    def log_submit():
-        username = login_uname_entry.get()
-        password = login_pwd_entry.get()
+    login_pwd_entry.pack(
+        padx=40,
+        pady=(5, 30)
+    )
 
-        if not username or not password:
-            tk.messagebox.showerror("Error", "Please fill all fields!")
-        else:
-            logged_In = db.login("user", username, password)
-            
-            if logged_In:
-                user_id = db.get_user_id(username)
-                
-                # SAVE LOGIN
-                with open("session.txt", "w") as f:
-                    f.write(str(user_id))
-                
-                user_frame = user.user_screen(container, db.get_products(), app)
-                show_frame(user_frame)
-            else:
-                tk.messagebox.showerror("Error", "Invalid credentials!")
 
-    # Submit Button
+    # =====================================================
+    # LOGIN BUTTON
+    # =====================================================
+
     ctk.CTkButton(
         right_frame,
         text="Login",
@@ -154,19 +292,34 @@ def login_screen(container, main_frame, show_frame, app):
         width=250,
         height=45,
         corner_radius=10
-    ).pack(pady=20)
+    ).pack(
+        pady=20
+    )
 
-    # Register Link
-    link_frame = ctk.CTkFrame(right_frame, fg_color="#ffe7d6")
-    link_frame.pack(pady=(10, 40))
+
+    # =====================================================
+    # REGISTER LINK
+    # =====================================================
+
+    link_frame = ctk.CTkFrame(
+        right_frame,
+        fg_color="#ffe7d6"
+    )
+
+    link_frame.pack(
+        pady=(10, 40)
+    )
+
 
     ctk.CTkLabel(
         link_frame,
         text="Don't have an account? ",
         text_color="black",
-        fg_color="#ffe7d6",
         font=("Arial", 11)
-    ).pack(side="left", padx=0)
+    ).pack(
+        side="left"
+    )
+
 
     ctk.CTkButton(
         link_frame,
@@ -176,22 +329,31 @@ def login_screen(container, main_frame, show_frame, app):
         hover_color="white",
         font=("Arial", 11, "bold"),
         border_width=0,
-        bg_color="#ffe7d6",
-        command=lambda: show_frame(register_frame) # Go to register
-    ).pack(side="left", padx=0)
+        command=lambda: show_frame("register")
+    ).pack(
+        side="left"
+    )
 
-    # ============ BACK BUTTON ============
+
+    # =====================================================
+    # BACK BUTTON
+    # =====================================================
+
     ctk.CTkButton(
         left_frame,
         text="←",
-        command=lambda: show_frame(main_frame),
+        command=lambda: show_frame("main"),
         width=50,
         height=50,
         fg_color="tomato",
         text_color="black",
         hover_color="#FC846F",
-        font=("Arial", 40, "bold"),
+        font=("Arial", 30, "bold"),
         corner_radius=50
-    ).place(x=50, y=50)
+    ).place(
+        x=50,
+        y=50
+    )
+
 
     return login
