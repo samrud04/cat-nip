@@ -4,7 +4,7 @@ from tkinter import messagebox
 import db
 
 
-def login_screen(container, show_frame):
+def login_screen(container, show_frame, refresh_user_screen):
 
     # =====================================================
     # LOGIN FRAME
@@ -29,9 +29,6 @@ def login_screen(container, show_frame):
 
         username = login_uname_entry.get().strip()
         password = login_pwd_entry.get()
-
-
-        # CHECK EMPTY FIELDS
 
         if not username or not password:
 
@@ -73,22 +70,22 @@ def login_screen(container, show_frame):
             user_id = db.get_user_id(username)
 
 
-            # SAVE USER SESSION
+            # SAVE CURRENT USER ID
 
             with open("session.txt", "w") as f:
 
                 f.write(str(user_id))
 
 
-            # CLEAR ENTRIES
+            # CLEAR LOGIN FIELDS
 
             login_uname_entry.delete(0, "end")
             login_pwd_entry.delete(0, "end")
 
 
-            # SHOW USER SCREEN
+            # OPEN USER SCREEN
 
-            show_frame("user")
+            refresh_user_screen()
 
 
         else:
