@@ -358,58 +358,135 @@ def add_order_item(order_id, product_id, quantity, price):
 
 def checkout(user_id):
 
-    # Get user's cart
-    cart_items = get_cart(user_id)
+    con, cur = connect()
 
-    if not cart_items:
-        return False
+    try:
 
+        # Get cart items with current stock
+        cur.execute(
+            """
+            SELECT
+                cart.product_id,
+                cart.quantity,
+                products.price,
+                products.stock
+            FROM cart
+            JOIN products
+            ON cart.product_id = products.id
+            WHERE cart.user_id = %s
+            """,
+            (user_id,)
+        )
 
-    total = 0
-
-
-    # Calculate total
-
-    for item in cart_items:
-
-        product_id = item[0]
-        quantity = item[1]
-        price = float(item[3])
-
-        total += quantity * price
-
-
-    # Create order
-
-    order_id = create_order(
-        user_id,
-        total
-    )
+        cart_items = cur.fetchall()
 
 
-    # Add products to order
+        # Check if cart is empty
+        if not cart_items:
 
-    for item in cart_items:
-
-        product_id = item[0]
-        quantity = item[1]
-        price = float(item[3])
+            con.close()
+            return False
 
 
-        add_order_item(
-            order_id,
-            product_id,
-            quantity,
-            price
+        total = 0
+
+
+        # Check stock and calculate total
+        for item in cart_items:
+
+            product_id = item[0]
+            quantity = item[1]
+            price = float(item[2])
+            stock = int(item[3])
+
+
+            # Prevent buying more than available stock
+            if quantity > stock:
+
+                con.close()
+                return False
+
+
+            total += quantity * price
+
+
+        # Create order
+        cur.execute(
+            """
+            INSERT INTO orders (user_id, total)
+            VALUES (%s, %s)
+            """,
+            (user_id, total)
+        )
+
+        order_id = cur.lastrowid
+
+
+        # Add order items and reduce stock
+        for item in cart_items:
+
+            product_id = item[0]
+            quantity = item[1]
+            price = float(item[2])
+
+
+            # Add item to order history
+            cur.execute(
+                """
+                INSERT INTO order_items
+                (order_id, product_id, quantity, price)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (
+                    order_id,
+                    product_id,
+                    quantity,
+                    price
+                )
+            )
+
+
+            # Reduce product stock
+            cur.execute(
+                """
+                UPDATE products
+                SET stock = stock - %s
+                WHERE id = %s
+                """,
+                (
+                    quantity,
+                    product_id
+                )
+            )
+
+
+        # Clear cart
+        cur.execute(
+            """
+            DELETE FROM cart
+            WHERE user_id = %s
+            """,
+            (user_id,)
         )
 
 
-    # Clear user's cart
+        # Save everything
+        con.commit()
 
-    clear_cart(user_id)
+        con.close()
+
+        return True
 
 
-    return True
+    except Exception as e:
+
+        print("Checkout Error:", e)
+
+        con.rollback()
+
+        con.close()
+
+        return False
 def create_booking(user_id, service_name, pet_name, booking_date, notes=""):
     try:
         conn, cursor = connect()
@@ -444,3 +521,24 @@ def get_user_bookings(user_id):
     except Exception as e:
         print("Error fetching bookings:", e)
         return []
+def reduce_stock(product_id, quantity):
+
+    con, cur = connect()
+
+    cur.execute(
+        """
+        UPDATE products
+        SET stock = stock - %s
+        WHERE id = %s
+        AND stock >= %s
+        """,
+        (quantity, product_id, quantity)
+    )
+
+    con.commit()
+
+    success = cur.rowcount > 0
+
+    con.close()
+
+    return success

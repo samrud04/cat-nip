@@ -873,6 +873,17 @@ def create_admin_frame(container, show_frame):
         padx=(5, 0)
     )
 
+    ctk.CTkButton(
+        search_frame,
+        text="🔄 Refresh",
+        width=100,
+        command=load_products
+    ).grid(
+        row=0,
+        column=3,
+        padx=(5, 0)
+    )
+
 
     # =====================================================
     # PRODUCT TABLE

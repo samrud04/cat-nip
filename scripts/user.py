@@ -20,10 +20,8 @@ def load_user_cart(user_id):
 
     global cart
 
-    # Clear previous user's cart
     cart.clear()
 
-    # Get this user's cart
     cart_items = db.get_cart(user_id)
 
     for item in cart_items:
@@ -40,7 +38,6 @@ def load_user_cart(user_id):
 
 def refresh_cart(cart_frame, total_label, products):
 
-    # Clear old cart display
     for widget in cart_frame.winfo_children():
         widget.destroy()
 
@@ -48,6 +45,7 @@ def refresh_cart(cart_frame, total_label, products):
 
 
     # Cart Title
+
     ctk.CTkLabel(
         cart_frame,
         text="🛒 Your Cart",
@@ -56,7 +54,8 @@ def refresh_cart(cart_frame, total_label, products):
     ).pack(pady=10)
 
 
-    # Show cart items
+    # Show Cart Items
+
     for product in products:
 
         product_id = product[0]
@@ -89,7 +88,7 @@ def refresh_cart(cart_frame, total_label, products):
 
                 ctk.CTkLabel(
                     item_frame,
-                    text=f"{name}",
+                    text=name,
                     text_color="black",
                     font=("Arial", 14, "bold")
                 ).pack(
@@ -121,19 +120,19 @@ def refresh_cart(cart_frame, total_label, products):
                 )
 
 
-    # Empty cart message
+    # Empty Cart
+
     if not cart:
 
         ctk.CTkLabel(
             cart_frame,
             text="Your cart is empty",
             text_color="gray"
-        ).pack(
-            pady=30
-        )
+        ).pack(pady=30)
 
 
-    # Update total
+    # Update Total
+
     total_label.configure(
         text=f"Total: ₹{total:.2f}"
     )
@@ -160,7 +159,18 @@ def add_to_cart(
     )
 
 
-    # Check stock
+    # Stock Check
+
+    if stock <= 0:
+
+        messagebox.showwarning(
+            "Out of Stock",
+            "This product is currently out of stock."
+        )
+
+        return
+
+
     if current_quantity >= stock:
 
         messagebox.showwarning(
@@ -171,24 +181,28 @@ def add_to_cart(
         return
 
 
-    # Add to database
+    # Add to Database
+
     db.add_to_cart(
         current_user_id,
         product_id
     )
 
 
-    # Update local cart
+    # Update Local Cart
+
     cart[product_id] = current_quantity + 1
 
 
-    # Update quantity label
+    # Update Label
+
     qty_label.configure(
         text=str(cart[product_id])
     )
 
 
-    # Refresh cart
+    # Refresh Cart
+
     refresh_cart(
         cart_frame,
         total_label,
@@ -211,27 +225,26 @@ def remove_from_cart(
 
 
     if product_id not in cart:
-
         return
 
 
     if cart[product_id] <= 0:
-
         return
 
 
-    # Remove from database
+    # Remove from Database
+
     db.remove_from_cart(
         current_user_id,
         product_id
     )
 
 
-    # Reduce local quantity
+    # Update Local Cart
+
     cart[product_id] -= 1
 
 
-    # Remove completely if zero
     if cart[product_id] <= 0:
 
         del cart[product_id]
@@ -247,7 +260,8 @@ def remove_from_cart(
         )
 
 
-    # Refresh cart
+    # Refresh Cart
+
     refresh_cart(
         cart_frame,
         total_label,
@@ -275,7 +289,9 @@ def create_product_card(
     category = product[4]
     stock = int(product[5])
 
-    # ---------- Product Card ----------
+
+    # PRODUCT CARD
+
     card = ctk.CTkFrame(
         parent,
         width=230,
@@ -285,44 +301,81 @@ def create_product_card(
         border_width=1,
         border_color="#f0d9c8"
     )
-    card.grid(row=row, column=column, padx=12, pady=12, sticky="n")
+
+    card.grid(
+        row=row,
+        column=column,
+        padx=12,
+        pady=12,
+        sticky="n"
+    )
+
     card.grid_propagate(False)
 
-    # ---------- Icon Area ----------
+
+    # IMAGE AREA
+
     image_frame = ctk.CTkFrame(
         card,
         width=190,
         height=110,
-        fg_color="#FFF0E6",          # soft peach
+        fg_color="#FFF0E6",
         corner_radius=16
     )
-    image_frame.pack(pady=(18, 10))
+
+    image_frame.pack(
+        pady=(18, 10)
+    )
+
     image_frame.pack_propagate(False)
 
-    # Smarter icon selection
+
+    # PRODUCT ICON
+
     name_lower = name.lower()
     category_lower = category.lower() if category else ""
 
+
     if "collar" in name_lower or "leash" in name_lower or "harness" in name_lower:
+
         emoji = "🦮"
+
     elif "food" in name_lower or category_lower == "food":
+
         emoji = "🍖"
+
     elif "toy" in name_lower or "ball" in name_lower or category_lower == "toy":
+
         emoji = "🎾"
+
     elif "bed" in name_lower or "cushion" in name_lower:
+
         emoji = "🛏️"
+
     elif "bowl" in name_lower or "feeder" in name_lower:
+
         emoji = "🥣"
+
     elif "shampoo" in name_lower or "groom" in name_lower or "brush" in name_lower:
+
         emoji = "🧴"
+
     elif "treat" in name_lower or "snack" in name_lower:
+
         emoji = "🦴"
+
     elif "cage" in name_lower or "carrier" in name_lower:
+
         emoji = "🏠"
+
     elif category_lower == "accessory":
+
         emoji = "🎀"
+
     else:
+
         emoji = "🛍️"
+
 
     ctk.CTkLabel(
         image_frame,
@@ -330,16 +383,22 @@ def create_product_card(
         font=("Segoe UI Emoji", 52)
     ).pack(expand=True)
 
-    # ---------- Product Name ----------
+
+    # PRODUCT NAME
+
     ctk.CTkLabel(
         card,
         text=name,
         font=("Segoe UI", 16, "bold"),
         text_color="#2b1d14",
         wraplength=200
-    ).pack(pady=(5, 2))
+    ).pack(
+        pady=(5, 2)
+    )
 
-    # ---------- Brand & Category ----------
+
+    # BRAND AND CATEGORY
+
     ctk.CTkLabel(
         card,
         text=f"{brand}  •  {category}",
@@ -347,24 +406,36 @@ def create_product_card(
         text_color="#666666"
     ).pack()
 
-    # ---------- Price ----------
+
+    # PRICE
+
     ctk.CTkLabel(
         card,
         text=f"₹{price:.2f}",
         font=("Segoe UI", 18, "bold"),
         text_color="#2e7d32"
-    ).pack(pady=6)
+    ).pack(
+        pady=6
+    )
 
-    # ---------- Stock Status ----------
+
+    # STOCK STATUS
+
     if stock <= 0:
+
         stock_text = "Out of Stock"
         stock_color = "#e53935"
+
     elif stock <= 10:
+
         stock_text = f"Only {stock} left!"
         stock_color = "#fb8c00"
+
     else:
-        stock_text = "In Stock"
+
+        stock_text = f"In Stock ({stock})"
         stock_color = "#43a047"
+
 
     ctk.CTkLabel(
         card,
@@ -373,9 +444,18 @@ def create_product_card(
         text_color=stock_color
     ).pack()
 
-    # ---------- Quantity Controls ----------
-    quantity_frame = ctk.CTkFrame(card, fg_color="transparent")
-    quantity_frame.pack(pady=12)
+
+    # QUANTITY CONTROLS
+
+    quantity_frame = ctk.CTkFrame(
+        card,
+        fg_color="transparent"
+    )
+
+    quantity_frame.pack(
+        pady=12
+    )
+
 
     qty_label = ctk.CTkLabel(
         quantity_frame,
@@ -384,6 +464,9 @@ def create_product_card(
         font=("Segoe UI", 16, "bold"),
         text_color="#2b1d14"
     )
+
+
+    # MINUS BUTTON
 
     minus_button = ctk.CTkButton(
         quantity_frame,
@@ -396,9 +479,16 @@ def create_product_card(
         text_color="white",
         font=("Segoe UI", 18, "bold"),
         command=lambda: remove_from_cart(
-            product_id, qty_label, cart_frame, total_label, products
+            product_id,
+            qty_label,
+            cart_frame,
+            total_label,
+            products
         )
     )
+
+
+    # PLUS BUTTON
 
     plus_button = ctk.CTkButton(
         quantity_frame,
@@ -411,13 +501,31 @@ def create_product_card(
         text_color="#1b1b1b",
         font=("Segoe UI", 18, "bold"),
         command=lambda: add_to_cart(
-            product_id, stock, qty_label, cart_frame, total_label, products
+            product_id,
+            stock,
+            qty_label,
+            cart_frame,
+            total_label,
+            products
         )
     )
 
-    minus_button.pack(side="left", padx=4)
-    qty_label.pack(side="left", padx=6)
-    plus_button.pack(side="left", padx=4)
+
+    minus_button.pack(
+        side="left",
+        padx=4
+    )
+
+    qty_label.pack(
+        side="left",
+        padx=6
+    )
+
+    plus_button.pack(
+        side="left",
+        padx=4
+    )
+
 
 # =====================================================
 # CREATE ORDER PAGE
@@ -436,7 +544,7 @@ def create_order_page(
     )
 
 
-    # Configure columns
+    # Configure Grid
 
     for column in range(4):
 
@@ -446,7 +554,43 @@ def create_order_page(
         )
 
 
-    # Create product cards
+    # REFRESH PRODUCTS
+
+    def refresh_products():
+
+        # Remove old cards
+
+        for widget in order_frame.winfo_children():
+
+            widget.destroy()
+
+
+        # Get latest products
+
+        latest_products = db.get_products()
+
+
+        # Create cards again
+
+        for index, product in enumerate(latest_products):
+
+            row = index // 4
+
+            column = index % 4
+
+
+            create_product_card(
+                order_frame,
+                product,
+                row,
+                column,
+                cart_frame,
+                total_label,
+                latest_products
+            )
+
+
+    # INITIAL PRODUCT CARDS
 
     for index, product in enumerate(products):
 
@@ -466,7 +610,7 @@ def create_order_page(
         )
 
 
-    return order_frame
+    return order_frame, refresh_products
 
 
 # =====================================================
@@ -480,31 +624,80 @@ def create_book_page(parent):
         fg_color="#ffe7d6"
     )
 
-    # Title
+
+    # TITLE
+
     ctk.CTkLabel(
         book_frame,
         text="🐾 Book Pet Services",
         font=("Segoe UI", 32, "bold"),
         text_color="#2b1d14"
-    ).pack(pady=(30, 10))
+    ).pack(
+        pady=(30, 10)
+    )
+
 
     ctk.CTkLabel(
         book_frame,
         text="Choose a service for your furry friend",
         font=("Segoe UI", 16),
         text_color="#666666"
-    ).pack(pady=(0, 25))
+    ).pack(
+        pady=(0, 25)
+    )
+
 
     services = [
-        {"title": "Pet Grooming", "emoji": "✂️", "description": "Full grooming service including bath, haircut, nail trimming and ear cleaning.", "price": "₹499 onwards"},
-        {"title": "Vet Consultation", "emoji": "🩺", "description": "Professional veterinary check-up and health consultation for your pet.", "price": "₹299"},
-        {"title": "Pet Boarding", "emoji": "🏠", "description": "Safe and comfortable temporary stay for your pet while you're away.", "price": "₹799 / night"},
-        {"title": "Nail Trimming", "emoji": "💅", "description": "Quick and gentle nail trimming service by trained staff.", "price": "₹149"},
-        {"title": "Pet Training", "emoji": "🎓", "description": "Basic obedience and behavior training sessions for dogs.", "price": "₹999 / session"},
-        {"title": "Dental Care", "emoji": "🦷", "description": "Teeth cleaning and oral health check for cats and dogs.", "price": "₹599"},
+
+        {
+            "title": "Pet Grooming",
+            "emoji": "✂️",
+            "description": "Full grooming service including bath, haircut, nail trimming and ear cleaning.",
+            "price": "₹499 onwards"
+        },
+
+        {
+            "title": "Vet Consultation",
+            "emoji": "🩺",
+            "description": "Professional veterinary check-up and health consultation for your pet.",
+            "price": "₹299"
+        },
+
+        {
+            "title": "Pet Boarding",
+            "emoji": "🏠",
+            "description": "Safe and comfortable temporary stay for your pet while you're away.",
+            "price": "₹799 / night"
+        },
+
+        {
+            "title": "Nail Trimming",
+            "emoji": "💅",
+            "description": "Quick and gentle nail trimming service by trained staff.",
+            "price": "₹149"
+        },
+
+        {
+            "title": "Pet Training",
+            "emoji": "🎓",
+            "description": "Basic obedience and behavior training sessions for dogs.",
+            "price": "₹999 / session"
+        },
+
+        {
+            "title": "Dental Care",
+            "emoji": "🦷",
+            "description": "Teeth cleaning and oral health check for cats and dogs.",
+            "price": "₹599"
+        }
+
     ]
 
+
     for service in services:
+
+
+        # SERVICE CARD
 
         card = ctk.CTkFrame(
             book_frame,
@@ -513,26 +706,57 @@ def create_book_page(parent):
             border_width=1,
             border_color="#f0d9c8"
         )
-        card.pack(fill="x", padx=40, pady=10)
 
-        left = ctk.CTkFrame(card, fg_color="transparent")
-        left.pack(side="left", fill="both", expand=True, padx=20, pady=18)
+        card.pack(
+            fill="x",
+            padx=40,
+            pady=10
+        )
 
-        title_frame = ctk.CTkFrame(left, fg_color="transparent")
-        title_frame.pack(anchor="w")
+
+        left = ctk.CTkFrame(
+            card,
+            fg_color="transparent"
+        )
+
+        left.pack(
+            side="left",
+            fill="both",
+            expand=True,
+            padx=20,
+            pady=18
+        )
+
+
+        title_frame = ctk.CTkFrame(
+            left,
+            fg_color="transparent"
+        )
+
+        title_frame.pack(
+            anchor="w"
+        )
+
 
         ctk.CTkLabel(
             title_frame,
             text=service["emoji"],
             font=("Segoe UI Emoji", 28)
-        ).pack(side="left", padx=(0, 12))
+        ).pack(
+            side="left",
+            padx=(0, 12)
+        )
+
 
         ctk.CTkLabel(
             title_frame,
             text=service["title"],
             font=("Segoe UI", 20, "bold"),
             text_color="#2b1d14"
-        ).pack(side="left")
+        ).pack(
+            side="left"
+        )
+
 
         ctk.CTkLabel(
             left,
@@ -541,58 +765,161 @@ def create_book_page(parent):
             text_color="#555555",
             wraplength=520,
             justify="left"
-        ).pack(anchor="w", pady=(8, 6))
+        ).pack(
+            anchor="w",
+            pady=(8, 6)
+        )
+
 
         ctk.CTkLabel(
             left,
             text=service["price"],
             font=("Segoe UI", 15, "bold"),
             text_color="#e67e22"
-        ).pack(anchor="w")
+        ).pack(
+            anchor="w"
+        )
 
-        # ========== WORKING BOOK BUTTON WITH POPUP ==========
-        def open_booking_popup(service_name=service["title"]):
+
+        # BOOKING POPUP
+
+        def open_booking_popup(
+                service_name=service["title"]):
+
 
             if current_user_id is None:
-                messagebox.showerror("Error", "Please login first.")
+
+                messagebox.showerror(
+                    "Error",
+                    "Please login first."
+                )
+
                 return
 
+
             popup = ctk.CTkToplevel()
-            popup.title(f"Book {service_name}")
-            popup.geometry("420x500")
+
+            popup.title(
+                f"Book {service_name}"
+            )
+
+            popup.geometry(
+                "420x500"
+            )
+
             popup.grab_set()
-            popup.resizable(False, False)
+
+            popup.resizable(
+                False,
+                False
+            )
+
 
             ctk.CTkLabel(
                 popup,
                 text=f"Book: {service_name}",
                 font=("Segoe UI", 22, "bold"),
                 text_color="#2b1d14"
-            ).pack(pady=(25, 20))
+            ).pack(
+                pady=(25, 20)
+            )
 
-            # Pet Name
-            ctk.CTkLabel(popup, text="Pet Name", anchor="w").pack(fill="x", padx=40)
-            pet_entry = ctk.CTkEntry(popup, height=38, placeholder_text="e.g. Bruno, Milo...")
-            pet_entry.pack(fill="x", padx=40, pady=(5, 15))
 
-            # Date
-            ctk.CTkLabel(popup, text="Preferred Date (YYYY-MM-DD)", anchor="w").pack(fill="x", padx=40)
-            date_entry = ctk.CTkEntry(popup, height=38, placeholder_text="2025-04-20")
-            date_entry.pack(fill="x", padx=40, pady=(5, 15))
+            # PET NAME
 
-            # Notes
-            ctk.CTkLabel(popup, text="Additional Notes (optional)", anchor="w").pack(fill="x", padx=40)
-            notes_entry = ctk.CTkTextbox(popup, height=90)
-            notes_entry.pack(fill="x", padx=40, pady=(5, 25))
+            ctk.CTkLabel(
+                popup,
+                text="Pet Name",
+                anchor="w"
+            ).pack(
+                fill="x",
+                padx=40
+            )
+
+
+            pet_entry = ctk.CTkEntry(
+                popup,
+                height=38,
+                placeholder_text="e.g. Bruno, Milo..."
+            )
+
+            pet_entry.pack(
+                fill="x",
+                padx=40,
+                pady=(5, 15)
+            )
+
+
+            # DATE
+
+            ctk.CTkLabel(
+                popup,
+                text="Preferred Date (YYYY-MM-DD)",
+                anchor="w"
+            ).pack(
+                fill="x",
+                padx=40
+            )
+
+
+            date_entry = ctk.CTkEntry(
+                popup,
+                height=38,
+                placeholder_text="2026-09-10"
+            )
+
+            date_entry.pack(
+                fill="x",
+                padx=40,
+                pady=(5, 15)
+            )
+
+
+            # NOTES
+
+            ctk.CTkLabel(
+                popup,
+                text="Additional Notes (optional)",
+                anchor="w"
+            ).pack(
+                fill="x",
+                padx=40
+            )
+
+
+            notes_entry = ctk.CTkTextbox(
+                popup,
+                height=90
+            )
+
+            notes_entry.pack(
+                fill="x",
+                padx=40,
+                pady=(5, 25)
+            )
+
 
             def confirm_booking():
+
                 pet_name = pet_entry.get().strip()
+
                 booking_date = date_entry.get().strip()
-                notes = notes_entry.get("1.0", "end").strip()
+
+                notes = notes_entry.get(
+                    "1.0",
+                    "end"
+                ).strip()
+
 
                 if not pet_name or not booking_date:
-                    messagebox.showwarning("Missing Info", "Please enter Pet Name and Date.")
+
+                    messagebox.showwarning(
+                        "Missing Info",
+                        "Please enter Pet Name and Date."
+                    )
+
                     return
+
 
                 success = db.create_booking(
                     current_user_id,
@@ -602,14 +929,24 @@ def create_book_page(parent):
                     notes
                 )
 
+
                 if success:
+
                     messagebox.showinfo(
                         "Booking Successful",
                         f"Your booking for {service_name} has been placed!\n\nWe will contact you soon."
                     )
+
                     popup.destroy()
+
+
                 else:
-                    messagebox.showerror("Error", "Could not save booking. Please try again.")
+
+                    messagebox.showerror(
+                        "Error",
+                        "Could not save booking. Please try again."
+                    )
+
 
             ctk.CTkButton(
                 popup,
@@ -619,7 +956,12 @@ def create_book_page(parent):
                 hover_color="#f08b75",
                 font=("Segoe UI", 15, "bold"),
                 command=confirm_booking
-            ).pack(fill="x", padx=40, pady=5)
+            ).pack(
+                fill="x",
+                padx=40,
+                pady=5
+            )
+
 
             ctk.CTkButton(
                 popup,
@@ -629,7 +971,12 @@ def create_book_page(parent):
                 hover_color="#d0d0d0",
                 text_color="#333",
                 command=popup.destroy
-            ).pack(fill="x", padx=40, pady=(5, 20))
+            ).pack(
+                fill="x",
+                padx=40,
+                pady=(5, 20)
+            )
+
 
         ctk.CTkButton(
             card,
@@ -642,9 +989,15 @@ def create_book_page(parent):
             text_color="white",
             font=("Segoe UI", 14, "bold"),
             command=open_booking_popup
-        ).pack(side="right", padx=25, pady=25)
+        ).pack(
+            side="right",
+            padx=25,
+            pady=25
+        )
 
-    return book_frame 
+
+    return book_frame
+
 
 # =====================================================
 # ABOUT POPUP
@@ -654,9 +1007,13 @@ def show_about_popup():
 
     popup = ctk.CTkToplevel()
 
-    popup.geometry("400x300")
+    popup.geometry(
+        "400x300"
+    )
 
-    popup.title("About")
+    popup.title(
+        "About"
+    )
 
     popup.grab_set()
 
@@ -701,9 +1058,13 @@ def show_contact_popup():
 
     popup = ctk.CTkToplevel()
 
-    popup.geometry("400x300")
+    popup.geometry(
+        "400x300"
+    )
 
-    popup.title("Contact Support")
+    popup.title(
+        "Contact Support"
+    )
 
     popup.grab_set()
 
@@ -747,9 +1108,13 @@ def show_faq_popup():
 
     popup = ctk.CTkToplevel()
 
-    popup.geometry("500x450")
+    popup.geometry(
+        "500x450"
+    )
 
-    popup.title("FAQ")
+    popup.title(
+        "FAQ"
+    )
 
     popup.grab_set()
 
@@ -803,178 +1168,371 @@ A: No. Every user has their own cart.
 
 
 # =====================================================
-# CREATE SETTINGS PAGE
+# SETTINGS PAGE
 # =====================================================
 
 def create_settings_page(parent, show_frame):
-    global current_user_id
-    bookings = db.get_user_bookings(current_user_id)
 
-    print("Current User ID:", current_user_id)
-    print("Bookings found:", bookings)
+    global current_user_id
+
 
     settings_content = ctk.CTkScrollableFrame(
         parent,
         fg_color="#ffe7d6"
     )
-    settings_content.pack(fill="both", expand=True)
 
-    # ========== TITLE ==========
+    settings_content.pack(
+        fill="both",
+        expand=True
+    )
+
+
+    # TITLE
+
     ctk.CTkLabel(
         settings_content,
         text="Settings",
         font=("Segoe UI", 32, "bold"),
         text_color="#2b1d14"
-    ).pack(pady=(25, 15))
+    ).pack(
+        pady=(25, 15)
+    )
 
-    
-    user_data = db.get_user(current_user_id)
 
-    # ========== ACCOUNT INFORMATION ==========
+    user_data = db.get_user(
+        current_user_id
+    )
+
+
+    # ACCOUNT INFORMATION
+
     account_frame = ctk.CTkFrame(
         settings_content,
         fg_color="white",
         corner_radius=15
     )
-    account_frame.pack(fill="x", padx=30, pady=10)
+
+    account_frame.pack(
+        fill="x",
+        padx=30,
+        pady=10
+    )
+
 
     ctk.CTkLabel(
         account_frame,
         text="Account Information",
         font=("Segoe UI", 18, "bold"),
         text_color="#2b1d14"
-    ).pack(anchor="w", padx=20, pady=(15, 10))
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(15, 10)
+    )
+
 
     if user_data:
+
         username = user_data[1]
         email = user_data[2]
         phone = user_data[3]
         address = user_data[4]
 
-        ctk.CTkLabel(account_frame, text=f"Username: {username}", text_color="#333").pack(anchor="w", padx=20, pady=2)
-        ctk.CTkLabel(account_frame, text=f"Email: {email}", text_color="#333").pack(anchor="w", padx=20, pady=2)
-        ctk.CTkLabel(account_frame, text=f"Phone: {phone}", text_color="#333").pack(anchor="w", padx=20, pady=2)
-        ctk.CTkLabel(account_frame, text=f"Address: {address}", text_color="#333", wraplength=700).pack(anchor="w", padx=20, pady=(2, 15))
 
-    # ========== MY BOOKINGS ==========
+        ctk.CTkLabel(
+            account_frame,
+            text=f"Username: {username}",
+            text_color="#333"
+        ).pack(
+            anchor="w",
+            padx=20,
+            pady=2
+        )
+
+
+        ctk.CTkLabel(
+            account_frame,
+            text=f"Email: {email}",
+            text_color="#333"
+        ).pack(
+            anchor="w",
+            padx=20,
+            pady=2
+        )
+
+
+        ctk.CTkLabel(
+            account_frame,
+            text=f"Phone: {phone}",
+            text_color="#333"
+        ).pack(
+            anchor="w",
+            padx=20,
+            pady=2
+        )
+
+
+        ctk.CTkLabel(
+            account_frame,
+            text=f"Address: {address}",
+            text_color="#333",
+            wraplength=700
+        ).pack(
+            anchor="w",
+            padx=20,
+            pady=(2, 15)
+        )
+
+
+    # MY BOOKINGS
+
     bookings_frame = ctk.CTkFrame(
         settings_content,
         fg_color="white",
         corner_radius=15
     )
-    bookings_frame.pack(fill="x", padx=30, pady=10)
+
+    bookings_frame.pack(
+        fill="x",
+        padx=30,
+        pady=10
+    )
+
 
     ctk.CTkLabel(
         bookings_frame,
         text="My Bookings",
         font=("Segoe UI", 18, "bold"),
         text_color="#2b1d14"
-    ).pack(anchor="w", padx=20, pady=(15, 10))
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(15, 10)
+    )
 
-    bookings = db.get_user_bookings(current_user_id)
+
+    bookings = db.get_user_bookings(
+        current_user_id
+    )
+
 
     if not bookings:
+
         ctk.CTkLabel(
             bookings_frame,
             text="You have no bookings yet.",
             text_color="#888888",
             font=("Segoe UI", 14)
-        ).pack(pady=25)
+        ).pack(
+            pady=25
+        )
+
+
     else:
+
         for booking in bookings:
+
             b_id, service, pet, date, notes, status, created = booking
+
 
             card = ctk.CTkFrame(
                 bookings_frame,
                 fg_color="#FFF8F3",
                 corner_radius=12
             )
-            card.pack(fill="x", padx=15, pady=6)
 
-            # Top row: Service name + Status
-            top = ctk.CTkFrame(card, fg_color="transparent")
-            top.pack(fill="x", padx=15, pady=(12, 4))
+            card.pack(
+                fill="x",
+                padx=15,
+                pady=6
+            )
+
+
+            top = ctk.CTkFrame(
+                card,
+                fg_color="transparent"
+            )
+
+            top.pack(
+                fill="x",
+                padx=15,
+                pady=(12, 4)
+            )
+
 
             ctk.CTkLabel(
                 top,
                 text=service,
                 font=("Segoe UI", 15, "bold"),
                 text_color="#2b1d14"
-            ).pack(side="left")
+            ).pack(
+                side="left"
+            )
 
-            status_color = "#43a047" if status.lower() == "confirmed" else "#e67e22"
+
+            status_color = (
+                "#43a047"
+                if status.lower() == "confirmed"
+                else "#e67e22"
+            )
+
+
             ctk.CTkLabel(
                 top,
                 text=status,
                 font=("Segoe UI", 13, "bold"),
                 text_color=status_color
-            ).pack(side="right")
+            ).pack(
+                side="right"
+            )
 
-            # Details
+
             ctk.CTkLabel(
                 card,
                 text=f"Pet: {pet}   •   Date: {date}",
                 font=("Segoe UI", 13),
                 text_color="#555555"
-            ).pack(anchor="w", padx=15)
+            ).pack(
+                anchor="w",
+                padx=15
+            )
+
 
             if notes and notes.strip():
+
                 ctk.CTkLabel(
                     card,
                     text=f"Notes: {notes}",
                     font=("Segoe UI", 12),
                     text_color="#777777",
                     wraplength=650
-                ).pack(anchor="w", padx=15, pady=(4, 12))
-            else:
-                ctk.CTkLabel(card, text="").pack(pady=6)
+                ).pack(
+                    anchor="w",
+                    padx=15,
+                    pady=(4, 12)
+                )
 
-    # ========== HELP & SUPPORT ==========
+
+    # HELP AND SUPPORT
+
     help_frame = ctk.CTkFrame(
         settings_content,
         fg_color="white",
         corner_radius=15
     )
-    help_frame.pack(fill="x", padx=30, pady=10)
+
+    help_frame.pack(
+        fill="x",
+        padx=30,
+        pady=10
+    )
+
 
     ctk.CTkLabel(
         help_frame,
         text="Help & Support",
         font=("Segoe UI", 18, "bold"),
         text_color="#2b1d14"
-    ).pack(anchor="w", padx=20, pady=(15, 10))
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(15, 10)
+    )
 
-    ctk.CTkButton(help_frame, text="About App", fg_color="#FA9A85", command=show_about_popup).pack(fill="x", padx=20, pady=5)
-    ctk.CTkButton(help_frame, text="Contact Support", fg_color="#FA9A85", command=show_contact_popup).pack(fill="x", padx=20, pady=5)
-    ctk.CTkButton(help_frame, text="FAQ", fg_color="#FA9A85", command=show_faq_popup).pack(fill="x", padx=20, pady=(5, 15))
 
-    # ========== LOGOUT ==========
+    ctk.CTkButton(
+        help_frame,
+        text="About App",
+        fg_color="#FA9A85",
+        command=show_about_popup
+    ).pack(
+        fill="x",
+        padx=20,
+        pady=5
+    )
+
+
+    ctk.CTkButton(
+        help_frame,
+        text="Contact Support",
+        fg_color="#FA9A85",
+        command=show_contact_popup
+    ).pack(
+        fill="x",
+        padx=20,
+        pady=5
+    )
+
+
+    ctk.CTkButton(
+        help_frame,
+        text="FAQ",
+        fg_color="#FA9A85",
+        command=show_faq_popup
+    ).pack(
+        fill="x",
+        padx=20,
+        pady=(5, 15)
+    )
+
+
+    # LOGOUT
+
     danger_frame = ctk.CTkFrame(
         settings_content,
         fg_color="white",
         corner_radius=15
     )
-    danger_frame.pack(fill="x", padx=30, pady=10)
+
+    danger_frame.pack(
+        fill="x",
+        padx=30,
+        pady=10
+    )
+
 
     ctk.CTkLabel(
         danger_frame,
         text="Account",
         font=("Segoe UI", 18, "bold"),
         text_color="#2b1d14"
-    ).pack(anchor="w", padx=20, pady=(15, 10))
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(15, 10)
+    )
+
 
     def logout():
+
         global current_user_id
-        confirm = messagebox.askyesno("Logout", "Are you sure you want to logout?")
+
+
+        confirm = messagebox.askyesno(
+            "Logout",
+            "Are you sure you want to logout?"
+        )
+
+
         if not confirm:
             return
 
+
         if os.path.exists("session.txt"):
-            os.remove("session.txt")
+
+            os.remove(
+                "session.txt"
+            )
+
 
         cart.clear()
+
         current_user_id = None
-        show_frame("login")
+
+        show_frame(
+            "login"
+        )
+
 
     ctk.CTkButton(
         danger_frame,
@@ -985,11 +1543,15 @@ def create_settings_page(parent, show_frame):
         height=42,
         font=("Segoe UI", 14, "bold"),
         command=logout
-    ).pack(fill="x", padx=20, pady=(0, 15))
+    ).pack(
+        fill="x",
+        padx=20,
+        pady=(0, 15)
+    )
 
 
 # =====================================================
-# INTERNAL PAGE SWITCHING
+# PAGE SWITCHING
 # =====================================================
 
 def show_order(
@@ -1038,15 +1600,10 @@ def show_settings(
     book_frame.pack_forget()
 
 
-    # Clear previous settings
-
     for widget in settings_frame.winfo_children():
 
         widget.destroy()
 
-
-    # Recreate settings
-    # This refreshes user information
 
     create_settings_page(
         settings_frame,
@@ -1084,7 +1641,7 @@ def create_navbar(
     )
 
 
-    # Logo
+    # LOGO
 
     ctk.CTkLabel(
         navbar,
@@ -1098,7 +1655,7 @@ def create_navbar(
     )
 
 
-    # Button frame
+    # BUTTON FRAME
 
     button_frame = ctk.CTkFrame(
         navbar,
@@ -1176,7 +1733,9 @@ def create_navbar(
 # CART SIDEBAR
 # =====================================================
 
-def create_cart_sidebar(parent):
+def create_cart_sidebar(
+        parent,
+        refresh_callback):
 
 
     sidebar = ctk.CTkFrame(
@@ -1184,6 +1743,7 @@ def create_cart_sidebar(parent):
         width=280,
         fg_color="white"
     )
+
 
     sidebar.pack(
         side="right",
@@ -1193,12 +1753,13 @@ def create_cart_sidebar(parent):
     )
 
 
-    # Cart items area
+    # CART ITEMS
 
     cart_items_frame = ctk.CTkScrollableFrame(
         sidebar,
         width=240
     )
+
 
     cart_items_frame.pack(
         fill="both",
@@ -1208,7 +1769,7 @@ def create_cart_sidebar(parent):
     )
 
 
-    # Total
+    # TOTAL
 
     total_label = ctk.CTkLabel(
         sidebar,
@@ -1216,6 +1777,7 @@ def create_cart_sidebar(parent):
         font=("Arial", 20, "bold"),
         text_color="black"
     )
+
 
     total_label.pack(
         pady=10
@@ -1230,7 +1792,9 @@ def create_cart_sidebar(parent):
 
         global current_user_id
 
-        # Check if a user is logged in
+
+        # LOGIN CHECK
+
         if current_user_id is None:
 
             messagebox.showerror(
@@ -1241,7 +1805,8 @@ def create_cart_sidebar(parent):
             return
 
 
-        # Check if cart is empty
+        # EMPTY CART CHECK
+
         if not cart or sum(cart.values()) == 0:
 
             messagebox.showwarning(
@@ -1252,39 +1817,55 @@ def create_cart_sidebar(parent):
             return
 
 
-        # Confirm checkout
+        # CONFIRM
+
         confirm = messagebox.askyesno(
             "Confirm Checkout",
             "Are you sure you want to place this order?"
         )
 
+
         if not confirm:
             return
 
 
-        # Save order to database
+        # CHECKOUT
+
         success = db.checkout(
-                current_user_id
+            current_user_id
         )
 
 
         if success:
 
-            # Clear local cart
+
+            # CLEAR LOCAL CART
+
             cart.clear()
 
 
-            # Get latest products
+            # GET LATEST PRODUCTS
+
             products = db.get_products()
 
 
-            # Refresh cart display
+            # REFRESH CART
+
             refresh_cart(
                 cart_items_frame,
                 total_label,
                 products
             )
 
+
+            # REFRESH PRODUCT CARDS
+
+            if refresh_callback[0]:
+
+                refresh_callback[0]()
+
+
+            # SUCCESS MESSAGE
 
             messagebox.showinfo(
                 "Order Successful",
@@ -1298,7 +1879,9 @@ def create_cart_sidebar(parent):
                 "Checkout Failed",
                 "Something went wrong while placing your order."
             )
-    # Checkout button
+
+
+    # CHECKOUT BUTTON
 
     ctk.CTkButton(
         sidebar,
@@ -1322,7 +1905,10 @@ def create_cart_sidebar(parent):
 # MAIN USER SCREEN
 # =====================================================
 
-def user_screen(container, show_frame):
+def user_screen(
+        container,
+        show_frame):
+
 
     global current_user_id
 
@@ -1345,6 +1931,13 @@ def user_screen(container, show_frame):
 
 
     # =================================================
+    # NAVBAR PLACEHOLDER
+    # =================================================
+
+    # The navbar will be created after pages are ready
+
+
+    # =================================================
     # MAIN CONTENT AREA
     # =================================================
 
@@ -1353,6 +1946,7 @@ def user_screen(container, show_frame):
         fg_color="#ffe7d6"
     )
 
+
     content_area.pack(
         fill="both",
         expand=True
@@ -1360,11 +1954,22 @@ def user_screen(container, show_frame):
 
 
     # =================================================
+    # REFRESH CALLBACK
+    # =================================================
+
+    # This stores the refresh_products function.
+    # It is created later by create_order_page.
+
+    refresh_callback = [None]
+
+
+    # =================================================
     # CART SIDEBAR
     # =================================================
 
     cart_frame, total_label = create_cart_sidebar(
-        content_area
+        content_area,
+        refresh_callback
     )
 
 
@@ -1377,6 +1982,7 @@ def user_screen(container, show_frame):
         fg_color="#ffe7d6"
     )
 
+
     page_container.pack(
         side="left",
         fill="both",
@@ -1385,7 +1991,7 @@ def user_screen(container, show_frame):
 
 
     # =================================================
-    # PRODUCTS
+    # GET PRODUCTS
     # =================================================
 
     products = db.get_products()
@@ -1406,12 +2012,19 @@ def user_screen(container, show_frame):
     # CREATE ORDER PAGE
     # =================================================
 
-    order_frame = create_order_page(
+    order_frame, refresh_products = create_order_page(
         page_container,
         products,
         cart_frame,
         total_label
     )
+
+
+    # =================================================
+    # CONNECT REFRESH FUNCTION
+    # =================================================
+
+    refresh_callback[0] = refresh_products
 
 
     # =================================================
@@ -1447,7 +2060,7 @@ def user_screen(container, show_frame):
 
 
     # =================================================
-    # SHOW ORDER PAGE FIRST
+    # SHOW ORDER PAGE
     # =================================================
 
     order_frame.pack(
