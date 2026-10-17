@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 import db
 from datetime import datetime
+from PIL import Image
 
 
 def register_screen(container, show_frame):
@@ -13,9 +14,23 @@ def register_screen(container, show_frame):
     # =====================================================
 
     register_frame = ctk.CTkFrame(
-        container,
-        fg_color="#fca265"
+        container
     )
+
+
+    bg_image = ctk.CTkImage(
+        light_image=Image.open("assets/register_bg.png"),
+        dark_image=Image.open("assets/register_bg.png"),
+        size=(1400, 750)
+    )
+
+    bg_label = ctk.CTkLabel(
+        register_frame,
+        text="",
+        image=bg_image
+    )
+    bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+    
 
 
     # =====================================================
