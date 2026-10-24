@@ -7,6 +7,7 @@ from pathlib import Path
 import db
 from adoption import open_adoption_window
 from playdates import open_playdates_user
+from chatbot import create_chatbot_page
 
 
 # =====================================================
@@ -1777,235 +1778,70 @@ def create_order_history_page(parent):
 # PAGE SWITCHING
 # =====================================================
 
-def show_order(
-        order_frame,
-        book_frame,
-        settings_frame,
-        history_frame=None):
+def show_user_page(target, pages, refresh_orders=None):
+    for frame in pages.values():
+        frame.pack_forget()
+    if target == "history" and refresh_orders:
+        refresh_orders()
+    pages[target].pack(fill="both", expand=True)
 
 
-    book_frame.pack_forget()
-    settings_frame.pack_forget()
-    if history_frame is not None:
-        history_frame.pack_forget()
+def show_order(order_frame, book_frame, settings_frame, history_frame=None, extra_frames=None):
+    pages = {"order": order_frame, "book": book_frame, "settings": settings_frame}
+    if history_frame is not None: pages["history"] = history_frame
+    if extra_frames: pages.update(extra_frames)
+    show_user_page("order", pages)
 
 
-    order_frame.pack(
-        fill="both",
-        expand=True
-    )
+def show_book(order_frame, book_frame, settings_frame, history_frame=None, extra_frames=None):
+    pages = {"order": order_frame, "book": book_frame, "settings": settings_frame}
+    if history_frame is not None: pages["history"] = history_frame
+    if extra_frames: pages.update(extra_frames)
+    show_user_page("book", pages)
 
 
-def show_book(
-        order_frame,
-        book_frame,
-        settings_frame,
-        history_frame=None):
+def show_settings(order_frame, book_frame, settings_frame, show_frame, history_frame=None, extra_frames=None):
+    pages = {"order": order_frame, "book": book_frame, "settings": settings_frame}
+    if history_frame is not None: pages["history"] = history_frame
+    if extra_frames: pages.update(extra_frames)
+    for widget in settings_frame.winfo_children(): widget.destroy()
+    create_settings_page(settings_frame, show_frame)
+    show_user_page("settings", pages)
 
 
-    order_frame.pack_forget()
-    settings_frame.pack_forget()
-    if history_frame is not None:
-        history_frame.pack_forget()
+def show_order_history(order_frame, book_frame, settings_frame, history_frame, refresh_orders, extra_frames=None):
+    pages = {"order": order_frame, "book": book_frame, "settings": settings_frame, "history": history_frame}
+    if extra_frames: pages.update(extra_frames)
+    show_user_page("history", pages, refresh_orders)
 
 
-    book_frame.pack(
-        fill="both",
-        expand=True
-    )
+def create_navbar(parent, order_frame, book_frame, settings_frame, show_frame,
+                  history_frame=None, refresh_orders=None, adoption_frame=None,
+                  playdates_frame=None, chatbot_frame=None):
+    navbar = ctk.CTkFrame(parent, height=70, fg_color="#FA9A85", corner_radius=0)
+    navbar.pack(fill="x")
+    ctk.CTkLabel(navbar, text="🐾 Pet Supplies", font=("Arial", 26, "bold"), text_color="white").pack(side="left", padx=18, pady=15)
+    button_frame = ctk.CTkFrame(navbar, fg_color="transparent")
+    button_frame.pack(side="right", padx=12)
 
+    pages = {"order": order_frame, "book": book_frame, "settings": settings_frame}
+    if history_frame is not None: pages["history"] = history_frame
+    if adoption_frame is not None: pages["adoption"] = adoption_frame
+    if playdates_frame is not None: pages["playdates"] = playdates_frame
+    if chatbot_frame is not None: pages["chatbot"] = chatbot_frame
 
-def show_settings(
-        order_frame,
-        book_frame,
-        settings_frame,
-        show_frame,
-        history_frame=None):
+    def nav_button(label, target):
+        ctk.CTkButton(button_frame, text=label, fg_color="white", text_color="#FA9A85",
+                      hover_color="#f9d8d1", font=("Arial", 14, "bold"), height=34,
+                      command=lambda key=target: show_user_page(key, pages, refresh_orders if key == "history" else None)).pack(side="left", padx=3)
 
-
-    order_frame.pack_forget()
-    book_frame.pack_forget()
-    if history_frame is not None:
-        history_frame.pack_forget()
-
-
-    for widget in settings_frame.winfo_children():
-
-        widget.destroy()
-
-
-    create_settings_page(
-        settings_frame,
-        show_frame
-    )
-
-
-    settings_frame.pack(
-        fill="both",
-        expand=True
-    )
-
-
-def show_order_history(order_frame, book_frame, settings_frame, history_frame, refresh_orders):
-    order_frame.pack_forget()
-    book_frame.pack_forget()
-    settings_frame.pack_forget()
-    refresh_orders()
-    history_frame.pack(fill="both", expand=True)
-
-
-# =====================================================
-# NAVBAR
-# =====================================================
-
-def create_navbar(
-        parent,
-        order_frame,
-        book_frame,
-        settings_frame,
-        show_frame,
-        history_frame=None,
-        refresh_orders=None):
-
-
-    navbar = ctk.CTkFrame(
-        parent,
-        height=70,
-        fg_color="#FA9A85",
-        corner_radius=0
-    )
-
-    navbar.pack(
-        fill="x"
-    )
-
-
-    # LOGO
-
-    ctk.CTkLabel(
-        navbar,
-        text="🐾 Pet Supplies",
-        font=("Arial", 28, "bold"),
-        text_color="white"
-    ).pack(
-        side="left",
-        padx=20,
-        pady=15
-    )
-
-
-    # BUTTON FRAME
-
-    button_frame = ctk.CTkFrame(
-        navbar,
-        fg_color="transparent"
-    )
-
-    button_frame.pack(
-        side="right",
-        padx=20
-    )
-
-
-    # ORDER
-
-    ctk.CTkButton(
-        button_frame,
-        text="Order",
-        fg_color="white",
-        text_color="#FA9A85",
-        hover_color="#f9d8d1",
-        font=("Arial", 16, "bold"),
-        command=lambda: show_order(
-            order_frame,
-            book_frame,
-            settings_frame,
-            history_frame
-        )
-    ).pack(
-        side="left",
-        padx=5
-    )
-
-
-    # BOOK
-
-    ctk.CTkButton(
-        button_frame,
-        text="Book",
-        fg_color="white",
-        text_color="#FA9A85",
-        hover_color="#f9d8d1",
-        font=("Arial", 16, "bold"),
-        command=lambda: show_book(
-            order_frame,
-            book_frame,
-            settings_frame,
-            history_frame
-        )
-    ).pack(
-        side="left",
-        padx=5
-    )
-
-
-    # PET ADOPTION
-    ctk.CTkButton(
-        button_frame,
-        text="🐾 Adopt",
-        fg_color="white",
-        text_color="#FA9A85",
-        hover_color="#f9d8d1",
-        font=("Arial", 16, "bold"),
-        command=lambda: open_adoption_window(parent, current_user_id)
-    ).pack(side="left", padx=5)
-
-    # PLAYDATES
-    ctk.CTkButton(
-        button_frame,
-        text="🐕 Playdates",
-        fg_color="white",
-        text_color="#FA9A85",
-        hover_color="#f9d8d1",
-        font=("Arial", 16, "bold"),
-        command=lambda: open_playdates_user(parent, current_user_id)
-    ).pack(side="left", padx=5)
-
-    # SETTINGS
-
-    ctk.CTkButton(
-        button_frame,
-        text="Settings",
-        fg_color="white",
-        text_color="#FA9A85",
-        hover_color="#f9d8d1",
-        font=("Arial", 16, "bold"),
-        command=lambda: show_settings(
-            order_frame,
-            book_frame,
-            settings_frame,
-            show_frame,
-            history_frame
-        )
-    ).pack(
-        side="left",
-        padx=5
-    )
-
-    # MY ORDERS
-    if history_frame is not None and refresh_orders is not None:
-        ctk.CTkButton(
-            button_frame,
-            text="My Orders",
-            fg_color="white",
-            text_color="#FA9A85",
-            hover_color="#f9d8d1",
-            font=("Arial", 16, "bold"),
-            command=lambda: show_order_history(
-                order_frame, book_frame, settings_frame,
-                history_frame, refresh_orders
-            )
-        ).pack(side="left", padx=5)
+    nav_button("Order", "order")
+    nav_button("Book", "book")
+    if adoption_frame is not None: nav_button("🐾 Adopt", "adoption")
+    if playdates_frame is not None: nav_button("🐕 Playdates", "playdates")
+    if chatbot_frame is not None: nav_button("💬 Chatbot", "chatbot")
+    nav_button("Settings", "settings")
+    if history_frame is not None: nav_button("My Orders", "history")
 
 
 # =====================================================
@@ -2453,6 +2289,16 @@ def user_screen(
 
     history_frame, refresh_orders = create_order_history_page(page_container)
 
+    # These features are embedded into the main user-page content area, just
+    # like Order, Book, Settings, and My Orders (not separate pop-up windows).
+    adoption_frame = ctk.CTkFrame(page_container, fg_color="#FFF6EF", corner_radius=0)
+    open_adoption_window(adoption_frame, current_user_id, embedded=True)
+    playdates_frame = ctk.CTkFrame(page_container, fg_color="#FFF6EF", corner_radius=0)
+    open_playdates_user(playdates_frame, current_user_id, embedded=True)
+    chatbot_frame = create_chatbot_page(page_container)
+
+    # =====================================================
+    # NAVBAR
 
     # =================================================
     # NAVBAR
@@ -2465,13 +2311,19 @@ def user_screen(
         settings_frame,
         show_frame,
         history_frame,
-        refresh_orders
+        refresh_orders,
+        adoption_frame,
+        playdates_frame,
+        chatbot_frame
     )
 
 
     # =================================================
     # SHOW ORDER PAGE
     # =================================================
+
+    for _page in (book_frame, settings_frame, history_frame, adoption_frame, playdates_frame, chatbot_frame):
+        _page.pack_forget()
 
     order_frame.pack(
         fill="both",

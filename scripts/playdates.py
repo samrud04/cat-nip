@@ -264,16 +264,20 @@ def open_playdates_admin(parent):
     _show_foreground(win)
     return win
 
-def open_playdates_user(parent, user_id):
+def open_playdates_user(parent, user_id, embedded=False):
     if not user_id:
         messagebox.showerror("Sign in required", "Please sign in before booking a playdate.", parent=parent); return
     try:
         db.ensure_playdate_tables()
     except Exception as exc:
         messagebox.showerror("Playdates unavailable", str(exc), parent=parent); return
-    root = parent.winfo_toplevel() if hasattr(parent, "winfo_toplevel") else parent
-    win = ctk.CTkToplevel(root); win.title("Cat Nip — Playdates"); win.geometry("1000x720"); win.minsize(800, 600); win.configure(fg_color=CREAM)
-    _maximize_window(win)
+    if embedded:
+        win = ctk.CTkFrame(parent, fg_color=CREAM, corner_radius=0)
+        win.pack(fill="both", expand=True)
+    else:
+        root = parent.winfo_toplevel() if hasattr(parent, "winfo_toplevel") else parent
+        win = ctk.CTkToplevel(root); win.title("Cat Nip — Playdates"); win.geometry("1000x720"); win.minsize(800, 600); win.configure(fg_color=CREAM)
+        _maximize_window(win)
     ctk.CTkLabel(win, text="🐾 Upcoming Playdates", font=("Arial", 25, "bold"), text_color=INK).pack(anchor="w", padx=20, pady=(18, 3))
     ctk.CTkLabel(win, text="Choose an event to book a place. You can cancel your booking before the event starts.", text_color=INK).pack(anchor="w", padx=20, pady=(0, 12))
     body = ctk.CTkFrame(win, fg_color="transparent"); body.pack(fill="both", expand=True, padx=20, pady=(0, 10))
@@ -394,6 +398,9 @@ def open_playdates_user(parent, user_id):
         else: messagebox.showwarning("Cannot cancel", "Bookings can only be cancelled before the event starts.", parent=win)
         load_events(); load_bookings()
 
-    win.protocol("WM_DELETE_WINDOW", win.destroy)
-    load_events(); load_bookings(); _show_foreground(win)
+    if not embedded:
+        win.protocol("WM_DELETE_WINDOW", win.destroy)
+    load_events(); load_bookings()
+    if not embedded:
+        _show_foreground(win)
     return win

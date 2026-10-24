@@ -1,122 +1,93 @@
-"""Standalone Cat Nip local-AI chat prototype.
-
-This is intentionally not wired into the live shopping/booking database yet.
-First verify Ollama works; then integrate this window into the current app and
-add carefully validated Python functions for database actions.
-"""
-
+"""Embedded local Ollama chatbot page for Cat Nip."""
 import threading
 import customtkinter as ctk
-from tkinter import messagebox
 
 MODEL = "qwen3:1.7b"
-
 SYSTEM_PROMPT = (
     "You are Cat Nip's friendly pet supplies and services assistant. "
-    "Help users understand how to browse products, orders, pet services, "
-    "adoption applications, and playdates. Be concise and ask clarifying "
-    "questions when needed. IMPORTANT: You do not have access to the live "
-    "Cat Nip database or the ability to place orders/book anything yet. "
-    "Never claim an action was completed. Explain that this is the initial "
-    "chat prototype when users ask you to perform an action."
+    "Help users understand products, shopping carts, orders, pet services, "
+    "adoption applications, and playdates. Be concise, friendly, and ask "
+    "clarifying questions when needed. This chat is currently informational: "
+    "you cannot read or change Cat Nip's live database, place orders, or make "
+    "bookings. Never claim an action was completed. Tell the user how to use "
+    "the relevant Cat Nip page instead. Do not invent product stock, prices, "
+    "booking availability, or user/order details."
 )
 
 
-class CatNipChatbot(ctk.CTkToplevel):
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.title("Cat Nip AI Assistant")
-        self.geometry("760x650")
-        self.minsize(560, 460)
-        self.transient(master) if master is not None else None
-        self.messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-        self.busy = False
-        self.protocol("WM_DELETE_WINDOW", self.destroy)
+def create_chatbot_page(parent):
+    page = ctk.CTkFrame(parent, fg_color="#FFF6EF", corner_radius=0)
+    page.grid_columnconfigure(0, weight=1)
+    page.grid_rowconfigure(1, weight=1)
 
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=1)
+    header = ctk.CTkFrame(page, fg_color="#FA9A85", corner_radius=0)
+    header.grid(row=0, column=0, sticky="ew")
+    ctk.CTkLabel(header, text="🐾 Cat Nip AI Assistant", font=("Segoe UI", 25, "bold"), text_color="white").pack(anchor="w", padx=20, pady=(14, 2))
+    ctk.CTkLabel(header, text="Ask about shopping, services, adoption, or playdates.", font=("Segoe UI", 13), text_color="#49352F").pack(anchor="w", padx=23, pady=(0, 12))
 
-        ctk.CTkLabel(
-            self, text="🐾 Cat Nip AI Assistant",
-            font=("Segoe UI", 24, "bold")
-        ).grid(row=0, column=0, padx=18, pady=(16, 6), sticky="w")
+    transcript = ctk.CTkTextbox(page, wrap="word", font=("Segoe UI", 14), corner_radius=12)
+    transcript.grid(row=1, column=0, sticky="nsew", padx=18, pady=(14, 8))
+    transcript.configure(state="disabled")
+    bottom = ctk.CTkFrame(page, fg_color="transparent")
+    bottom.grid(row=2, column=0, sticky="ew", padx=18, pady=(4, 8))
+    bottom.grid_columnconfigure(0, weight=1)
+    entry = ctk.CTkEntry(bottom, placeholder_text="Type your message…", height=42)
+    entry.grid(row=0, column=0, sticky="ew", padx=(0, 8))
+    send_button = ctk.CTkButton(bottom, text="Send", width=100, height=42, fg_color="#FA9A85", hover_color="#E98270", text_color="#30251f")
+    send_button.grid(row=0, column=1)
+    status = ctk.CTkLabel(page, text=f"Local model: {MODEL} · runs on this computer", anchor="w", text_color="#6D625D")
+    status.grid(row=3, column=0, sticky="ew", padx=20, pady=(0, 10))
 
-        self.transcript = ctk.CTkTextbox(self, wrap="word", font=("Segoe UI", 14))
-        self.transcript.grid(row=1, column=0, padx=18, pady=8, sticky="nsew")
-        self.transcript.configure(state="disabled")
-        self._append("Cat Nip", "Hi! 👋 How can I help? You can ask about products, orders, services, adoption, or playdates. This first version can chat, but it cannot make bookings or orders yet.")
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    state = {"busy": False, "alive": True}
 
-        bottom = ctk.CTkFrame(self, fg_color="transparent")
-        bottom.grid(row=2, column=0, padx=18, pady=(6, 18), sticky="ew")
-        bottom.grid_columnconfigure(0, weight=1)
-        self.entry = ctk.CTkEntry(bottom, placeholder_text="Type your message…", height=42)
-        self.entry.grid(row=0, column=0, padx=(0, 8), sticky="ew")
-        self.entry.bind("<Return>", self._on_enter)
-        self.send_button = ctk.CTkButton(bottom, text="Send", width=100, height=42, command=self.send)
-        self.send_button.grid(row=0, column=1)
-        self.status = ctk.CTkLabel(self, text="Local model: " + MODEL, anchor="w", text_color="gray")
-        self.status.grid(row=3, column=0, padx=20, pady=(0, 10), sticky="ew")
-        self.entry.focus_set()
-
-    def _on_enter(self, _event):
-        self.send()
-        return "break"
-
-    def _append(self, speaker, text):
-        self.transcript.configure(state="normal")
-        self.transcript.insert("end", f"{speaker}:\n{text}\n\n")
-        self.transcript.see("end")
-        self.transcript.configure(state="disabled")
-
-    def send(self):
-        text = self.entry.get().strip()
-        if not text or self.busy:
+    def append(speaker, text):
+        if not page.winfo_exists():
             return
-        self.entry.delete(0, "end")
-        self._append("You", text)
-        self.messages.append({"role": "user", "content": text})
-        self.busy = True
-        self.send_button.configure(state="disabled")
-        self.status.configure(text="Thinking… (the first reply may take a little longer)")
-        threading.Thread(target=self._get_reply, daemon=True).start()
+        transcript.configure(state="normal")
+        transcript.insert("end", f"{speaker}:\n{text}\n\n")
+        transcript.see("end")
+        transcript.configure(state="disabled")
 
-    def _get_reply(self):
-        try:
-            import ollama
-            response = ollama.chat(
-                model=MODEL,
-                messages=self.messages,
-                options={"temperature": 0.4},
-            )
-            reply = response.message.content or "Sorry, I couldn't form a response. Try rephrasing that."
-            self.messages.append({"role": "assistant", "content": reply})
-            self.after(0, lambda: self._finish(reply, None))
-        except Exception as exc:
-            self.after(0, lambda error=str(exc): self._finish(None, error))
+    append("Cat Nip", "Hi! 👋 How can I help? Ask me about products, order steps, pet services, adoption, or playdates. I can answer questions, but actions must still be completed through the app pages.")
 
-    def _finish(self, reply, error):
-        if not self.winfo_exists():
+    def finish(reply=None, error=None):
+        if not page.winfo_exists():
             return
         if error:
-            self._append("Cat Nip", "I couldn't connect to Ollama. Make sure Ollama is installed and running, and that the model exists. In PowerShell run: ollama run " + MODEL + "\n\nDetails: " + error)
-            self.status.configure(text="Not connected to Ollama")
+            append("Cat Nip", "I couldn't connect to Ollama. Make sure Ollama is running and the model is installed. In PowerShell, run: ollama run " + MODEL + f"\n\nDetails: {error}")
+            status.configure(text="Not connected to Ollama")
         else:
-            self._append("Cat Nip", reply)
-            self.status.configure(text="Connected locally · " + MODEL)
-        self.busy = False
-        self.send_button.configure(state="normal")
-        self.entry.focus_set()
+            append("Cat Nip", reply or "Sorry, I couldn't form a response. Try rephrasing that.")
+            status.configure(text=f"Connected locally · {MODEL}")
+        state["busy"] = False
+        send_button.configure(state="normal")
+        entry.focus_set()
 
+    def get_reply(history):
+        try:
+            import ollama
+            response = ollama.chat(model=MODEL, messages=history, options={"temperature": 0.4})
+            reply = response.message.content or "Sorry, I couldn't form a response. Try rephrasing that."
+            messages.append({"role": "assistant", "content": reply})
+            page.after(0, lambda result=reply: finish(result, None))
+        except Exception as exc:
+            page.after(0, lambda error=str(exc): finish(None, error))
 
-def open_chatbot(master=None):
-    """Open the standalone prototype window."""
-    return CatNipChatbot(master)
+    def send(_event=None):
+        text = entry.get().strip()
+        if not text or state["busy"]:
+            return "break"
+        entry.delete(0, "end")
+        append("You", text)
+        messages.append({"role": "user", "content": text})
+        state["busy"] = True
+        send_button.configure(state="disabled")
+        status.configure(text="Thinking… (first reply may take a little longer)")
+        threading.Thread(target=get_reply, args=(list(messages),), daemon=True).start()
+        return "break"
 
-
-if __name__ == "__main__":
-    ctk.set_appearance_mode("light")
-    ctk.set_default_color_theme("blue")
-    app = ctk.CTk()
-    app.withdraw()
-    window = CatNipChatbot(app)
-    app.mainloop()
+    send_button.configure(command=send)
+    entry.bind("<Return>", send)
+    entry.focus_set()
+    return page

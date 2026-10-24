@@ -16,7 +16,7 @@ def display_pet_icon(value):
     return PET_ICONS.get(str(value).lower(), "🐾")
 
 
-def open_adoption_window(parent, user_id):
+def open_adoption_window(parent, user_id, embedded=False):
     if not user_id:
         messagebox.showerror("Sign in required", "Please sign in before applying to adopt a pet.")
         return
@@ -26,12 +26,16 @@ def open_adoption_window(parent, user_id):
         messagebox.showerror("Adoption unavailable", f"Could not prepare the adoption database.\n\n{exc}")
         return
 
-    win = ctk.CTkToplevel(parent)
-    win.title("Cat Nip — Adopt a Pet")
-    win.geometry("1040x760")
-    win.minsize(850, 620)
-    win.configure(fg_color=CREAM)
-    win.transient(parent.winfo_toplevel())
+    if embedded:
+        win = ctk.CTkFrame(parent, fg_color=CREAM, corner_radius=0)
+        win.pack(fill="both", expand=True)
+    else:
+        win = ctk.CTkToplevel(parent)
+        win.title("Cat Nip — Adopt a Pet")
+        win.geometry("1040x760")
+        win.minsize(850, 620)
+        win.configure(fg_color=CREAM)
+        win.transient(parent.winfo_toplevel())
 
     header = ctk.CTkFrame(win, fg_color=PEACH, corner_radius=0)
     header.pack(fill="x")
