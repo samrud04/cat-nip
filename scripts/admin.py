@@ -2,6 +2,8 @@ import customtkinter as ctk
 from tkinter import ttk, messagebox
 import os
 
+from adoption import open_adoption_admin
+
 from db import (
     get_products,
     add_product,
@@ -982,6 +984,18 @@ def create_admin_frame(container, show_frame):
         width=170,
         fg_color="#39845A",
         hover_color="#2D6D49"
+    ).pack(
+        side="right",
+        padx=(0, 10)
+    )
+
+    ctk.CTkButton(
+        header_top,
+        text="🐾 Adoption Applications",
+        command=lambda: open_adoption_admin(admin_frame),
+        width=190,
+        fg_color="#B96D57",
+        hover_color="#9E5947"
     ).pack(
         side="right",
         padx=(0, 10)

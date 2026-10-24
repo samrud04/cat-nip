@@ -737,3 +737,153 @@ def update_booking_status(booking_id, status):
     finally:
         cur.close()
         con.close()
+
+
+# =====================================================
+# PET ADOPTION (demo shelter listings + applications)
+# =====================================================
+
+def ensure_adoption_tables():
+    """Create adoption tables on first use; leaves existing app data untouched."""
+    con, cur = connect()
+    try:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS pets (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                species VARCHAR(40) NOT NULL,
+                age VARCHAR(40) NOT NULL,
+                gender VARCHAR(20) NOT NULL,
+                description VARCHAR(500) NOT NULL,
+                emoji VARCHAR(32) NOT NULL DEFAULT 'paw',
+                status VARCHAR(30) NOT NULL DEFAULT 'Available',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB
+        """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS adoption_applications (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                pet_id INT NOT NULL,
+                user_id INT NOT NULL,
+                reason VARCHAR(1000) NOT NULL,
+                status VARCHAR(30) NOT NULL DEFAULT 'Pending',
+                collection_address VARCHAR(255) NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT fk_adoption_pet FOREIGN KEY (pet_id) REFERENCES pets(id),
+                CONSTRAINT fk_adoption_user FOREIGN KEY (user_id) REFERENCES `user`(id),
+                UNIQUE KEY uq_user_pet_application (user_id, pet_id)
+            ) ENGINE=InnoDB
+        """)
+        # Upgrade existing installations safely without dropping application data.
+        cur.execute("SHOW COLUMNS FROM adoption_applications LIKE 'collection_address'")
+        if not cur.fetchone():
+            cur.execute("ALTER TABLE adoption_applications ADD COLUMN collection_address VARCHAR(255) NULL AFTER status")
+        cur.execute("SELECT COUNT(*) FROM pets")
+        if cur.fetchone()[0] == 0:
+            demo_pets = [
+                ('Milo', 'Cat', '8 months', 'Male', 'A curious, playful kitten who loves toys and sunny windows.', 'cat'),
+                ('Luna', 'Cat', '2 years', 'Female', 'A gentle, affectionate cat who enjoys quiet company.', 'cat'),
+                ('Buddy', 'Dog', '1 year', 'Male', 'A cheerful, energetic dog who loves walks and learning tricks.', 'dog'),
+                ('Daisy', 'Dog', '3 years', 'Female', 'A friendly, calm companion who would love a caring home.', 'dog'),
+                ('Peanut', 'Rabbit', '6 months', 'Female', 'A soft-natured bunny who enjoys fresh greens and a calm space.', 'rabbit'),
+                ('Oreo', 'Cat', '1 year', 'Male', 'A sociable cat with a big personality and lots of curiosity.', 'paw'),
+            ]
+            cur.executemany(
+                "INSERT INTO pets (name, species, age, gender, description, emoji) VALUES (%s,%s,%s,%s,%s,%s)",
+                demo_pets
+            )
+        con.commit()
+    finally:
+        cur.close()
+        con.close()
+
+def get_available_pets(species='All'):
+    ensure_adoption_tables()
+    con, cur = connect()
+    try:
+        if species and species != 'All':
+            cur.execute("SELECT id, name, species, age, gender, description, emoji, status FROM pets WHERE status='Available' AND species=%s ORDER BY id", (species,))
+        else:
+            cur.execute("SELECT id, name, species, age, gender, description, emoji, status FROM pets WHERE status='Available' ORDER BY id")
+        return cur.fetchall()
+    finally:
+        cur.close(); con.close()
+
+def submit_adoption_application(user_id, pet_id, reason):
+    ensure_adoption_tables()
+    con, cur = connect()
+    try:
+        cur.execute("SELECT status FROM pets WHERE id=%s", (pet_id,))
+        pet = cur.fetchone()
+        if not pet or pet[0] != 'Available':
+            return 'unavailable'
+        cur.execute("SELECT id FROM adoption_applications WHERE user_id=%s AND pet_id=%s", (user_id, pet_id))
+        if cur.fetchone():
+            return 'exists'
+        cur.execute("INSERT INTO adoption_applications (pet_id, user_id, reason) VALUES (%s,%s,%s)", (pet_id, user_id, reason))
+        con.commit()
+        return 'submitted'
+    finally:
+        cur.close(); con.close()
+
+def get_user_adoption_applications(user_id):
+    ensure_adoption_tables()
+    con, cur = connect()
+    try:
+        cur.execute("""SELECT a.id, p.name, p.species, a.status, a.created_at, a.reason, a.collection_address
+                       FROM adoption_applications a JOIN pets p ON p.id=a.pet_id
+                       WHERE a.user_id=%s ORDER BY a.created_at DESC, a.id DESC""", (user_id,))
+        return cur.fetchall()
+    finally:
+        cur.close(); con.close()
+
+def get_all_adoption_applications():
+    ensure_adoption_tables()
+    con, cur = connect()
+    try:
+        cur.execute("""SELECT a.id, p.name, p.species, u.username, u.email, u.phone, a.reason, a.status, a.created_at, a.pet_id, a.user_id
+                       FROM adoption_applications a JOIN pets p ON p.id=a.pet_id
+                       JOIN `user` u ON u.id=a.user_id ORDER BY a.created_at DESC, a.id DESC""")
+        return cur.fetchall()
+    finally:
+        cur.close(); con.close()
+
+def update_adoption_application(application_id, status):
+    allowed = {'Pending', 'Approved', 'Rejected'}
+    if status not in allowed:
+        raise ValueError('Invalid adoption application status')
+    ensure_adoption_tables()
+    con, cur = connect()
+    try:
+        cur.execute("SELECT pet_id, user_id, status, collection_address FROM adoption_applications WHERE id=%s", (application_id,))
+        app = cur.fetchone()
+        if not app:
+            return False
+        pet_id, user_id, old_status, collection_address = app
+        if status == 'Approved':
+            cur.execute("SELECT status FROM pets WHERE id=%s FOR UPDATE", (pet_id,))
+            pet = cur.fetchone()
+            if not pet or (pet[0] != 'Available' and old_status != 'Approved'):
+                con.rollback()
+                return False
+            cur.execute("UPDATE pets SET status='Adopted' WHERE id=%s", (pet_id,))
+            cur.execute("UPDATE adoption_applications SET status='Rejected' WHERE pet_id=%s AND id<>%s AND status='Pending'", (pet_id, application_id))
+            if not collection_address:
+                import random
+                # Fictional demonstration addresses only; not real collection centres.
+                demo_addresses = [
+                    'Demo Adoption Centre, 14 Coral Garden Road, Adyar, Chennai 600020',
+                    'Cat Nip Collection Hub, 27 Mango Grove Avenue, Velachery, Chennai 600042',
+                    'Demo Pet Welcome Centre, 8 Lakeview Cross Street, Anna Nagar, Chennai 600040',
+                    'Cat Nip Adoption Point, 35 Jasmine Park Road, Thoraipakkam, Chennai 600097',
+                    'Demo Animal Care Centre, 19 Banyan Lane, Mylapore, Chennai 600004',
+                    'Cat Nip Pet Collection Desk, 6 Rainbow Nagar Main Road, Porur, Chennai 600116',
+                ]
+                collection_address = random.choice(demo_addresses)
+        elif old_status == 'Approved':
+            cur.execute("UPDATE pets SET status='Available' WHERE id=%s", (pet_id,))
+        cur.execute("UPDATE adoption_applications SET status=%s, collection_address=%s WHERE id=%s", (status, collection_address, application_id))
+        con.commit()
+        return True
+    finally:
+        cur.close(); con.close()

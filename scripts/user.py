@@ -5,8 +5,7 @@ import html
 import webbrowser
 from pathlib import Path
 import db
-from datetime import date, datetime
-from date_picker import attach_date_picker
+from adoption import open_adoption_window
 
 
 # =====================================================
@@ -867,33 +866,17 @@ def create_book_page(parent):
             )
 
 
-            date_row = ctk.CTkFrame(popup, fg_color="transparent")
-            date_row.pack(fill="x", padx=40, pady=(5, 15))
-
             date_entry = ctk.CTkEntry(
-                date_row,
+                popup,
                 height=38,
-                placeholder_text="YYYY-MM-DD"
+                placeholder_text="2026-09-10"
             )
-            date_entry.pack(side="left", fill="x", expand=True)
 
-            ctk.CTkButton(
-                date_row,
-                text="📅",
-                width=44,
-                height=38,
-                fg_color="#F4B183",
-                hover_color="#D98958",
-                text_color="#30251F",
-                command=attach_date_picker(
-                    date_entry,
-                    popup,
-                    date_format="%Y-%m-%d",
-                    min_date=date.today(),
-                    max_date=date(9999, 12, 31),
-                    initial_date=date.today()
-                )
-            ).pack(side="left", padx=(8, 0))
+            date_entry.pack(
+                fill="x",
+                padx=40,
+                pady=(5, 15)
+            )
 
 
             # NOTES
@@ -933,25 +916,14 @@ def create_book_page(parent):
 
 
                 if not pet_name or not booking_date:
+
                     messagebox.showwarning(
                         "Missing Info",
                         "Please enter Pet Name and Date."
                     )
+
                     return
 
-                # Appointment dates must be valid MySQL dates and cannot be in the past.
-                try:
-                    parsed_booking_date = datetime.strptime(booking_date, "%Y-%m-%d").date()
-                    if parsed_booking_date < date.today():
-                        raise ValueError("past date")
-                    if not date(1000, 1, 1) <= parsed_booking_date <= date(9999, 12, 31):
-                        raise ValueError("outside supported date range")
-                except ValueError:
-                    messagebox.showwarning(
-                        "Invalid Date",
-                        "Choose a valid appointment date today or later using the calendar."
-                    )
-                    return
 
                 success = db.create_booking(
                     current_user_id,
@@ -1975,6 +1947,17 @@ def create_navbar(
         padx=5
     )
 
+
+    # PET ADOPTION
+    ctk.CTkButton(
+        button_frame,
+        text="🐾 Adopt",
+        fg_color="white",
+        text_color="#FA9A85",
+        hover_color="#f9d8d1",
+        font=("Arial", 16, "bold"),
+        command=lambda: open_adoption_window(parent, current_user_id)
+    ).pack(side="left", padx=5)
 
     # SETTINGS
 
