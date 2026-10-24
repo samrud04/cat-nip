@@ -1554,18 +1554,127 @@ def create_settings_page(parent, show_frame):
 
 
 # =====================================================
+# MY ORDERS / ORDER HISTORY
+# =====================================================
+
+def create_order_history_page(parent):
+    """Create the signed-in user's order history with reusable invoices."""
+    history_frame = ctk.CTkScrollableFrame(parent, fg_color="#ffe7d6")
+
+    header = ctk.CTkFrame(history_frame, fg_color="transparent")
+    header.pack(fill="x", padx=22, pady=(20, 8))
+    ctk.CTkLabel(
+        header,
+        text="📦 My Orders",
+        font=("Segoe UI", 26, "bold"),
+        text_color="#2b1d14"
+    ).pack(side="left")
+
+    body = ctk.CTkFrame(history_frame, fg_color="transparent")
+    body.pack(fill="both", expand=True, padx=12, pady=(0, 18))
+
+    def refresh_orders():
+        for widget in body.winfo_children():
+            widget.destroy()
+
+        if current_user_id is None:
+            ctk.CTkLabel(
+                body, text="Please log in to view your orders.",
+                font=("Segoe UI", 15), text_color="#6d5b52"
+            ).pack(pady=28)
+            return
+
+        try:
+            orders = db.get_user_orders(current_user_id)
+        except Exception as exc:
+            print("Could not load order history:", exc)
+            ctk.CTkLabel(
+                body,
+                text="Couldn't load your orders. Please try again.",
+                font=("Segoe UI", 15), text_color="#9b2c2c"
+            ).pack(pady=28)
+            return
+
+        if not orders:
+            ctk.CTkLabel(
+                body,
+                text="You haven't placed any orders yet. Your purchases will appear here.",
+                font=("Segoe UI", 15), text_color="#6d5b52",
+                wraplength=650
+            ).pack(pady=36)
+            return
+
+        for order_id, total, order_date, status, item_count in orders:
+            card = ctk.CTkFrame(body, fg_color="#fffaf6", corner_radius=12)
+            card.pack(fill="x", padx=8, pady=7)
+
+            date_text = (
+                order_date.strftime("%d %b %Y, %I:%M %p")
+                if hasattr(order_date, "strftime") else str(order_date)
+            )
+            status_text = str(status or "Placed")
+            top = ctk.CTkFrame(card, fg_color="transparent")
+            top.pack(fill="x", padx=16, pady=(13, 4))
+            ctk.CTkLabel(
+                top, text=f"Order #CN-{order_id}",
+                font=("Segoe UI", 16, "bold"), text_color="#2b1d14"
+            ).pack(side="left")
+            ctk.CTkLabel(
+                top, text=status_text,
+                font=("Segoe UI", 13, "bold"), text_color="#b95340"
+            ).pack(side="right")
+
+            ctk.CTkLabel(
+                card,
+                text=f"Placed: {date_text}   •   {item_count} item(s)   •   Total: ₹{float(total):,.2f}",
+                font=("Segoe UI", 13), text_color="#6d5b52"
+            ).pack(anchor="w", padx=16, pady=(0, 10))
+
+            ctk.CTkButton(
+                card,
+                text="View Invoice",
+                width=130,
+                fg_color="#fa9a85",
+                hover_color="#e98270",
+                text_color="#30251f",
+                command=lambda oid=order_id: open_invoice(oid)
+            ).pack(anchor="e", padx=16, pady=(0, 13))
+
+    def open_invoice(order_id):
+        try:
+            generate_order_bill(order_id, current_user_id)
+        except Exception as exc:
+            messagebox.showerror("Invoice unavailable", f"Couldn't open this invoice.\n\n{exc}")
+
+    ctk.CTkButton(
+        header,
+        text="Refresh",
+        width=100,
+        fg_color="#fa9a85",
+        hover_color="#e98270",
+        text_color="#30251f",
+        command=refresh_orders
+    ).pack(side="right")
+
+    refresh_orders()
+    return history_frame, refresh_orders
+
+
+# =====================================================
 # PAGE SWITCHING
 # =====================================================
 
 def show_order(
         order_frame,
         book_frame,
-        settings_frame):
+        settings_frame,
+        history_frame=None):
 
 
     book_frame.pack_forget()
-
     settings_frame.pack_forget()
+    if history_frame is not None:
+        history_frame.pack_forget()
 
 
     order_frame.pack(
@@ -1577,12 +1686,14 @@ def show_order(
 def show_book(
         order_frame,
         book_frame,
-        settings_frame):
+        settings_frame,
+        history_frame=None):
 
 
     order_frame.pack_forget()
-
     settings_frame.pack_forget()
+    if history_frame is not None:
+        history_frame.pack_forget()
 
 
     book_frame.pack(
@@ -1595,12 +1706,14 @@ def show_settings(
         order_frame,
         book_frame,
         settings_frame,
-        show_frame):
+        show_frame,
+        history_frame=None):
 
 
     order_frame.pack_forget()
-
     book_frame.pack_forget()
+    if history_frame is not None:
+        history_frame.pack_forget()
 
 
     for widget in settings_frame.winfo_children():
@@ -1620,6 +1733,14 @@ def show_settings(
     )
 
 
+def show_order_history(order_frame, book_frame, settings_frame, history_frame, refresh_orders):
+    order_frame.pack_forget()
+    book_frame.pack_forget()
+    settings_frame.pack_forget()
+    refresh_orders()
+    history_frame.pack(fill="both", expand=True)
+
+
 # =====================================================
 # NAVBAR
 # =====================================================
@@ -1629,7 +1750,9 @@ def create_navbar(
         order_frame,
         book_frame,
         settings_frame,
-        show_frame):
+        show_frame,
+        history_frame=None,
+        refresh_orders=None):
 
 
     navbar = ctk.CTkFrame(
@@ -1683,7 +1806,8 @@ def create_navbar(
         command=lambda: show_order(
             order_frame,
             book_frame,
-            settings_frame
+            settings_frame,
+            history_frame
         )
     ).pack(
         side="left",
@@ -1703,7 +1827,8 @@ def create_navbar(
         command=lambda: show_book(
             order_frame,
             book_frame,
-            settings_frame
+            settings_frame,
+            history_frame
         )
     ).pack(
         side="left",
@@ -1724,12 +1849,28 @@ def create_navbar(
             order_frame,
             book_frame,
             settings_frame,
-            show_frame
+            show_frame,
+            history_frame
         )
     ).pack(
         side="left",
         padx=5
     )
+
+    # MY ORDERS
+    if history_frame is not None and refresh_orders is not None:
+        ctk.CTkButton(
+            button_frame,
+            text="My Orders",
+            fg_color="white",
+            text_color="#FA9A85",
+            hover_color="#f9d8d1",
+            font=("Arial", 16, "bold"),
+            command=lambda: show_order_history(
+                order_frame, book_frame, settings_frame,
+                history_frame, refresh_orders
+            )
+        ).pack(side="left", padx=5)
 
 
 # =====================================================
@@ -2175,6 +2316,8 @@ def user_screen(
         fg_color="#ffe7d6"
     )
 
+    history_frame, refresh_orders = create_order_history_page(page_container)
+
 
     # =================================================
     # NAVBAR
@@ -2185,7 +2328,9 @@ def user_screen(
         order_frame,
         book_frame,
         settings_frame,
-        show_frame
+        show_frame,
+        history_frame,
+        refresh_orders
     )
 
 

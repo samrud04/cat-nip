@@ -544,6 +544,26 @@ def reduce_stock(product_id, quantity):
 
     return success
 
+def get_user_orders(user_id):
+    """Return the signed-in user's orders, newest first, with item counts."""
+    con, cur = connect()
+    try:
+        cur.execute(
+            """
+            SELECT o.id, o.total, o.order_date, o.status,
+                   (SELECT COUNT(*) FROM order_items oi WHERE oi.order_id = o.id) AS item_count
+            FROM orders o
+            WHERE o.user_id = %s
+            ORDER BY o.order_date DESC, o.id DESC
+            """,
+            (user_id,)
+        )
+        return cur.fetchall()
+    finally:
+        cur.close()
+        con.close()
+
+
 def get_order_invoice_data(order_id, user_id):
     """Return an order, its customer details, and line items for that user.
 
