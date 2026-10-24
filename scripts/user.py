@@ -6,6 +6,7 @@ import webbrowser
 from pathlib import Path
 import db
 from adoption import open_adoption_window
+from playdates import open_playdates_user
 
 
 # =====================================================
@@ -1957,6 +1958,17 @@ def create_navbar(
         hover_color="#f9d8d1",
         font=("Arial", 16, "bold"),
         command=lambda: open_adoption_window(parent, current_user_id)
+    ).pack(side="left", padx=5)
+
+    # PLAYDATES
+    ctk.CTkButton(
+        button_frame,
+        text="🐕 Playdates",
+        fg_color="white",
+        text_color="#FA9A85",
+        hover_color="#f9d8d1",
+        font=("Arial", 16, "bold"),
+        command=lambda: open_playdates_user(parent, current_user_id)
     ).pack(side="left", padx=5)
 
     # SETTINGS

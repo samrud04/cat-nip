@@ -887,3 +887,204 @@ def update_adoption_application(application_id, status):
         return True
     finally:
         cur.close(); con.close()
+
+# =====================================================
+# PLAYDATES (admin-created events and automatic bookings)
+# =====================================================
+
+def ensure_playdate_tables():
+    """Create playdate tables safely without touching existing Cat Nip data."""
+    con, cur = connect()
+    try:
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS playdate_events (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                title VARCHAR(120) NOT NULL,
+                description VARCHAR(500) NULL,
+                pet_type VARCHAR(30) NOT NULL DEFAULT 'All',
+                event_date DATE NOT NULL,
+                start_time TIME NOT NULL,
+                end_time TIME NOT NULL,
+                location VARCHAR(255) NOT NULL,
+                capacity INT NOT NULL,
+                allow_own_pets TINYINT(1) NOT NULL DEFAULT 0,
+                allowed_pet_types VARCHAR(100) NOT NULL DEFAULT 'Dog,Cat,Rabbit',
+                status VARCHAR(20) NOT NULL DEFAULT 'Open',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB
+        """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS playdate_bookings (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                event_id INT NOT NULL,
+                user_id INT NOT NULL,
+                pet_name VARCHAR(100) NULL,
+                pet_type VARCHAR(30) NULL,
+                status VARCHAR(20) NOT NULL DEFAULT 'Confirmed',
+                booked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT fk_playdate_event FOREIGN KEY (event_id) REFERENCES playdate_events(id),
+                CONSTRAINT fk_playdate_user FOREIGN KEY (user_id) REFERENCES `user`(id),
+                UNIQUE KEY uq_playdate_user_event (event_id, user_id)
+            ) ENGINE=InnoDB
+        """)
+        con.commit()
+    finally:
+        cur.close(); con.close()
+
+
+def create_playdate_event(title, description, pet_type, event_date, start_time, end_time,
+                          location, capacity, allow_own_pets, allowed_pet_types):
+    from datetime import date, time
+    ensure_playdate_tables()
+    title = str(title).strip()
+    location = str(location).strip()
+    if not title or not location:
+        raise ValueError('Event title and location are required.')
+    if int(capacity) < 1:
+        raise ValueError('Capacity must be at least 1 participant.')
+    d = date.fromisoformat(str(event_date).strip())
+    start = time.fromisoformat(str(start_time).strip())
+    end = time.fromisoformat(str(end_time).strip())
+    if d < date.today():
+        raise ValueError('Playdate must be today or in the future.')
+    if end <= start:
+        raise ValueError('End time must be later than start time.')
+    con, cur = connect()
+    try:
+        cur.execute("""INSERT INTO playdate_events
+            (title, description, pet_type, event_date, start_time, end_time, location,
+             capacity, allow_own_pets, allowed_pet_types)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+            (title, str(description).strip(), pet_type, d, start, end, location,
+             int(capacity), int(bool(allow_own_pets)), str(allowed_pet_types)))
+        con.commit()
+        return cur.lastrowid
+    finally:
+        cur.close(); con.close()
+
+
+def get_playdate_events(include_past=False):
+    ensure_playdate_tables()
+    con, cur = connect()
+    try:
+        where = "" if include_past else "WHERE e.event_date >= CURDATE() AND e.status='Open'"
+        cur.execute(f"""SELECT e.id, e.title, e.description, e.pet_type, e.event_date,
+                    e.start_time, e.end_time, e.location, e.capacity, e.allow_own_pets,
+                    e.allowed_pet_types, e.status,
+                    (SELECT COUNT(*) FROM playdate_bookings b WHERE b.event_id=e.id AND b.status='Confirmed') AS booked
+                    FROM playdate_events e {where} ORDER BY e.event_date, e.start_time, e.id""")
+        return cur.fetchall()
+    finally:
+        cur.close(); con.close()
+
+
+def get_user_playdate_bookings(user_id):
+    ensure_playdate_tables()
+    con, cur = connect()
+    try:
+        cur.execute("""SELECT b.id, e.id, e.title, e.event_date, e.start_time, e.end_time,
+                    e.location, b.pet_name, b.pet_type, b.status, e.status
+                    FROM playdate_bookings b JOIN playdate_events e ON e.id=b.event_id
+                    WHERE b.user_id=%s ORDER BY e.event_date DESC, e.start_time DESC, b.id DESC""", (user_id,))
+        return cur.fetchall()
+    finally:
+        cur.close(); con.close()
+
+
+def _playdate_datetime(day_value, time_value):
+    from datetime import datetime, time, timedelta
+    if isinstance(time_value, timedelta):
+        seconds = int(time_value.total_seconds()) % 86400
+        time_value = time(seconds // 3600, (seconds % 3600) // 60, seconds % 60)
+    elif isinstance(time_value, str):
+        time_value = time.fromisoformat(time_value)
+    return datetime.combine(day_value, time_value)
+
+
+def book_playdate(event_id, user_id, pet_name=None, pet_type=None):
+    from datetime import datetime
+    ensure_playdate_tables()
+    con, cur = connect()
+    try:
+        cur.execute("SELECT event_date, start_time, capacity, allow_own_pets, allowed_pet_types, status FROM playdate_events WHERE id=%s FOR UPDATE", (event_id,))
+        event = cur.fetchone()
+        if not event or event[5] != 'Open':
+            return 'closed'
+        event_date, start_time, capacity, allow_own, allowed_types, _ = event
+        if _playdate_datetime(event_date, start_time) <= datetime.now():
+            return 'started'
+        cur.execute("SELECT id, status FROM playdate_bookings WHERE event_id=%s AND user_id=%s", (event_id, user_id))
+        existing = cur.fetchone()
+        if existing and existing[1] == 'Confirmed':
+            return 'exists'
+        if pet_name:
+            if not allow_own:
+                return 'pets_not_allowed'
+            if not pet_type or pet_type not in [x.strip() for x in (allowed_types or '').split(',')]:
+                return 'pet_type_not_allowed'
+        cur.execute("SELECT COUNT(*) FROM playdate_bookings WHERE event_id=%s AND status='Confirmed'", (event_id,))
+        if cur.fetchone()[0] >= capacity:
+            return 'full'
+        if existing:
+            cur.execute("UPDATE playdate_bookings SET pet_name=%s, pet_type=%s, status='Confirmed', booked_at=CURRENT_TIMESTAMP WHERE id=%s",
+                        (pet_name or None, pet_type or None, existing[0]))
+        else:
+            cur.execute("INSERT INTO playdate_bookings (event_id,user_id,pet_name,pet_type) VALUES (%s,%s,%s,%s)",
+                        (event_id, user_id, pet_name or None, pet_type or None))
+        con.commit()
+        return 'confirmed'
+    finally:
+        cur.close(); con.close()
+
+
+def cancel_playdate_booking(booking_id, user_id):
+    from datetime import datetime
+    ensure_playdate_tables()
+    con, cur = connect()
+    try:
+        cur.execute("""SELECT b.status, e.event_date, e.start_time FROM playdate_bookings b
+                       JOIN playdate_events e ON e.id=b.event_id WHERE b.id=%s AND b.user_id=%s""", (booking_id, user_id))
+        row = cur.fetchone()
+        if not row or row[0] != 'Confirmed':
+            return False
+        if _playdate_datetime(row[1], row[2]) <= datetime.now():
+            return False
+        cur.execute("UPDATE playdate_bookings SET status='Cancelled' WHERE id=%s", (booking_id,))
+        con.commit()
+        return True
+    finally:
+        cur.close(); con.close()
+
+
+def get_admin_playdate_bookings(event_id=None):
+    ensure_playdate_tables()
+    con, cur = connect()
+    try:
+        if event_id is None:
+            cur.execute("""SELECT b.id, e.id, e.title, u.username, u.email, e.event_date, e.start_time,
+                         b.pet_name, b.pet_type, b.status FROM playdate_bookings b
+                         JOIN playdate_events e ON e.id=b.event_id JOIN `user` u ON u.id=b.user_id
+                         ORDER BY e.event_date DESC, b.id DESC""")
+        else:
+            cur.execute("""SELECT b.id, e.id, e.title, u.username, u.email, e.event_date, e.start_time,
+                         b.pet_name, b.pet_type, b.status FROM playdate_bookings b
+                         JOIN playdate_events e ON e.id=b.event_id JOIN `user` u ON u.id=b.user_id
+                         WHERE e.id=%s ORDER BY b.id""", (event_id,))
+        return cur.fetchall()
+    finally:
+        cur.close(); con.close()
+
+
+def update_playdate_event_status(event_id, status):
+    if status not in ('Open', 'Cancelled', 'Completed'):
+        raise ValueError('Invalid playdate status.')
+    ensure_playdate_tables()
+    con, cur = connect()
+    try:
+        cur.execute("UPDATE playdate_events SET status=%s WHERE id=%s", (status, event_id))
+        if status == 'Cancelled':
+            cur.execute("UPDATE playdate_bookings SET status='Cancelled' WHERE event_id=%s AND status='Confirmed'", (event_id,))
+        con.commit()
+        return cur.rowcount > 0
+    finally:
+        cur.close(); con.close()

@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 import os
 
 from adoption import open_adoption_admin
+from playdates import open_playdates_admin
 
 from db import (
     get_products,
@@ -996,6 +997,18 @@ def create_admin_frame(container, show_frame):
         width=190,
         fg_color="#B96D57",
         hover_color="#9E5947"
+    ).pack(
+        side="right",
+        padx=(0, 10)
+    )
+
+    ctk.CTkButton(
+        header_top,
+        text="🐕 Manage Playdates",
+        command=lambda: open_playdates_admin(admin_frame),
+        width=165,
+        fg_color="#6C8D70",
+        hover_color="#55755A"
     ).pack(
         side="right",
         padx=(0, 10)

@@ -189,7 +189,9 @@ def open_adoption_admin(parent):
     table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 12))
     cols = ("ID", "Pet", "Species", "Username", "Email", "Phone", "Reason", "Status", "Submitted")
     tree = ttk.Treeview(table_frame, columns=cols, show="headings", height=14)
-    widths = (55, 90, 80, 100, 150, 95, 260, 90, 140)
+    # Long reasons stay in the database and are opened in a dedicated scrollable viewer.
+    widths = (55, 90, 80, 100, 150, 95, 135, 90, 140)
+    reasons_by_id = {}
     for col, width in zip(cols, widths):
         tree.heading(col, text=col)
         tree.column(col, width=width, minwidth=50, anchor="w")
@@ -203,12 +205,40 @@ def open_adoption_admin(parent):
 
     def load():
         for row in tree.get_children(): tree.delete(row)
+        reasons_by_id.clear()
         try:
             for app in db.get_all_adoption_applications():
                 app_id, pet, species, username, email, phone, reason, status, created, pet_id, user_id = app
-                tree.insert("", "end", iid=str(app_id), values=(app_id, pet, species, username, email or "—", phone or "—", reason, status, created))
+                reasons_by_id[int(app_id)] = reason or "No reason provided."
+                tree.insert("", "end", iid=str(app_id), values=(app_id, pet, species, username, email or "—", phone or "—", "Select row → View Reason", status, created))
         except Exception as exc:
             messagebox.showerror("Could not load applications", str(exc), parent=win)
+
+    def view_reason():
+        selected = tree.selection()
+        if not selected:
+            messagebox.showwarning("Select an application", "Choose an application in the table first.", parent=win)
+            return
+        app_id = int(selected[0])
+        values = tree.item(selected[0], "values")
+        pet_name = values[1] if len(values) > 1 else "Pet"
+        username = values[3] if len(values) > 3 else "User"
+        popup = ctk.CTkToplevel(win)
+        popup.title(f"Adoption Reason — Application #{app_id}")
+        popup.geometry("680x480")
+        popup.minsize(500, 350)
+        popup.configure(fg_color=CREAM)
+        ctk.CTkLabel(popup, text=f"Application #{app_id} — {pet_name}", font=("Arial", 21, "bold"), text_color=INK).pack(anchor="w", padx=18, pady=(16, 3))
+        ctk.CTkLabel(popup, text=f"Applicant: {username}", text_color=INK).pack(anchor="w", padx=18, pady=(0, 10))
+        reason_box = ctk.CTkTextbox(popup, wrap="word", font=("Arial", 14), corner_radius=10)
+        reason_box.pack(fill="both", expand=True, padx=18, pady=(0, 12))
+        reason_box.insert("1.0", reasons_by_id.get(app_id, "No reason provided."))
+        reason_box.configure(state="disabled")
+        ctk.CTkButton(popup, text="Close", command=popup.destroy).pack(anchor="e", padx=18, pady=(0, 14))
+        try:
+            popup.transient(win); popup.lift(); popup.focus_force()
+        except Exception:
+            pass
 
     actions = ctk.CTkFrame(win, fg_color="transparent")
     actions.pack(fill="x", padx=20, pady=(0, 18))
@@ -232,6 +262,7 @@ def open_adoption_admin(parent):
             messagebox.showinfo("Updated", f"Application marked {status_box.get()}.", parent=win)
         load()
 
+    ctk.CTkButton(actions, text="View Full Reason", command=view_reason, fg_color="#6C8D70", hover_color="#55755A").pack(side="left", padx=(0, 5))
     ctk.CTkButton(actions, text="Update Selected", command=update, fg_color=PEACH, hover_color="#E98270", text_color=INK).pack(side="left", padx=5)
     ctk.CTkButton(actions, text="Refresh", command=load).pack(side="left", padx=5)
     ctk.CTkButton(actions, text="Close", command=win.destroy).pack(side="right")
