@@ -1,6 +1,9 @@
 import customtkinter as ctk
 from tkinter import messagebox
 import os
+import html
+import webbrowser
+from pathlib import Path
 import db
 
 
@@ -1730,6 +1733,114 @@ def create_navbar(
 
 
 # =====================================================
+# BILL / INVOICE GENERATION
+# =====================================================
+
+def generate_order_bill(order_id, user_id):
+    """Display the saved order invoice inside the Cat Nip application.
+
+    Also saves an HTML copy so the user can open a printable version and
+    save it as PDF if desired.
+    """
+    invoice_data = db.get_order_invoice_data(order_id, user_id)
+    if not invoice_data:
+        raise ValueError("The order details could not be found for this account.")
+
+    order = invoice_data["order"]
+    items = invoice_data["items"]
+    (saved_order_id, total, order_date, status, username, email, phone, address) = order
+
+    def esc(value):
+        return html.escape("" if value is None else str(value))
+
+    date_text = order_date.strftime("%d %b %Y, %I:%M %p") if hasattr(order_date, "strftime") else str(order_date)
+
+    html_rows = []
+    for _product_id, name, quantity, price in items:
+        subtotal = float(price) * int(quantity)
+        html_rows.append(
+            "<tr>"
+            f"<td>{esc(name)}</td>"
+            f"<td class='number'>{int(quantity)}</td>"
+            f"<td class='number'>₹{float(price):,.2f}</td>"
+            f"<td class='number'>₹{subtotal:,.2f}</td>"
+            "</tr>"
+        )
+    if not html_rows:
+        html_rows.append("<tr><td colspan='4'>No item details available.</td></tr>")
+
+    # Keep a printable copy available, but show the invoice in the app by default.
+    bill_html = f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><title>Cat Nip Invoice #{saved_order_id}</title>
+<style>body{{font-family:Arial,sans-serif;color:#30251f;background:#fff8f3;padding:32px}}.invoice{{max-width:800px;margin:auto;background:white;padding:36px}}table{{width:100%;border-collapse:collapse;margin-top:24px}}th,td{{padding:10px;border-bottom:1px solid #eee;text-align:left}}th{{background:#fa9a85}}.number{{text-align:right}}.total{{text-align:right;font-size:22px;font-weight:bold;margin-top:24px}}@media print{{.no-print{{display:none}}}}</style></head>
+<body><main class="invoice"><h1>🐾 Cat Nip</h1><p>Pet Goods &amp; Services — Customer Invoice</p>
+<p><strong>Invoice #CN-{saved_order_id}</strong><br>Date: {esc(date_text)}<br>Order status: {esc(status or 'Placed')}</p>
+<p><strong>Bill to:</strong><br>{esc(username)}<br>{esc(address)}<br>{esc(phone)}<br>{esc(email)}</p>
+<table><thead><tr><th>Product</th><th>Qty</th><th>Unit price</th><th>Subtotal</th></tr></thead><tbody>{''.join(html_rows)}</tbody></table>
+<p class="total">Total: ₹{float(total):,.2f}</p><p>Thank you for shopping with Cat Nip!</p>
+<button class="no-print" onclick="window.print()">Print / Save as PDF</button></main></body></html>"""
+    bills_dir = Path(__file__).resolve().parent.parent / "bills"
+    bills_dir.mkdir(parents=True, exist_ok=True)
+    bill_path = bills_dir / f"invoice_{saved_order_id}.html"
+    bill_path.write_text(bill_html, encoding="utf-8")
+
+    # In-app invoice window.
+    bill_window = ctk.CTkToplevel()
+    bill_window.title(f"Cat Nip - Invoice #CN-{saved_order_id}")
+    bill_window.geometry("820x680")
+    bill_window.minsize(650, 520)
+    bill_window.transient()
+    bill_window.grab_set()
+
+    page = ctk.CTkScrollableFrame(bill_window, fg_color="#fffaf6", corner_radius=0)
+    page.pack(fill="both", expand=True, padx=12, pady=(12, 6))
+
+    header = ctk.CTkFrame(page, fg_color="#fffaf6")
+    header.pack(fill="x", padx=18, pady=(18, 10))
+    ctk.CTkLabel(header, text="🐾 Cat Nip", font=("Arial", 28, "bold"), text_color="#d96e59").pack(anchor="w")
+    ctk.CTkLabel(header, text="PET GOODS & SERVICES  •  CUSTOMER INVOICE", font=("Arial", 12, "bold"), text_color="#766b65").pack(anchor="w", pady=(2, 12))
+    ctk.CTkFrame(header, height=2, fg_color="#fa9a85").pack(fill="x", pady=(0, 12))
+
+    order_info = ctk.CTkFrame(page, fg_color="white", corner_radius=10)
+    order_info.pack(fill="x", padx=18, pady=6)
+    ctk.CTkLabel(order_info, text=f"Invoice #CN-{saved_order_id}", font=("Arial", 18, "bold"), text_color="#30251f").pack(anchor="w", padx=16, pady=(12, 2))
+    ctk.CTkLabel(order_info, text=f"Date: {date_text}    |    Status: {status or 'Placed'}", font=("Arial", 12), text_color="#766b65").pack(anchor="w", padx=16, pady=(0, 12))
+
+    customer = ctk.CTkFrame(page, fg_color="white", corner_radius=10)
+    customer.pack(fill="x", padx=18, pady=6)
+    ctk.CTkLabel(customer, text="BILL TO", font=("Arial", 11, "bold"), text_color="#d96e59").pack(anchor="w", padx=16, pady=(12, 2))
+    customer_text = "\n".join(str(v) for v in (username, address, phone, email) if v)
+    ctk.CTkLabel(customer, text=customer_text or "Customer details unavailable", justify="left", anchor="w", font=("Arial", 12), text_color="#30251f").pack(anchor="w", padx=16, pady=(0, 12))
+
+    table = ctk.CTkFrame(page, fg_color="white", corner_radius=10)
+    table.pack(fill="x", padx=18, pady=6)
+    table.grid_columnconfigure(0, weight=5)
+    table.grid_columnconfigure(1, weight=1)
+    table.grid_columnconfigure(2, weight=2)
+    table.grid_columnconfigure(3, weight=2)
+    headings = [("Product", 0), ("Qty", 1), ("Unit price", 2), ("Subtotal", 3)]
+    for title, col in headings:
+        ctk.CTkLabel(table, text=title, font=("Arial", 11, "bold"), text_color="#30251f", fg_color="#fa9a85", corner_radius=4).grid(row=0, column=col, sticky="ew", padx=3, pady=(8, 5), ipady=7)
+
+    for row_index, (_product_id, name, quantity, price) in enumerate(items, start=1):
+        qty = int(quantity)
+        unit_price = float(price)
+        values = (str(name), str(qty), f"₹{unit_price:,.2f}", f"₹{unit_price * qty:,.2f}")
+        for col, value in enumerate(values):
+            ctk.CTkLabel(table, text=value, anchor="w" if col == 0 else "e", font=("Arial", 12), text_color="#30251f").grid(row=row_index, column=col, sticky="ew", padx=10, pady=8)
+        ctk.CTkFrame(table, height=1, fg_color="#f0e4dc").grid(row=row_index + 1, column=0, columnspan=4, sticky="ew", padx=8)
+
+    ctk.CTkLabel(page, text=f"TOTAL:  ₹{float(total):,.2f}", font=("Arial", 24, "bold"), text_color="#b95340").pack(anchor="e", padx=28, pady=(16, 6))
+    ctk.CTkLabel(page, text="Thank you for shopping with Cat Nip! Keep this invoice for your records.", font=("Arial", 12), text_color="#766b65", wraplength=700).pack(anchor="w", padx=22, pady=(0, 18))
+
+    actions = ctk.CTkFrame(bill_window, fg_color="transparent")
+    actions.pack(fill="x", padx=18, pady=(4, 14))
+    ctk.CTkButton(actions, text="Open Printable Version", fg_color="#fa9a85", hover_color="#e98270", text_color="#30251f", command=lambda: webbrowser.open(bill_path.resolve().as_uri())).pack(side="left", padx=(0, 8))
+    ctk.CTkButton(actions, text="Close", command=bill_window.destroy).pack(side="right")
+    return bill_path
+
+
+# =====================================================
 # CART SIDEBAR
 # =====================================================
 
@@ -1831,12 +1942,12 @@ def create_cart_sidebar(
 
         # CHECKOUT
 
-        success = db.checkout(
+        order_id = db.checkout(
             current_user_id
         )
 
 
-        if success:
+        if order_id:
 
 
             # CLEAR LOCAL CART
@@ -1867,9 +1978,28 @@ def create_cart_sidebar(
 
             # SUCCESS MESSAGE
 
+            # Generate the invoice after checkout succeeds. A bill-generation
+            # problem must not turn a successful order into a failed checkout.
+            try:
+                generate_order_bill(order_id, current_user_id)
+                bill_message = (
+                    f"Your order has been placed successfully!\n\n"
+                    f"Order ID: {order_id}\n"
+                    "Your invoice is displayed inside Cat Nip. "
+                    "Use Open Printable Version to print or save it as PDF."
+                )
+            except Exception as exc:
+                print("Bill generation error:", exc)
+                bill_message = (
+                    f"Your order has been placed successfully!\n\n"
+                    f"Order ID: {order_id}\n"
+                    "However, the invoice could not be generated. "
+                    "Please contact the project administrator."
+                )
+
             messagebox.showinfo(
                 "Order Successful",
-                "Your order has been placed successfully!"
+                bill_message
             )
 
 

@@ -475,7 +475,8 @@ def checkout(user_id):
 
         con.close()
 
-        return True
+        # Return the new order ID so the UI can generate its bill.
+        return order_id
 
 
     except Exception as e:
@@ -542,3 +543,43 @@ def reduce_stock(product_id, quantity):
     con.close()
 
     return success
+
+def get_order_invoice_data(order_id, user_id):
+    """Return an order, its customer details, and line items for that user.
+
+    LEFT JOIN keeps historical order lines visible even if a product was later
+    deleted from the catalogue.
+    """
+    con, cur = connect()
+    try:
+        cur.execute(
+            """
+            SELECT o.id, o.total, o.order_date, o.status,
+                   u.username, u.email, u.phone, u.address
+            FROM orders o
+            JOIN `user` u ON u.id = o.user_id
+            WHERE o.id = %s AND o.user_id = %s
+            """,
+            (order_id, user_id)
+        )
+        order = cur.fetchone()
+        if order is None:
+            return None
+
+        cur.execute(
+            """
+            SELECT oi.product_id,
+                   COALESCE(p.name, CONCAT('Product #', oi.product_id)),
+                   oi.quantity, oi.price
+            FROM order_items oi
+            LEFT JOIN products p ON p.id = oi.product_id
+            WHERE oi.order_id = %s
+            ORDER BY oi.id
+            """,
+            (order_id,)
+        )
+        items = cur.fetchall()
+        return {"order": order, "items": items}
+    finally:
+        cur.close()
+        con.close()
