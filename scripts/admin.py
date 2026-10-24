@@ -8,6 +8,12 @@ from db import (
     delete_product,
     update_stock,
     update_product,
+    get_all_orders,
+    get_admin_order_details,
+    update_order_status,
+    get_all_bookings,
+    get_admin_booking_details,
+    update_booking_status,
 )
 
 
@@ -551,6 +557,361 @@ def create_admin_frame(container, show_frame):
 
 
     # =====================================================
+    # ORDER MANAGEMENT
+    # =====================================================
+
+    def open_order_management():
+        order_window = ctk.CTkToplevel(admin_frame)
+        order_window.title("Cat Nip — Order Management")
+        order_window.geometry("1100x700")
+        order_window.minsize(850, 550)
+        order_window.configure(fg_color="#EAF4FF")
+        order_window.grab_set()
+
+        ctk.CTkLabel(
+            order_window,
+            text="📦 Order Management",
+            font=("Segoe UI", 26, "bold")
+        ).pack(anchor="w", padx=20, pady=(18, 4))
+
+        ctk.CTkLabel(
+            order_window,
+            text="Review purchases, view order contents, and update delivery status.",
+            font=("Segoe UI", 13)
+        ).pack(anchor="w", padx=22, pady=(0, 12))
+
+        content = ctk.CTkFrame(order_window, fg_color="transparent")
+        content.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        content.grid_columnconfigure(0, weight=3)
+        content.grid_columnconfigure(1, weight=2)
+        content.grid_rowconfigure(0, weight=1)
+
+        orders_panel = ctk.CTkFrame(content)
+        orders_panel.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
+        orders_panel.grid_columnconfigure(0, weight=1)
+        orders_panel.grid_rowconfigure(1, weight=1)
+
+        ctk.CTkLabel(
+            orders_panel, text="All Orders", font=("Segoe UI", 18, "bold")
+        ).grid(row=0, column=0, sticky="w", padx=12, pady=10)
+
+        order_columns = ("Order ID", "Customer", "Date", "Total", "Status", "Items")
+        orders_tree = ttk.Treeview(
+            orders_panel, columns=order_columns, show="headings", height=18
+        )
+        for col in order_columns:
+            orders_tree.heading(col, text=col)
+            orders_tree.column(col, anchor="center", width=100)
+        orders_tree.column("Customer", width=120)
+        orders_tree.column("Date", width=145)
+        orders_tree.grid(row=1, column=0, sticky="nsew", padx=(10, 0), pady=(0, 10))
+
+        orders_scroll = ttk.Scrollbar(orders_panel, orient="vertical", command=orders_tree.yview)
+        orders_tree.configure(yscrollcommand=orders_scroll.set)
+        orders_scroll.grid(row=1, column=1, sticky="ns", pady=(0, 10))
+
+        right_panel = ctk.CTkFrame(content)
+        right_panel.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
+        right_panel.grid_columnconfigure(0, weight=1)
+        right_panel.grid_rowconfigure(2, weight=1)
+
+        ctk.CTkLabel(
+            right_panel, text="Order Details", font=("Segoe UI", 18, "bold")
+        ).grid(row=0, column=0, sticky="w", padx=12, pady=(10, 5))
+
+        customer_label = ctk.CTkLabel(
+            right_panel, text="Select an order to view its details.",
+            justify="left", anchor="w", wraplength=350
+        )
+        customer_label.grid(row=1, column=0, sticky="ew", padx=12, pady=5)
+
+        item_columns = ("Product", "Qty", "Unit Price")
+        items_tree = ttk.Treeview(right_panel, columns=item_columns, show="headings", height=10)
+        for col in item_columns:
+            items_tree.heading(col, text=col)
+            items_tree.column(col, anchor="center", width=95)
+        items_tree.column("Product", width=160, anchor="w")
+        items_tree.grid(row=2, column=0, sticky="nsew", padx=10, pady=8)
+
+        status_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
+        status_frame.grid(row=3, column=0, sticky="ew", padx=12, pady=(4, 12))
+        status_frame.grid_columnconfigure(0, weight=1)
+
+        ctk.CTkLabel(status_frame, text="Update status:").grid(
+            row=0, column=0, sticky="w", pady=(0, 5)
+        )
+        status_picker = ctk.CTkComboBox(
+            status_frame,
+            values=["Placed", "Processing", "Shipped", "Delivered", "Cancelled"],
+            state="readonly"
+        )
+        status_picker.set("Placed")
+        status_picker.grid(row=1, column=0, sticky="ew", pady=(0, 8))
+
+        selected_order = {"id": None}
+
+        def refresh_order_list(select_id=None):
+            for row in orders_tree.get_children():
+                orders_tree.delete(row)
+            try:
+                orders = get_all_orders()
+                for order in orders:
+                    order_id, username, order_date, total, status, item_count = order
+                    date_text = order_date.strftime("%d %b %Y, %H:%M") if hasattr(order_date, "strftime") else str(order_date)
+                    orders_tree.insert(
+                        "", "end", iid=str(order_id),
+                        values=(order_id, username or f"User #{order_id}", date_text,
+                                f"₹{float(total):,.2f}", status or "Placed", item_count)
+                    )
+                if select_id is not None and orders_tree.exists(str(select_id)):
+                    orders_tree.selection_set(str(select_id))
+                    orders_tree.focus(str(select_id))
+                    show_selected_order()
+            except Exception as exc:
+                messagebox.showerror("Orders Error", f"Could not load orders.\n\n{exc}", parent=order_window)
+
+        def show_selected_order(_event=None):
+            selection = orders_tree.selection()
+            if not selection:
+                return
+            try:
+                order_id = int(selection[0])
+                data = get_admin_order_details(order_id)
+                if not data:
+                    customer_label.configure(text="Order not found.")
+                    return
+                order = data["order"]
+                selected_order["id"] = order_id
+                _, user_id, username, email, phone, address, total, order_date, status = order
+                date_text = order_date.strftime("%d %b %Y, %H:%M") if hasattr(order_date, "strftime") else str(order_date)
+                customer_label.configure(
+                    text=(f"Order #{order_id}\nCustomer: {username or f'User #{user_id}'}\n"
+                          f"Email: {email or '—'}\nPhone: {phone or '—'}\n"
+                          f"Address: {address or '—'}\nDate: {date_text}\n"
+                          f"Total: ₹{float(total):,.2f}\nCurrent status: {status or 'Placed'}")
+                )
+                for row in items_tree.get_children():
+                    items_tree.delete(row)
+                for product_id, product_name, quantity, price in data["items"]:
+                    items_tree.insert(
+                        "", "end",
+                        values=(product_name, quantity, f"₹{float(price):,.2f}")
+                    )
+                status_picker.set(status or "Placed")
+            except Exception as exc:
+                messagebox.showerror("Order Details Error", f"Could not load order details.\n\n{exc}", parent=order_window)
+
+        def save_status():
+            order_id = selected_order["id"]
+            if order_id is None:
+                messagebox.showwarning("Select Order", "Select an order first.", parent=order_window)
+                return
+            new_status = status_picker.get()
+            if not messagebox.askyesno(
+                "Confirm Status Change",
+                f"Set order #{order_id} to '{new_status}'?",
+                parent=order_window
+            ):
+                return
+            try:
+                update_order_status(order_id, new_status)
+                refresh_order_list(select_id=order_id)
+                messagebox.showinfo("Updated", f"Order #{order_id} is now {new_status}.", parent=order_window)
+            except Exception as exc:
+                messagebox.showerror("Update Failed", f"Could not update status.\n\n{exc}", parent=order_window)
+
+        orders_tree.bind("<<TreeviewSelect>>", show_selected_order)
+
+        ctk.CTkButton(
+            status_frame, text="💾 Update Order Status", command=save_status
+        ).grid(row=2, column=0, sticky="ew", pady=(0, 7))
+        ctk.CTkButton(
+            status_frame, text="🔄 Refresh Orders",
+            command=lambda: refresh_order_list(selected_order["id"])
+        ).grid(row=3, column=0, sticky="ew")
+
+        refresh_order_list()
+
+
+    # =====================================================
+    # BOOKING MANAGEMENT
+    # =====================================================
+
+    def open_booking_management():
+        booking_window = ctk.CTkToplevel(admin_frame)
+        booking_window.title("Cat Nip — Booking Management")
+        booking_window.geometry("1120x710")
+        booking_window.minsize(880, 570)
+        booking_window.configure(fg_color="#EAF4FF")
+        booking_window.grab_set()
+
+        ctk.CTkLabel(
+            booking_window,
+            text="📅 Booking Management",
+            font=("Segoe UI", 26, "bold")
+        ).pack(anchor="w", padx=20, pady=(18, 4))
+        ctk.CTkLabel(
+            booking_window,
+            text="Review service appointments, customer details, and update booking status.",
+            font=("Segoe UI", 13)
+        ).pack(anchor="w", padx=22, pady=(0, 12))
+
+        content = ctk.CTkFrame(booking_window, fg_color="transparent")
+        content.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        content.grid_columnconfigure(0, weight=3)
+        content.grid_columnconfigure(1, weight=2)
+        content.grid_rowconfigure(0, weight=1)
+
+        left = ctk.CTkFrame(content)
+        left.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
+        left.grid_columnconfigure(0, weight=1)
+        left.grid_rowconfigure(1, weight=1)
+        ctk.CTkLabel(left, text="All Bookings", font=("Segoe UI", 18, "bold")).grid(
+            row=0, column=0, sticky="w", padx=12, pady=10
+        )
+
+        columns = ("Booking ID", "Customer", "Service", "Pet", "Date", "Status")
+        bookings_tree = ttk.Treeview(left, columns=columns, show="headings", height=18)
+        for col in columns:
+            bookings_tree.heading(col, text=col)
+            bookings_tree.column(col, anchor="center", width=95)
+        bookings_tree.column("Booking ID", width=85)
+        bookings_tree.column("Customer", width=110)
+        bookings_tree.column("Service", width=120)
+        bookings_tree.column("Pet", width=90)
+        bookings_tree.column("Date", width=100)
+        bookings_tree.grid(row=1, column=0, sticky="nsew", padx=(10, 0), pady=(0, 10))
+        scrollbar = ttk.Scrollbar(left, orient="vertical", command=bookings_tree.yview)
+        bookings_tree.configure(yscrollcommand=scrollbar.set)
+        scrollbar.grid(row=1, column=1, sticky="ns", pady=(0, 10))
+
+        right = ctk.CTkFrame(content)
+        right.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
+        right.grid_columnconfigure(0, weight=1)
+        right.grid_rowconfigure(1, weight=1)
+        ctk.CTkLabel(right, text="Booking Details", font=("Segoe UI", 18, "bold")).grid(
+            row=0, column=0, sticky="w", padx=12, pady=(10, 5)
+        )
+        details = ctk.CTkTextbox(right, height=270, wrap="word")
+        details.grid(row=1, column=0, sticky="nsew", padx=10, pady=8)
+        details.insert("1.0", "Select a booking to view its details.")
+        details.configure(state="disabled")
+
+        status_frame = ctk.CTkFrame(right, fg_color="transparent")
+        status_frame.grid(row=2, column=0, sticky="ew", padx=12, pady=(4, 12))
+        status_frame.grid_columnconfigure(0, weight=1)
+        ctk.CTkLabel(status_frame, text="Update status:").grid(
+            row=0, column=0, sticky="w", pady=(0, 5)
+        )
+        status_picker = ctk.CTkComboBox(
+            status_frame,
+            values=["Pending", "Confirmed", "In Progress", "Completed", "Cancelled"],
+            state="readonly"
+        )
+        status_picker.set("Pending")
+        status_picker.grid(row=1, column=0, sticky="ew", pady=(0, 8))
+        selected = {"id": None}
+
+        def set_details(text):
+            details.configure(state="normal")
+            details.delete("1.0", "end")
+            details.insert("1.0", text)
+            details.configure(state="disabled")
+
+        def show_selected_booking(_event=None):
+            selection = bookings_tree.selection()
+            if not selection:
+                return
+            try:
+                booking_id = int(selection[0])
+                row = get_admin_booking_details(booking_id)
+                if not row:
+                    set_details("Booking not found.")
+                    return
+                (bid, user_id, username, email, phone, service, pet, booking_date,
+                 notes, status, created_at) = row
+                selected["id"] = bid
+                date_text = booking_date.strftime("%d %b %Y") if hasattr(booking_date, "strftime") else str(booking_date or "Not specified")
+                created_text = created_at.strftime("%d %b %Y, %H:%M") if hasattr(created_at, "strftime") else str(created_at or "—")
+                set_details(
+                    f"Booking #{bid}\n"
+                    f"Customer: {username or f'User #{user_id}'}\n"
+                    f"Email: {email or '—'}\n"
+                    f"Phone: {phone or '—'}\n\n"
+                    f"Service: {service or '—'}\n"
+                    f"Pet name: {pet or '—'}\n"
+                    f"Appointment date: {date_text}\n"
+                    f"Current status: {status or 'Pending'}\n"
+                    f"Created: {created_text}\n\n"
+                    f"Customer notes:\n{notes or 'No additional notes.'}"
+                )
+                status_picker.set(status or "Pending")
+            except Exception as exc:
+                messagebox.showerror(
+                    "Booking Details Error", f"Could not load booking details.\n\n{exc}",
+                    parent=booking_window
+                )
+
+        def refresh_booking_list(select_id=None):
+            for item in bookings_tree.get_children():
+                bookings_tree.delete(item)
+            try:
+                for booking in get_all_bookings():
+                    bid, username, service, pet, booking_date, status, created_at = booking
+                    date_text = booking_date.strftime("%d %b %Y") if hasattr(booking_date, "strftime") else str(booking_date or "—")
+                    bookings_tree.insert(
+                        "", "end", iid=str(bid),
+                        values=(bid, username or "Unknown", service or "—", pet or "—", date_text, status or "Pending")
+                    )
+                if select_id is not None and bookings_tree.exists(str(select_id)):
+                    bookings_tree.selection_set(str(select_id))
+                    bookings_tree.focus(str(select_id))
+                    show_selected_booking()
+                elif select_id is None:
+                    selected["id"] = None
+                    set_details("Select a booking to view its details.")
+            except Exception as exc:
+                messagebox.showerror(
+                    "Bookings Error", f"Could not load bookings.\n\n{exc}",
+                    parent=booking_window
+                )
+
+        def save_booking_status():
+            booking_id = selected["id"]
+            if booking_id is None:
+                messagebox.showwarning("Select Booking", "Select a booking first.", parent=booking_window)
+                return
+            new_status = status_picker.get()
+            if not messagebox.askyesno(
+                "Confirm Status Change",
+                f"Set booking #{booking_id} to '{new_status}'?",
+                parent=booking_window
+            ):
+                return
+            try:
+                update_booking_status(booking_id, new_status)
+                refresh_booking_list(select_id=booking_id)
+                messagebox.showinfo(
+                    "Updated", f"Booking #{booking_id} is now {new_status}.", parent=booking_window
+                )
+            except Exception as exc:
+                messagebox.showerror(
+                    "Update Failed", f"Could not update booking status.\n\n{exc}",
+                    parent=booking_window
+                )
+
+        bookings_tree.bind("<<TreeviewSelect>>", show_selected_booking)
+        ctk.CTkButton(status_frame, text="💾 Update Booking Status", command=save_booking_status).grid(
+            row=2, column=0, sticky="ew", pady=(0, 7)
+        )
+        ctk.CTkButton(
+            status_frame, text="🔄 Refresh Bookings",
+            command=lambda: refresh_booking_list(selected["id"])
+        ).grid(row=3, column=0, sticky="ew")
+        refresh_booking_list()
+
+
+    # =====================================================
     # HEADER
     # =====================================================
 
@@ -600,6 +961,30 @@ def create_admin_frame(container, show_frame):
         hover_color="#C9302C"
     ).pack(
         side="right"
+    )
+
+    ctk.CTkButton(
+        header_top,
+        text="📦 Manage Orders",
+        command=open_order_management,
+        width=155,
+        fg_color="#2878B5",
+        hover_color="#1F6396"
+    ).pack(
+        side="right",
+        padx=(0, 10)
+    )
+
+    ctk.CTkButton(
+        header_top,
+        text="📅 Manage Bookings",
+        command=open_booking_management,
+        width=170,
+        fg_color="#39845A",
+        hover_color="#2D6D49"
+    ).pack(
+        side="right",
+        padx=(0, 10)
     )
 
 

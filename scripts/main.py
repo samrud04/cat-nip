@@ -104,7 +104,7 @@ def main():
     right_frame = ctk.CTkFrame(
         main_frame,
         fg_color="#fca265",
-        corner_radius=40
+        corner_radius=40    
     )
     right_frame.grid(row=0, column=1, sticky="nsew", padx=(30, 60), pady=80)
 

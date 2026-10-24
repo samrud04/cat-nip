@@ -5,6 +5,8 @@ from tkinter import messagebox
 import db
 from datetime import datetime
 from PIL import Image
+from datetime import date
+from date_picker import attach_date_picker
 
 
 def register_screen(container, show_frame):
@@ -239,6 +241,25 @@ def register_screen(container, show_frame):
         y=505
     )
 
+    dob_calendar_button = ctk.CTkButton(
+        register_frame,
+        text="📅",
+        width=42,
+        height=32,
+        fg_color="#F4B183",
+        hover_color="#D98958",
+        text_color="black",
+        command=attach_date_picker(
+            dob_entry,
+            register_frame,
+            date_format="%d-%m-%Y",
+            min_date=date(1900, 1, 1),
+            max_date=date.today(),
+            initial_date=date(2000, 1, 1)
+        )
+    )
+    dob_calendar_button.place(x=555, y=505)
+
 
     # =====================================================
     # GENDER
@@ -385,7 +406,7 @@ def register_screen(container, show_frame):
 
             if (
                 dob_date.year < 1900
-                or dob_date.year > current_year
+                or dob_date.date() > datetime.now().date()
             ):
 
                 messagebox.showerror(

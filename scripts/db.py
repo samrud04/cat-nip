@@ -603,3 +603,137 @@ def get_order_invoice_data(order_id, user_id):
     finally:
         cur.close()
         con.close()
+
+
+def get_all_orders():
+    """Return all customer orders for the admin order-management screen."""
+    con, cur = connect()
+    try:
+        cur.execute(
+            """
+            SELECT o.id, u.username, o.order_date, o.total, o.status,
+                   (SELECT COUNT(*) FROM order_items oi WHERE oi.order_id = o.id) AS item_count
+            FROM orders o
+            LEFT JOIN `user` u ON u.id = o.user_id
+            ORDER BY o.order_date DESC, o.id DESC
+            """
+        )
+        return cur.fetchall()
+    finally:
+        cur.close()
+        con.close()
+
+
+def get_admin_order_details(order_id):
+    """Return customer/order information and line items for an admin."""
+    con, cur = connect()
+    try:
+        cur.execute(
+            """
+            SELECT o.id, o.user_id, u.username, u.email, u.phone, u.address,
+                   o.total, o.order_date, o.status
+            FROM orders o
+            LEFT JOIN `user` u ON u.id = o.user_id
+            WHERE o.id = %s
+            """,
+            (order_id,)
+        )
+        order = cur.fetchone()
+        if order is None:
+            return None
+
+        cur.execute(
+            """
+            SELECT oi.product_id,
+                   COALESCE(p.name, CONCAT('Product #', oi.product_id)),
+                   oi.quantity, oi.price
+            FROM order_items oi
+            LEFT JOIN products p ON p.id = oi.product_id
+            WHERE oi.order_id = %s
+            ORDER BY oi.id
+            """,
+            (order_id,)
+        )
+        return {"order": order, "items": cur.fetchall()}
+    finally:
+        cur.close()
+        con.close()
+
+
+def update_order_status(order_id, status):
+    """Update an order's tracking status."""
+    allowed_statuses = {"Placed", "Processing", "Shipped", "Delivered", "Cancelled"}
+    if status not in allowed_statuses:
+        raise ValueError("Invalid order status")
+
+    con, cur = connect()
+    try:
+        cur.execute(
+            "UPDATE orders SET status = %s WHERE id = %s",
+            (status, order_id)
+        )
+        con.commit()
+        return cur.rowcount > 0
+    finally:
+        cur.close()
+        con.close()
+
+
+
+def get_all_bookings():
+    """Return all service bookings with customer names for the admin screen."""
+    con, cur = connect()
+    try:
+        cur.execute(
+            """
+            SELECT b.id, u.username, b.service_name, b.pet_name,
+                   b.booking_date, b.status, b.created_at
+            FROM bookings b
+            LEFT JOIN `user` u ON u.id = b.user_id
+            ORDER BY b.created_at DESC, b.id DESC
+            """
+        )
+        return cur.fetchall()
+    finally:
+        cur.close()
+        con.close()
+
+
+def get_admin_booking_details(booking_id):
+    """Return booking details and the customer's contact information."""
+    con, cur = connect()
+    try:
+        cur.execute(
+            """
+            SELECT b.id, b.user_id, u.username, u.email, u.phone,
+                   b.service_name, b.pet_name, b.booking_date, b.notes,
+                   b.status, b.created_at
+            FROM bookings b
+            LEFT JOIN `user` u ON u.id = b.user_id
+            WHERE b.id = %s
+            """,
+            (booking_id,)
+        )
+        return cur.fetchone()
+    finally:
+        cur.close()
+        con.close()
+
+
+def update_booking_status(booking_id, status):
+    """Update the status of a service booking."""
+    allowed_statuses = {"Pending", "Confirmed", "In Progress", "Completed", "Cancelled"}
+    if status not in allowed_statuses:
+        raise ValueError("Invalid booking status")
+
+    con, cur = connect()
+    try:
+        cur.execute(
+            "UPDATE bookings SET status = %s WHERE id = %s",
+            (status, booking_id)
+        )
+        con.commit()
+        return cur.rowcount > 0
+    finally:
+        cur.close()
+        con.close()

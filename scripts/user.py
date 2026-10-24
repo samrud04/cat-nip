@@ -5,6 +5,8 @@ import html
 import webbrowser
 from pathlib import Path
 import db
+from datetime import date, datetime
+from date_picker import attach_date_picker
 
 
 # =====================================================
@@ -865,17 +867,33 @@ def create_book_page(parent):
             )
 
 
-            date_entry = ctk.CTkEntry(
-                popup,
-                height=38,
-                placeholder_text="2026-09-10"
-            )
+            date_row = ctk.CTkFrame(popup, fg_color="transparent")
+            date_row.pack(fill="x", padx=40, pady=(5, 15))
 
-            date_entry.pack(
-                fill="x",
-                padx=40,
-                pady=(5, 15)
+            date_entry = ctk.CTkEntry(
+                date_row,
+                height=38,
+                placeholder_text="YYYY-MM-DD"
             )
+            date_entry.pack(side="left", fill="x", expand=True)
+
+            ctk.CTkButton(
+                date_row,
+                text="📅",
+                width=44,
+                height=38,
+                fg_color="#F4B183",
+                hover_color="#D98958",
+                text_color="#30251F",
+                command=attach_date_picker(
+                    date_entry,
+                    popup,
+                    date_format="%Y-%m-%d",
+                    min_date=date.today(),
+                    max_date=date(9999, 12, 31),
+                    initial_date=date.today()
+                )
+            ).pack(side="left", padx=(8, 0))
 
 
             # NOTES
@@ -915,14 +933,25 @@ def create_book_page(parent):
 
 
                 if not pet_name or not booking_date:
-
                     messagebox.showwarning(
                         "Missing Info",
                         "Please enter Pet Name and Date."
                     )
-
                     return
 
+                # Appointment dates must be valid MySQL dates and cannot be in the past.
+                try:
+                    parsed_booking_date = datetime.strptime(booking_date, "%Y-%m-%d").date()
+                    if parsed_booking_date < date.today():
+                        raise ValueError("past date")
+                    if not date(1000, 1, 1) <= parsed_booking_date <= date(9999, 12, 31):
+                        raise ValueError("outside supported date range")
+                except ValueError:
+                    messagebox.showwarning(
+                        "Invalid Date",
+                        "Choose a valid appointment date today or later using the calendar."
+                    )
+                    return
 
                 success = db.create_booking(
                     current_user_id,
@@ -1630,15 +1659,126 @@ def create_order_history_page(parent):
                 font=("Segoe UI", 13), text_color="#6d5b52"
             ).pack(anchor="w", padx=16, pady=(0, 10))
 
+            actions = ctk.CTkFrame(card, fg_color="transparent")
+            actions.pack(fill="x", padx=16, pady=(0, 13))
+
             ctk.CTkButton(
-                card,
+                actions,
+                text="Track Order  →",
+                width=130,
+                fg_color="#f7d9c5",
+                hover_color="#efc4aa",
+                text_color="#30251f",
+                command=lambda oid=order_id: open_order_tracking(oid)
+            ).pack(side="left")
+            ctk.CTkButton(
+                actions,
                 text="View Invoice",
                 width=130,
                 fg_color="#fa9a85",
                 hover_color="#e98270",
                 text_color="#30251f",
                 command=lambda oid=order_id: open_invoice(oid)
-            ).pack(anchor="e", padx=16, pady=(0, 13))
+            ).pack(side="right")
+
+    def open_order_tracking(order_id):
+        """Show a clear status timeline for one of the signed-in user's orders."""
+        try:
+            # Re-read the signed-in user's orders so the tracker uses the latest saved status.
+            latest = next(
+                (row for row in db.get_user_orders(current_user_id) if int(row[0]) == int(order_id)),
+                None
+            )
+        except Exception as exc:
+            messagebox.showerror("Tracking unavailable", f"Couldn't load tracking details.\n\n{exc}")
+            return
+
+        if latest is None:
+            messagebox.showerror("Order unavailable", "This order could not be found in your account.")
+            return
+
+        _, total, latest_date, latest_status, _ = latest
+        status_text = str(latest_status or "Placed")
+        normalized_status = status_text.strip().lower()
+        tracking = ctk.CTkToplevel(history_frame)
+        tracking.title(f"Track Order — CN-{order_id}")
+        tracking.geometry("560x500")
+        tracking.minsize(500, 450)
+        tracking.configure(fg_color="#ffe7d6")
+        tracking.transient(history_frame.winfo_toplevel())
+        tracking.grab_set()
+
+        ctk.CTkLabel(
+            tracking, text=f"📦 Track Order #CN-{order_id}",
+            font=("Segoe UI", 23, "bold"), text_color="#2b1d14"
+        ).pack(anchor="w", padx=24, pady=(22, 4))
+        date_text = (
+            latest_date.strftime("%d %b %Y, %I:%M %p")
+            if hasattr(latest_date, "strftime") else str(latest_date)
+        )
+        ctk.CTkLabel(
+            tracking, text=f"Placed {date_text}   •   Total ₹{float(total):,.2f}",
+            font=("Segoe UI", 12), text_color="#6d5b52"
+        ).pack(anchor="w", padx=26, pady=(0, 18))
+
+        current = ctk.CTkFrame(tracking, fg_color="#fffaf6", corner_radius=14)
+        current.pack(fill="x", padx=22, pady=(0, 16))
+        status_color = "#b95340" if normalized_status == "cancelled" else "#7b563e"
+        ctk.CTkLabel(
+            current, text="CURRENT STATUS", font=("Segoe UI", 10, "bold"),
+            text_color="#8a776c"
+        ).pack(anchor="w", padx=16, pady=(13, 2))
+        ctk.CTkLabel(
+            current, text=status_text, font=("Segoe UI", 20, "bold"),
+            text_color=status_color
+        ).pack(anchor="w", padx=16, pady=(0, 13))
+
+        stages = ["Placed", "Processing", "Shipped", "Delivered"]
+        if normalized_status == "cancelled":
+            cancel_box = ctk.CTkFrame(tracking, fg_color="#fff0ed", corner_radius=12)
+            cancel_box.pack(fill="x", padx=22, pady=4)
+            ctk.CTkLabel(
+                cancel_box, text="✕  This order has been cancelled.",
+                font=("Segoe UI", 14, "bold"), text_color="#a83232"
+            ).pack(anchor="w", padx=16, pady=(13, 4))
+            ctk.CTkLabel(
+                cancel_box,
+                text="If you have questions about this order, please contact the store.",
+                font=("Segoe UI", 12), text_color="#6d5b52", wraplength=440, justify="left"
+            ).pack(anchor="w", padx=16, pady=(0, 13))
+        else:
+            stage_index = next((i for i, stage in enumerate(stages) if stage.lower() == normalized_status), 0)
+            timeline = ctk.CTkFrame(tracking, fg_color="transparent")
+            timeline.pack(fill="x", padx=28, pady=(0, 12))
+            for index, stage in enumerate(stages):
+                done = index <= stage_index
+                row = ctk.CTkFrame(timeline, fg_color="transparent")
+                row.pack(fill="x", pady=4)
+                dot_color = "#b85e47" if done else "#d8c6ba"
+                ctk.CTkLabel(
+                    row, text="●" if done else "○", width=28,
+                    font=("Segoe UI", 19, "bold"), text_color=dot_color
+                ).pack(side="left")
+                ctk.CTkLabel(
+                    row, text=stage, font=("Segoe UI", 14, "bold" if index == stage_index else "normal"),
+                    text_color="#2b1d14" if done else "#9b8a80"
+                ).pack(side="left", padx=(8, 0))
+                if index == stage_index:
+                    ctk.CTkLabel(
+                        row, text="CURRENT", font=("Segoe UI", 9, "bold"),
+                        text_color="#b85e47"
+                    ).pack(side="right", padx=8)
+
+        ctk.CTkLabel(
+            tracking,
+            text="Order updates are provided by the Cat Nip team. Use Refresh in My Orders to check for changes.",
+            font=("Segoe UI", 11), text_color="#766b65", wraplength=490, justify="left"
+        ).pack(anchor="w", padx=25, pady=(4, 12))
+        ctk.CTkButton(
+            tracking, text="Done", width=110, fg_color="#fa9a85",
+            hover_color="#e98270", text_color="#30251f",
+            command=tracking.destroy
+        ).pack(anchor="e", padx=22, pady=(0, 18))
 
     def open_invoice(order_id):
         try:
