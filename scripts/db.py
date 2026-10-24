@@ -920,6 +920,7 @@ def ensure_playdate_tables():
                 user_id INT NOT NULL,
                 pet_name VARCHAR(100) NULL,
                 pet_type VARCHAR(30) NULL,
+                pets_details TEXT NULL,
                 status VARCHAR(20) NOT NULL DEFAULT 'Confirmed',
                 booked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 CONSTRAINT fk_playdate_event FOREIGN KEY (event_id) REFERENCES playdate_events(id),
@@ -927,6 +928,10 @@ def ensure_playdate_tables():
                 UNIQUE KEY uq_playdate_user_event (event_id, user_id)
             ) ENGINE=InnoDB
         """)
+        # Safe migration for installations created before multi-pet support.
+        cur.execute("SHOW COLUMNS FROM playdate_bookings LIKE 'pets_details'")
+        if not cur.fetchone():
+            cur.execute("ALTER TABLE playdate_bookings ADD COLUMN pets_details TEXT NULL AFTER pet_type")
         con.commit()
     finally:
         cur.close(); con.close()
@@ -983,7 +988,7 @@ def get_user_playdate_bookings(user_id):
     con, cur = connect()
     try:
         cur.execute("""SELECT b.id, e.id, e.title, e.event_date, e.start_time, e.end_time,
-                    e.location, b.pet_name, b.pet_type, b.status, e.status
+                    e.location, b.pet_name, b.pet_type, b.status, e.status, b.pets_details
                     FROM playdate_bookings b JOIN playdate_events e ON e.id=b.event_id
                     WHERE b.user_id=%s ORDER BY e.event_date DESC, e.start_time DESC, b.id DESC""", (user_id,))
         return cur.fetchall()
@@ -1001,9 +1006,23 @@ def _playdate_datetime(day_value, time_value):
     return datetime.combine(day_value, time_value)
 
 
-def book_playdate(event_id, user_id, pet_name=None, pet_type=None):
+def book_playdate(event_id, user_id, pet_name=None, pet_type=None, pets=None):
     from datetime import datetime
+    import json
     ensure_playdate_tables()
+    # Accept the older single-pet arguments as well as the new list of up to 3 pets.
+    if pets is None:
+        pets = ([{"name": str(pet_name).strip(), "type": str(pet_type).strip()}]
+                if pet_name and pet_type else [])
+    cleaned_pets = []
+    for pet in pets:
+        name = str(pet.get("name", "")).strip()
+        ptype = str(pet.get("type", "")).strip()
+        if not name or not ptype:
+            raise ValueError("Enter both a name and type for every pet, or set the pet count to zero.")
+        cleaned_pets.append({"name": name[:100], "type": ptype[:30]})
+    if len(cleaned_pets) > 3:
+        raise ValueError("You can register up to 3 pets for one playdate booking.")
     con, cur = connect()
     try:
         cur.execute("SELECT event_date, start_time, capacity, allow_own_pets, allowed_pet_types, status FROM playdate_events WHERE id=%s FOR UPDATE", (event_id,))
@@ -1017,20 +1036,25 @@ def book_playdate(event_id, user_id, pet_name=None, pet_type=None):
         existing = cur.fetchone()
         if existing and existing[1] == 'Confirmed':
             return 'exists'
-        if pet_name:
+        if cleaned_pets:
             if not allow_own:
                 return 'pets_not_allowed'
-            if not pet_type or pet_type not in [x.strip() for x in (allowed_types or '').split(',')]:
+            permitted = [x.strip() for x in (allowed_types or '').split(',') if x.strip()]
+            if any(pet["type"] not in permitted for pet in cleaned_pets):
                 return 'pet_type_not_allowed'
         cur.execute("SELECT COUNT(*) FROM playdate_bookings WHERE event_id=%s AND status='Confirmed'", (event_id,))
         if cur.fetchone()[0] >= capacity:
             return 'full'
+        first_pet = cleaned_pets[0] if cleaned_pets else None
+        first_name = first_pet["name"] if first_pet else None
+        first_type = first_pet["type"] if first_pet else None
+        pets_json = json.dumps(cleaned_pets, ensure_ascii=True) if cleaned_pets else None
         if existing:
-            cur.execute("UPDATE playdate_bookings SET pet_name=%s, pet_type=%s, status='Confirmed', booked_at=CURRENT_TIMESTAMP WHERE id=%s",
-                        (pet_name or None, pet_type or None, existing[0]))
+            cur.execute("UPDATE playdate_bookings SET pet_name=%s, pet_type=%s, pets_details=%s, status='Confirmed', booked_at=CURRENT_TIMESTAMP WHERE id=%s",
+                        (first_name, first_type, pets_json, existing[0]))
         else:
-            cur.execute("INSERT INTO playdate_bookings (event_id,user_id,pet_name,pet_type) VALUES (%s,%s,%s,%s)",
-                        (event_id, user_id, pet_name or None, pet_type or None))
+            cur.execute("INSERT INTO playdate_bookings (event_id,user_id,pet_name,pet_type,pets_details) VALUES (%s,%s,%s,%s,%s)",
+                        (event_id, user_id, first_name, first_type, pets_json))
         con.commit()
         return 'confirmed'
     finally:
@@ -1062,12 +1086,12 @@ def get_admin_playdate_bookings(event_id=None):
     try:
         if event_id is None:
             cur.execute("""SELECT b.id, e.id, e.title, u.username, u.email, e.event_date, e.start_time,
-                         b.pet_name, b.pet_type, b.status FROM playdate_bookings b
+                         b.pet_name, b.pet_type, b.status, b.pets_details FROM playdate_bookings b
                          JOIN playdate_events e ON e.id=b.event_id JOIN `user` u ON u.id=b.user_id
                          ORDER BY e.event_date DESC, b.id DESC""")
         else:
             cur.execute("""SELECT b.id, e.id, e.title, u.username, u.email, e.event_date, e.start_time,
-                         b.pet_name, b.pet_type, b.status FROM playdate_bookings b
+                         b.pet_name, b.pet_type, b.status, b.pets_details FROM playdate_bookings b
                          JOIN playdate_events e ON e.id=b.event_id JOIN `user` u ON u.id=b.user_id
                          WHERE e.id=%s ORDER BY b.id""", (event_id,))
         return cur.fetchall()
