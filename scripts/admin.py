@@ -23,16 +23,48 @@ from db import (
 def create_admin_frame(container, show_frame):
 
     # =====================================================
-    # ADMIN FRAME
+    # 1. ROOT ADMIN FRAME & DARK PALETTE TREEVIEW STYLING
     # =====================================================
 
     admin_frame = ctk.CTkFrame(
         container,
-        fg_color="#EAF4FF"
+        fg_color=("#F1F5F9", "#0F172A")
     )
 
-    admin_frame.grid_rowconfigure(1, weight=1)
-    admin_frame.grid_columnconfigure(1, weight=1)
+    admin_frame.grid_columnconfigure(0, weight=0)  # Left Full Sidebar
+    admin_frame.grid_columnconfigure(1, weight=1)  # Main Content Area
+    admin_frame.grid_rowconfigure(0, weight=1)
+
+    # Style ttk.Treeview to seamlessly blend with CustomTkinter dark cards
+    style = ttk.Style()
+    style.theme_use("clam")
+
+    style.configure(
+        "CatNip.Treeview",
+        background="#1E293B",
+        foreground="#F8FAFC",
+        fieldbackground="#1E293B",
+        rowheight=34,
+        font=("Segoe UI", 10),
+        borderwidth=0
+    )
+    style.configure(
+        "CatNip.Treeview.Heading",
+        background="#0F172A",
+        foreground="#38BDF8",
+        font=("Segoe UI", 10, "bold"),
+        relief="flat",
+        padding=(8, 8)
+    )
+    style.map(
+        "CatNip.Treeview",
+        background=[("selected", "#0284C7")],
+        foreground=[("selected", "#FFFFFF")]
+    )
+    style.map(
+        "CatNip.Treeview.Heading",
+        background=[("active", "#1E293B")]
+    )
 
 
     # =====================================================
@@ -40,20 +72,16 @@ def create_admin_frame(container, show_frame):
     # =====================================================
 
     def logout():
-
-        # Remove session if it exists
         if os.path.exists("session.txt"):
             os.remove("session.txt")
-
         show_frame("login")
 
 
     # =====================================================
-    # LOAD PRODUCTS
+    # LOAD PRODUCTS & STATS
     # =====================================================
 
     def load_products():
-
         for row in tree.get_children():
             tree.delete(row)
 
@@ -64,7 +92,6 @@ def create_admin_frame(container, show_frame):
         inventory_value = 0
 
         for product in products:
-
             row_id = tree.insert(
                 "",
                 "end",
@@ -77,34 +104,21 @@ def create_admin_frame(container, show_frame):
             inventory_value += price * stock
 
             if stock < 5:
-
                 low_stock += 1
-
                 tree.item(
                     row_id,
                     tags=("low_stock",)
                 )
 
-
         tree.tag_configure(
             "low_stock",
-            background="#FFF0F0"
+            background="#450A0A",
+            foreground="#FCA5A5"
         )
 
-
-        total_products_label.configure(
-            text=f"Products: {total_products}"
-        )
-
-
-        low_stock_label.configure(
-            text=f"Low Stock: {low_stock}"
-        )
-
-
-        inventory_value_label.configure(
-            text=f"Inventory Value: ₹{inventory_value:,.2f}"
-        )
+        total_products_label.configure(text=str(total_products))
+        low_stock_label.configure(text=str(low_stock))
+        inventory_value_label.configure(text=f"₹{inventory_value:,.2f}")
 
 
     # =====================================================
@@ -112,128 +126,64 @@ def create_admin_frame(container, show_frame):
     # =====================================================
 
     def add_product_gui():
-
         product_name = name_entry.get().strip()
         price = price_entry.get().strip()
         brand = brand_entry.get().strip()
         category = category_entry.get()
         stock = stock_entry.get().strip()
 
-
         if not product_name:
-
-            messagebox.showerror(
-                "Error",
-                "Please enter a product name."
-            )
-
+            messagebox.showerror("Error", "Please enter a product name.")
             return
-
 
         if not price:
-
-            messagebox.showerror(
-                "Error",
-                "Please enter a price."
-            )
-
+            messagebox.showerror("Error", "Please enter a price.")
             return
-
 
         if not brand:
-
-            messagebox.showerror(
-                "Error",
-                "Please enter a brand."
-            )
-
+            messagebox.showerror("Error", "Please enter a brand.")
             return
-
 
         if category == "Select Category":
-
-            messagebox.showerror(
-                "Error",
-                "Please select a category."
-            )
-
+            messagebox.showerror("Error", "Please select a category.")
             return
-
 
         if not stock:
-
-            messagebox.showerror(
-                "Error",
-                "Please enter the stock quantity."
-            )
-
+            messagebox.showerror("Error", "Please enter the stock quantity.")
             return
-
 
         try:
-
             price = float(price)
             stock = int(stock)
-
         except ValueError:
-
-            messagebox.showerror(
-                "Invalid Input",
-                "Price must be a number and stock must be a whole number."
-            )
-
+            messagebox.showerror("Invalid Input", "Price must be a number and stock must be a whole number.")
             return
-
 
         if price <= 0:
-
-            messagebox.showerror(
-                "Invalid Price",
-                "Price must be greater than 0."
-            )
-
+            messagebox.showerror("Invalid Price", "Price must be greater than 0.")
             return
-
 
         if stock < 0:
-
-            messagebox.showerror(
-                "Invalid Stock",
-                "Stock cannot be negative."
-            )
-
+            messagebox.showerror("Invalid Stock", "Stock cannot be negative.")
             return
 
-
-        add_product(
-            (
-                product_name,
-                price,
-                brand,
-                category,
-                stock
-            )
-        )
-
+        add_product((
+            product_name,
+            price,
+            brand,
+            category,
+            stock
+        ))
 
         load_products()
-
 
         name_entry.delete(0, "end")
         price_entry.delete(0, "end")
         brand_entry.delete(0, "end")
-
-        category_entry.set(
-            "Select Category"
-        )
-
+        category_entry.set("Select Category")
         stock_entry.delete(0, "end")
 
-
-        messagebox.showinfo(
-            "Success",
-            f"{product_name} was added successfully!"
-        )
+        messagebox.showinfo("Success", f"{product_name} was added successfully!")
 
 
     # =====================================================
@@ -241,48 +191,27 @@ def create_admin_frame(container, show_frame):
     # =====================================================
 
     def delete_selected():
-
         selected = tree.selection()
 
-
         if not selected:
-
-            messagebox.showerror(
-                "Error",
-                "Please select a product to delete."
-            )
-
+            messagebox.showerror("Error", "Please select a product to delete.")
             return
 
-
-        values = tree.item(
-            selected[0]
-        )["values"]
-
-
+        values = tree.item(selected[0])["values"]
         product_id = values[0]
         product_name = values[1]
-
 
         confirm = messagebox.askyesno(
             "Confirm Delete",
             f"Are you sure you want to delete '{product_name}'?"
         )
 
-
         if not confirm:
             return
 
-
         delete_product(product_id)
-
         load_products()
-
-
-        messagebox.showinfo(
-            "Success",
-            f"'{product_name}' was deleted successfully."
-        )
+        messagebox.showinfo("Success", f"'{product_name}' was deleted successfully.")
 
 
     # =====================================================
@@ -290,51 +219,33 @@ def create_admin_frame(container, show_frame):
     # =====================================================
 
     def edit_selected():
-
         selected = tree.selection()
 
-
         if not selected:
-
-            messagebox.showerror(
-                "Error",
-                "Please select a product to edit."
-            )
-
+            messagebox.showerror("Error", "Please select a product to edit.")
             return
 
-
-        values = tree.item(
-            selected[0]
-        )["values"]
-
-
+        values = tree.item(selected[0])["values"]
         product_id = values[0]
-
 
         name_entry.delete(0, "end")
         name_entry.insert(0, values[1])
 
-
         price_entry.delete(0, "end")
         price_entry.insert(0, values[2])
-
 
         brand_entry.delete(0, "end")
         brand_entry.insert(0, values[3])
 
-
-        category_entry.set(
-            values[4]
-        )
-
+        category_entry.set(values[4])
 
         stock_entry.delete(0, "end")
         stock_entry.insert(0, values[5])
 
-
         edit_button.configure(
             text="💾 Save Changes",
+            fg_color="#10B981",
+            hover_color="#059669",
             command=lambda: save_edit(product_id)
         )
 
@@ -344,58 +255,30 @@ def create_admin_frame(container, show_frame):
     # =====================================================
 
     def save_edit(product_id):
-
         product_name = name_entry.get().strip()
         price = price_entry.get().strip()
         brand = brand_entry.get().strip()
         category = category_entry.get()
         stock = stock_entry.get().strip()
 
-
         if not product_name or not price or not brand or not stock:
-
-            messagebox.showerror(
-                "Error",
-                "Please fill all fields."
-            )
-
+            messagebox.showerror("Error", "Please fill all fields.")
             return
-
 
         if category == "Select Category":
-
-            messagebox.showerror(
-                "Error",
-                "Please select a category."
-            )
-
+            messagebox.showerror("Error", "Please select a category.")
             return
-
 
         try:
-
             price = float(price)
             stock = int(stock)
-
         except ValueError:
-
-            messagebox.showerror(
-                "Invalid Input",
-                "Price and stock must be valid numbers."
-            )
-
+            messagebox.showerror("Invalid Input", "Price and stock must be valid numbers.")
             return
-
 
         if price <= 0 or stock < 0:
-
-            messagebox.showerror(
-                "Error",
-                "Enter valid price and stock."
-            )
-
+            messagebox.showerror("Error", "Enter valid price and stock.")
             return
-
 
         update_product(
             product_id,
@@ -406,31 +289,22 @@ def create_admin_frame(container, show_frame):
             stock
         )
 
-
         load_products()
-
 
         name_entry.delete(0, "end")
         price_entry.delete(0, "end")
         brand_entry.delete(0, "end")
-
-        category_entry.set(
-            "Select Category"
-        )
-
+        category_entry.set("Select Category")
         stock_entry.delete(0, "end")
-
 
         edit_button.configure(
             text="✏️ Edit Selected",
+            fg_color="#334155",
+            hover_color="#475569",
             command=edit_selected
         )
 
-
-        messagebox.showinfo(
-            "Success",
-            f"{product_name} was updated successfully!"
-        )
+        messagebox.showinfo("Success", f"{product_name} was updated successfully!")
 
 
     # =====================================================
@@ -438,25 +312,13 @@ def create_admin_frame(container, show_frame):
     # =====================================================
 
     def increase_stock():
-
         selected = tree.selection()
-
-
         if not selected:
+            messagebox.showerror("Error", "Please select a product.")
             return
 
-
-        values = tree.item(
-            selected[0]
-        )["values"]
-
-
-        update_stock(
-            values[0],
-            int(values[5]) + 1
-        )
-
-
+        values = tree.item(selected[0])["values"]
+        update_stock(values[0], int(values[5]) + 1)
         load_products()
 
 
@@ -465,69 +327,28 @@ def create_admin_frame(container, show_frame):
     # =====================================================
 
     def decrease_stock():
-
         selected = tree.selection()
-
-
         if not selected:
-
-            messagebox.showerror(
-                "Error",
-                "Please select a product."
-            )
-
+            messagebox.showerror("Error", "Please select a product.")
             return
 
-
-        values = tree.item(
-            selected[0]
-        )["values"]
-
-
+        values = tree.item(selected[0])["values"]
         product_id = values[0]
         product_name = values[1]
-
-        current_stock = int(
-            values[5]
-        )
-
+        current_stock = int(values[5])
 
         if current_stock == 0:
-
-            messagebox.showwarning(
-                "Out of Stock",
-                f"{product_name} is already out of stock."
-            )
-
+            messagebox.showwarning("Out of Stock", f"{product_name} is already out of stock.")
             return
 
-
         new_stock = current_stock - 1
-
-
-        update_stock(
-            product_id,
-            new_stock
-        )
-
-
+        update_stock(product_id, new_stock)
         load_products()
 
-
         if new_stock == 0:
-
-            messagebox.showwarning(
-                "Out of Stock",
-                f"{product_name} is now out of stock."
-            )
-
-
+            messagebox.showwarning("Out of Stock", f"{product_name} is now out of stock.")
         elif new_stock < 5:
-
-            messagebox.showwarning(
-                "Low Stock",
-                f"{product_name} has only {new_stock} item(s) left."
-            )
+            messagebox.showwarning("Low Stock", f"{product_name} has only {new_stock} item(s) left.")
 
 
     # =====================================================
@@ -535,118 +356,113 @@ def create_admin_frame(container, show_frame):
     # =====================================================
 
     def search_products():
-
         search_text = search_entry.get().lower().strip()
-
 
         for row in tree.get_children():
             tree.delete(row)
 
-
         for product in get_products():
-
-            product_text = " ".join(
-                str(value) for value in product
-            ).lower()
-
-
+            product_text = " ".join(str(value) for value in product).lower()
             if search_text in product_text:
-
-                tree.insert(
-                    "",
-                    "end",
-                    values=product
-                )
+                tree.insert("", "end", values=product)
 
 
     # =====================================================
-    # ORDER MANAGEMENT
+    # ORDER MANAGEMENT WINDOW (DARK THEMED)
     # =====================================================
 
     def open_order_management():
         order_window = ctk.CTkToplevel(admin_frame)
         order_window.title("Cat Nip — Order Management")
-        order_window.geometry("1100x700")
-        order_window.minsize(850, 550)
-        order_window.configure(fg_color="#EAF4FF")
+        order_window.geometry("1120x720")
+        order_window.minsize(880, 580)
+        order_window.configure(fg_color=("#F1F5F9", "#0F172A"))
         order_window.grab_set()
 
-        ctk.CTkLabel(
-            order_window,
-            text="📦 Order Management",
-            font=("Segoe UI", 26, "bold")
-        ).pack(anchor="w", padx=20, pady=(18, 4))
+        modal_header = ctk.CTkFrame(order_window, corner_radius=12, fg_color=("#FFFFFF", "#1E293B"), border_width=1, border_color=("#E2E8F0", "#334155"))
+        modal_header.pack(fill="x", padx=18, pady=(18, 12))
 
         ctk.CTkLabel(
-            order_window,
+            modal_header,
+            text="📦 Order Management",
+            font=("Segoe UI", 22, "bold"),
+            text_color="#38BDF8"
+        ).pack(anchor="w", padx=20, pady=(14, 2))
+
+        ctk.CTkLabel(
+            modal_header,
             text="Review purchases, view order contents, and update delivery status.",
-            font=("Segoe UI", 13)
-        ).pack(anchor="w", padx=22, pady=(0, 12))
+            font=("Segoe UI", 12),
+            text_color="#94A3B8"
+        ).pack(anchor="w", padx=20, pady=(0, 14))
 
         content = ctk.CTkFrame(order_window, fg_color="transparent")
-        content.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        content.pack(fill="both", expand=True, padx=18, pady=(0, 18))
         content.grid_columnconfigure(0, weight=3)
         content.grid_columnconfigure(1, weight=2)
         content.grid_rowconfigure(0, weight=1)
 
-        orders_panel = ctk.CTkFrame(content)
+        orders_panel = ctk.CTkFrame(content, corner_radius=12, fg_color=("#FFFFFF", "#1E293B"), border_width=1, border_color=("#E2E8F0", "#334155"))
         orders_panel.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
         orders_panel.grid_columnconfigure(0, weight=1)
         orders_panel.grid_rowconfigure(1, weight=1)
 
         ctk.CTkLabel(
-            orders_panel, text="All Orders", font=("Segoe UI", 18, "bold")
-        ).grid(row=0, column=0, sticky="w", padx=12, pady=10)
+            orders_panel, text="All Orders", font=("Segoe UI", 16, "bold"), text_color="#38BDF8"
+        ).grid(row=0, column=0, sticky="w", padx=16, pady=(14, 8))
 
         order_columns = ("Order ID", "Customer", "Date", "Total", "Status", "Items")
         orders_tree = ttk.Treeview(
-            orders_panel, columns=order_columns, show="headings", height=18
+            orders_panel, columns=order_columns, show="headings", height=18, style="CatNip.Treeview"
         )
         for col in order_columns:
             orders_tree.heading(col, text=col)
             orders_tree.column(col, anchor="center", width=100)
         orders_tree.column("Customer", width=120)
         orders_tree.column("Date", width=145)
-        orders_tree.grid(row=1, column=0, sticky="nsew", padx=(10, 0), pady=(0, 10))
+        orders_tree.grid(row=1, column=0, sticky="nsew", padx=(14, 0), pady=(0, 14))
 
         orders_scroll = ttk.Scrollbar(orders_panel, orient="vertical", command=orders_tree.yview)
         orders_tree.configure(yscrollcommand=orders_scroll.set)
-        orders_scroll.grid(row=1, column=1, sticky="ns", pady=(0, 10))
+        orders_scroll.grid(row=1, column=1, sticky="ns", pady=(0, 14), padx=(0, 8))
 
-        right_panel = ctk.CTkFrame(content)
+        right_panel = ctk.CTkFrame(content, corner_radius=12, fg_color=("#FFFFFF", "#1E293B"), border_width=1, border_color=("#E2E8F0", "#334155"))
         right_panel.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
         right_panel.grid_columnconfigure(0, weight=1)
         right_panel.grid_rowconfigure(2, weight=1)
 
         ctk.CTkLabel(
-            right_panel, text="Order Details", font=("Segoe UI", 18, "bold")
-        ).grid(row=0, column=0, sticky="w", padx=12, pady=(10, 5))
+            right_panel, text="Order Details", font=("Segoe UI", 16, "bold"), text_color="#38BDF8"
+        ).grid(row=0, column=0, sticky="w", padx=16, pady=(14, 6))
 
+        customer_card = ctk.CTkFrame(right_panel, corner_radius=8, fg_color=("#F8FAFC", "#0F172A"))
+        customer_card.grid(row=1, column=0, sticky="ew", padx=14, pady=4)
         customer_label = ctk.CTkLabel(
-            right_panel, text="Select an order to view its details.",
-            justify="left", anchor="w", wraplength=350
+            customer_card, text="Select an order to view its details.",
+            justify="left", anchor="w", wraplength=340, font=("Segoe UI", 12)
         )
-        customer_label.grid(row=1, column=0, sticky="ew", padx=12, pady=5)
+        customer_label.pack(fill="both", padx=12, pady=10)
 
         item_columns = ("Product", "Qty", "Unit Price")
-        items_tree = ttk.Treeview(right_panel, columns=item_columns, show="headings", height=10)
+        items_tree = ttk.Treeview(right_panel, columns=item_columns, show="headings", height=8, style="CatNip.Treeview")
         for col in item_columns:
             items_tree.heading(col, text=col)
             items_tree.column(col, anchor="center", width=95)
         items_tree.column("Product", width=160, anchor="w")
-        items_tree.grid(row=2, column=0, sticky="nsew", padx=10, pady=8)
+        items_tree.grid(row=2, column=0, sticky="nsew", padx=14, pady=10)
 
         status_frame = ctk.CTkFrame(right_panel, fg_color="transparent")
-        status_frame.grid(row=3, column=0, sticky="ew", padx=12, pady=(4, 12))
+        status_frame.grid(row=3, column=0, sticky="ew", padx=14, pady=(4, 14))
         status_frame.grid_columnconfigure(0, weight=1)
 
-        ctk.CTkLabel(status_frame, text="Update status:").grid(
-            row=0, column=0, sticky="w", pady=(0, 5)
+        ctk.CTkLabel(status_frame, text="Update Status:", font=("Segoe UI", 12, "bold")).grid(
+            row=0, column=0, sticky="w", pady=(0, 4)
         )
         status_picker = ctk.CTkComboBox(
             status_frame,
             values=["Placed", "Processing", "Shipped", "Delivered", "Cancelled"],
-            state="readonly"
+            state="readonly",
+            height=36
         )
         status_picker.set("Placed")
         status_picker.grid(row=1, column=0, sticky="ew", pady=(0, 8))
@@ -689,9 +505,9 @@ def create_admin_frame(container, show_frame):
                 date_text = order_date.strftime("%d %b %Y, %H:%M") if hasattr(order_date, "strftime") else str(order_date)
                 customer_label.configure(
                     text=(f"Order #{order_id}\nCustomer: {username or f'User #{user_id}'}\n"
-                          f"Email: {email or '—'}\nPhone: {phone or '—'}\n"
+                          f"Email: {email or '—'}  |  Phone: {phone or '—'}\n"
                           f"Address: {address or '—'}\nDate: {date_text}\n"
-                          f"Total: ₹{float(total):,.2f}\nCurrent status: {status or 'Placed'}")
+                          f"Total: ₹{float(total):,.2f}  |  Status: {status or 'Placed'}")
                 )
                 for row in items_tree.get_children():
                     items_tree.delete(row)
@@ -726,55 +542,65 @@ def create_admin_frame(container, show_frame):
         orders_tree.bind("<<TreeviewSelect>>", show_selected_order)
 
         ctk.CTkButton(
-            status_frame, text="💾 Update Order Status", command=save_status
-        ).grid(row=2, column=0, sticky="ew", pady=(0, 7))
+            status_frame, text="💾 Update Order Status", command=save_status,
+            height=36, font=("Segoe UI", 12, "bold"), fg_color="#10B981", hover_color="#059669"
+        ).grid(row=2, column=0, sticky="ew", pady=(0, 6))
+
         ctk.CTkButton(
             status_frame, text="🔄 Refresh Orders",
-            command=lambda: refresh_order_list(selected_order["id"])
+            command=lambda: refresh_order_list(selected_order["id"]),
+            height=34, font=("Segoe UI", 12), fg_color="#334155", hover_color="#475569"
         ).grid(row=3, column=0, sticky="ew")
 
         refresh_order_list()
 
 
     # =====================================================
-    # BOOKING MANAGEMENT
+    # BOOKING MANAGEMENT WINDOW (DARK THEMED)
     # =====================================================
 
     def open_booking_management():
         booking_window = ctk.CTkToplevel(admin_frame)
         booking_window.title("Cat Nip — Booking Management")
-        booking_window.geometry("1120x710")
-        booking_window.minsize(880, 570)
-        booking_window.configure(fg_color="#EAF4FF")
+        booking_window.geometry("1140x720")
+        booking_window.minsize(890, 580)
+        booking_window.configure(fg_color=("#F1F5F9", "#0F172A"))
         booking_window.grab_set()
 
+        modal_header = ctk.CTkFrame(booking_window, corner_radius=12, fg_color=("#FFFFFF", "#1E293B"), border_width=1, border_color=("#E2E8F0", "#334155"))
+        modal_header.pack(fill="x", padx=18, pady=(18, 12))
+
         ctk.CTkLabel(
-            booking_window,
+            modal_header,
             text="📅 Booking Management",
-            font=("Segoe UI", 26, "bold")
-        ).pack(anchor="w", padx=20, pady=(18, 4))
+            font=("Segoe UI", 22, "bold"),
+            text_color="#0D9488"
+        ).pack(anchor="w", padx=20, pady=(14, 2))
+
         ctk.CTkLabel(
-            booking_window,
+            modal_header,
             text="Review service appointments, customer details, and update booking status.",
-            font=("Segoe UI", 13)
-        ).pack(anchor="w", padx=22, pady=(0, 12))
+            font=("Segoe UI", 12),
+            text_color="#94A3B8"
+        ).pack(anchor="w", padx=20, pady=(0, 14))
 
         content = ctk.CTkFrame(booking_window, fg_color="transparent")
-        content.pack(fill="both", expand=True, padx=15, pady=(0, 15))
+        content.pack(fill="both", expand=True, padx=18, pady=(0, 18))
         content.grid_columnconfigure(0, weight=3)
         content.grid_columnconfigure(1, weight=2)
         content.grid_rowconfigure(0, weight=1)
 
-        left = ctk.CTkFrame(content)
+        left = ctk.CTkFrame(content, corner_radius=12, fg_color=("#FFFFFF", "#1E293B"), border_width=1, border_color=("#E2E8F0", "#334155"))
         left.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
         left.grid_columnconfigure(0, weight=1)
         left.grid_rowconfigure(1, weight=1)
-        ctk.CTkLabel(left, text="All Bookings", font=("Segoe UI", 18, "bold")).grid(
-            row=0, column=0, sticky="w", padx=12, pady=10
+
+        ctk.CTkLabel(left, text="All Bookings", font=("Segoe UI", 16, "bold"), text_color="#0D9488").grid(
+            row=0, column=0, sticky="w", padx=16, pady=(14, 8)
         )
 
         columns = ("Booking ID", "Customer", "Service", "Pet", "Date", "Status")
-        bookings_tree = ttk.Treeview(left, columns=columns, show="headings", height=18)
+        bookings_tree = ttk.Treeview(left, columns=columns, show="headings", height=18, style="CatNip.Treeview")
         for col in columns:
             bookings_tree.heading(col, text=col)
             bookings_tree.column(col, anchor="center", width=95)
@@ -783,33 +609,38 @@ def create_admin_frame(container, show_frame):
         bookings_tree.column("Service", width=120)
         bookings_tree.column("Pet", width=90)
         bookings_tree.column("Date", width=100)
-        bookings_tree.grid(row=1, column=0, sticky="nsew", padx=(10, 0), pady=(0, 10))
+        bookings_tree.grid(row=1, column=0, sticky="nsew", padx=(14, 0), pady=(0, 14))
+
         scrollbar = ttk.Scrollbar(left, orient="vertical", command=bookings_tree.yview)
         bookings_tree.configure(yscrollcommand=scrollbar.set)
-        scrollbar.grid(row=1, column=1, sticky="ns", pady=(0, 10))
+        scrollbar.grid(row=1, column=1, sticky="ns", pady=(0, 14), padx=(0, 8))
 
-        right = ctk.CTkFrame(content)
+        right = ctk.CTkFrame(content, corner_radius=12, fg_color=("#FFFFFF", "#1E293B"), border_width=1, border_color=("#E2E8F0", "#334155"))
         right.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
         right.grid_columnconfigure(0, weight=1)
         right.grid_rowconfigure(1, weight=1)
-        ctk.CTkLabel(right, text="Booking Details", font=("Segoe UI", 18, "bold")).grid(
-            row=0, column=0, sticky="w", padx=12, pady=(10, 5)
+
+        ctk.CTkLabel(right, text="Booking Details", font=("Segoe UI", 16, "bold"), text_color="#0D9488").grid(
+            row=0, column=0, sticky="w", padx=16, pady=(14, 6)
         )
-        details = ctk.CTkTextbox(right, height=270, wrap="word")
-        details.grid(row=1, column=0, sticky="nsew", padx=10, pady=8)
+
+        details = ctk.CTkTextbox(right, height=270, wrap="word", corner_radius=8, font=("Segoe UI", 12))
+        details.grid(row=1, column=0, sticky="nsew", padx=14, pady=8)
         details.insert("1.0", "Select a booking to view its details.")
         details.configure(state="disabled")
 
         status_frame = ctk.CTkFrame(right, fg_color="transparent")
-        status_frame.grid(row=2, column=0, sticky="ew", padx=12, pady=(4, 12))
+        status_frame.grid(row=2, column=0, sticky="ew", padx=14, pady=(4, 14))
         status_frame.grid_columnconfigure(0, weight=1)
-        ctk.CTkLabel(status_frame, text="Update status:").grid(
-            row=0, column=0, sticky="w", pady=(0, 5)
+
+        ctk.CTkLabel(status_frame, text="Update Status:", font=("Segoe UI", 12, "bold")).grid(
+            row=0, column=0, sticky="w", pady=(0, 4)
         )
         status_picker = ctk.CTkComboBox(
             status_frame,
             values=["Pending", "Confirmed", "In Progress", "Completed", "Cancelled"],
-            state="readonly"
+            state="readonly",
+            height=36
         )
         status_picker.set("Pending")
         status_picker.grid(row=1, column=0, sticky="ew", pady=(0, 8))
@@ -839,14 +670,13 @@ def create_admin_frame(container, show_frame):
                 set_details(
                     f"Booking #{bid}\n"
                     f"Customer: {username or f'User #{user_id}'}\n"
-                    f"Email: {email or '—'}\n"
-                    f"Phone: {phone or '—'}\n\n"
+                    f"Email: {email or '—'}  |  Phone: {phone or '—'}\n\n"
                     f"Service: {service or '—'}\n"
-                    f"Pet name: {pet or '—'}\n"
-                    f"Appointment date: {date_text}\n"
-                    f"Current status: {status or 'Pending'}\n"
+                    f"Pet Name: {pet or '—'}\n"
+                    f"Appointment Date: {date_text}\n"
+                    f"Current Status: {status or 'Pending'}\n"
                     f"Created: {created_text}\n\n"
-                    f"Customer notes:\n{notes or 'No additional notes.'}"
+                    f"Customer Notes:\n{notes or 'No additional notes.'}"
                 )
                 status_picker.set(status or "Pending")
             except Exception as exc:
@@ -904,414 +734,380 @@ def create_admin_frame(container, show_frame):
                 )
 
         bookings_tree.bind("<<TreeviewSelect>>", show_selected_booking)
-        ctk.CTkButton(status_frame, text="💾 Update Booking Status", command=save_booking_status).grid(
-            row=2, column=0, sticky="ew", pady=(0, 7)
-        )
+
+        ctk.CTkButton(
+            status_frame, text="💾 Update Booking Status", command=save_booking_status,
+            height=36, font=("Segoe UI", 12, "bold"), fg_color="#10B981", hover_color="#059669"
+        ).grid(row=2, column=0, sticky="ew", pady=(0, 6))
+
         ctk.CTkButton(
             status_frame, text="🔄 Refresh Bookings",
-            command=lambda: refresh_booking_list(selected["id"])
+            command=lambda: refresh_booking_list(selected["id"]),
+            height=34, font=("Segoe UI", 12), fg_color="#334155", hover_color="#475569"
         ).grid(row=3, column=0, sticky="ew")
+
         refresh_booking_list()
 
 
     # =====================================================
-    # HEADER
-    # =====================================================
-
-    header = ctk.CTkFrame(
-        admin_frame,
-        fg_color="#D9ECFF",
-        corner_radius=15
-    )
-
-    header.grid(
-        row=0,
-        column=0,
-        columnspan=2,
-        sticky="ew",
-        padx=15,
-        pady=15
-    )
-
-
-    header_top = ctk.CTkFrame(
-        header,
-        fg_color="transparent"
-    )
-
-    header_top.pack(
-        fill="x",
-        padx=20,
-        pady=15
-    )
-
-
-    ctk.CTkLabel(
-        header_top,
-        text="🐾 Pet Store Admin",
-        font=("Segoe UI", 28, "bold")
-    ).pack(
-        side="left"
-    )
-
-
-    ctk.CTkButton(
-        header_top,
-        text="Logout",
-        command=logout,
-        width=100,
-        fg_color="#D9534F",
-        hover_color="#C9302C"
-    ).pack(
-        side="right"
-    )
-
-    ctk.CTkButton(
-        header_top,
-        text="📦 Manage Orders",
-        command=open_order_management,
-        width=155,
-        fg_color="#2878B5",
-        hover_color="#1F6396"
-    ).pack(
-        side="right",
-        padx=(0, 10)
-    )
-
-    ctk.CTkButton(
-        header_top,
-        text="📅 Manage Bookings",
-        command=open_booking_management,
-        width=170,
-        fg_color="#39845A",
-        hover_color="#2D6D49"
-    ).pack(
-        side="right",
-        padx=(0, 10)
-    )
-
-    ctk.CTkButton(
-        header_top,
-        text="🐾 Adoption Applications",
-        command=lambda: open_adoption_admin(admin_frame),
-        width=190,
-        fg_color="#B96D57",
-        hover_color="#9E5947"
-    ).pack(
-        side="right",
-        padx=(0, 10)
-    )
-
-    ctk.CTkButton(
-        header_top,
-        text="🐕 Manage Playdates",
-        command=lambda: open_playdates_admin(admin_frame),
-        width=165,
-        fg_color="#6C8D70",
-        hover_color="#55755A"
-    ).pack(
-        side="right",
-        padx=(0, 10)
-    )
-
-
-    # =====================================================
-    # STATISTICS
-    # =====================================================
-
-    stats_frame = ctk.CTkFrame(
-        header,
-        fg_color="transparent"
-    )
-
-    stats_frame.pack(
-        fill="x",
-        padx=20,
-        pady=(0, 15)
-    )
-
-
-    total_products_label = ctk.CTkLabel(
-        stats_frame,
-        text="Products: 0",
-        font=("Segoe UI", 16, "bold")
-    )
-
-    total_products_label.pack(
-        side="left",
-        expand=True
-    )
-
-
-    low_stock_label = ctk.CTkLabel(
-        stats_frame,
-        text="Low Stock: 0",
-        font=("Segoe UI", 16, "bold")
-    )
-
-    low_stock_label.pack(
-        side="left",
-        expand=True
-    )
-
-
-    inventory_value_label = ctk.CTkLabel(
-        stats_frame,
-        text="Inventory Value: ₹0",
-        font=("Segoe UI", 16, "bold")
-    )
-
-    inventory_value_label.pack(
-        side="left",
-        expand=True
-    )
-
-
-    # =====================================================
-    # SIDEBAR
+    # 2. FULL-HEIGHT MODERN LEFT SIDEBAR (EXACT MATCH)
     # =====================================================
 
     sidebar = ctk.CTkFrame(
         admin_frame,
-        fg_color="#DFF1FF",
-        width=300
+        width=245,
+        corner_radius=0,
+        fg_color=("#F1F5F9", "#0F172A")
     )
+    sidebar.grid(row=0, column=0, sticky="nsew")
+    sidebar.grid_propagate(False)
 
-    sidebar.grid(
-        row=1,
-        column=0,
-        sticky="ns",
-        padx=(15, 8),
-        pady=(0, 15)
-    )
+    # Brand Title
+    brand_frame = ctk.CTkFrame(sidebar, fg_color="transparent")
+    brand_frame.pack(fill="x", padx=16, pady=(22, 20))
 
+    ctk.CTkLabel(brand_frame, text="🐾", font=("Segoe UI", 30)).pack(side="left", padx=(0, 8))
+    title_box = ctk.CTkFrame(brand_frame, fg_color="transparent")
+    title_box.pack(side="left")
+    ctk.CTkLabel(
+        title_box,
+        text="Cat Nip Admin",
+        font=("Segoe UI", 17, "bold"),
+        text_color="#38BDF8"
+    ).pack(anchor="w")
+    ctk.CTkLabel(
+        title_box,
+        text="Store Management",
+        font=("Segoe UI", 10),
+        text_color="#94A3B8"
+    ).pack(anchor="w")
 
-    name_entry = ctk.CTkEntry(
+    # Divider
+    ctk.CTkFrame(sidebar, height=1, fg_color=("#CBD5E1", "#334155")).pack(fill="x", padx=14, pady=(0, 15))
+
+    # Navigation Buttons (Vertical list matching earlier system)
+    ctk.CTkLabel(
         sidebar,
-        placeholder_text="Product Name"
-    )
+        text="STORE MODULES",
+        font=("Segoe UI", 10, "bold"),
+        text_color="#64748B"
+    ).pack(anchor="w", padx=20, pady=(0, 6))
 
-    name_entry.pack(
-        padx=20,
-        pady=10,
-        fill="x"
-    )
-
-
-    price_entry = ctk.CTkEntry(
+    ctk.CTkButton(
         sidebar,
-        placeholder_text="Price"
-    )
+        text="📦  Manage Orders",
+        command=open_order_management,
+        anchor="w",
+        font=("Segoe UI", 12, "bold"),
+        height=40,
+        fg_color="#0284C7",
+        hover_color="#0369A1"
+    ).pack(fill="x", padx=14, pady=3)
 
-    price_entry.pack(
-        padx=20,
-        pady=10,
-        fill="x"
-    )
-
-
-    brand_entry = ctk.CTkEntry(
+    ctk.CTkButton(
         sidebar,
-        placeholder_text="Brand"
+        text="📅  Manage Bookings",
+        command=open_booking_management,
+        anchor="w",
+        font=("Segoe UI", 12, "bold"),
+        height=40,
+        fg_color="#0D9488",
+        hover_color="#0F766E"
+    ).pack(fill="x", padx=14, pady=3)
+
+    ctk.CTkButton(
+        sidebar,
+        text="🐾  Adoption Requests",
+        command=lambda: open_adoption_admin(admin_frame),
+        anchor="w",
+        font=("Segoe UI", 12, "bold"),
+        height=40,
+        fg_color="#EA580C",
+        hover_color="#C2410C"
+    ).pack(fill="x", padx=14, pady=3)
+
+    ctk.CTkButton(
+        sidebar,
+        text="🐕  Manage Playdates",
+        command=lambda: open_playdates_admin(admin_frame),
+        anchor="w",
+        font=("Segoe UI", 12, "bold"),
+        height=40,
+        fg_color="#7C3AED",
+        hover_color="#6D28D9"
+    ).pack(fill="x", padx=14, pady=3)
+
+    # Bottom of Sidebar (Status & Logout)
+    bottom_box = ctk.CTkFrame(sidebar, fg_color="transparent")
+    bottom_box.pack(side="bottom", fill="x", padx=14, pady=20)
+
+    ctk.CTkLabel(
+        bottom_box,
+        text="🟢 Admin Session Active",
+        font=("Segoe UI", 11),
+        text_color="#10B981"
+    ).pack(anchor="w", pady=(0, 10))
+
+    ctk.CTkButton(
+        bottom_box,
+        text="🚪  Logout",
+        command=logout,
+        font=("Segoe UI", 12, "bold"),
+        height=38,
+        fg_color="#EF4444",
+        hover_color="#DC2626"
+    ).pack(fill="x")
+
+
+    # =====================================================
+    # 3. RIGHT MAIN CONTENT AREA
+    # =====================================================
+
+    main_content = ctk.CTkFrame(admin_frame, fg_color="transparent")
+    main_content.grid(row=0, column=1, sticky="nsew", padx=20, pady=20)
+    main_content.grid_rowconfigure(2, weight=1)
+    main_content.grid_columnconfigure(0, weight=1)
+
+    # Top Header Title
+    top_header = ctk.CTkFrame(main_content, fg_color="transparent")
+    top_header.grid(row=0, column=0, sticky="ew", pady=(0, 14))
+
+    ctk.CTkLabel(
+        top_header,
+        text="Store Management Dashboard",
+        font=("Segoe UI", 24, "bold"),
+        text_color=("#0F172A", "#F8FAFC")
+    ).pack(anchor="w")
+
+    ctk.CTkLabel(
+        top_header,
+        text="Live inventory metrics, stock manipulation & item management",
+        font=("Segoe UI", 12),
+        text_color="#94A3B8"
+    ).pack(anchor="w", pady=(2, 0))
+
+
+    # =====================================================
+    # 4. KPI METRIC CARDS ROW (EXACT SAME 3 METRICS)
+    # =====================================================
+
+    stats_row = ctk.CTkFrame(main_content, fg_color="transparent")
+    stats_row.grid(row=1, column=0, sticky="ew", pady=(0, 14))
+    stats_row.columnconfigure((0, 1, 2), weight=1)
+
+    # Card 1: Total Products
+    card_prod = ctk.CTkFrame(stats_row, corner_radius=12, fg_color=("#FFFFFF", "#1E293B"), border_width=1, border_color=("#E2E8F0", "#334155"))
+    card_prod.grid(row=0, column=0, padx=(0, 8), sticky="ew")
+    top_p = ctk.CTkFrame(card_prod, fg_color="transparent")
+    top_p.pack(fill="x", padx=16, pady=(12, 2))
+    ctk.CTkLabel(top_p, text="Total Products", font=("Segoe UI", 12), text_color="#94A3B8").pack(side="left")
+    ctk.CTkLabel(top_p, text="📦", font=("Segoe UI", 16)).pack(side="right")
+    total_products_label = ctk.CTkLabel(card_prod, text="0", font=("Segoe UI", 26, "bold"), text_color="#38BDF8")
+    total_products_label.pack(anchor="w", padx=16, pady=(0, 12))
+
+    # Card 2: Low Stock Alert
+    card_stock = ctk.CTkFrame(stats_row, corner_radius=12, fg_color=("#FFFFFF", "#1E293B"), border_width=1, border_color=("#E2E8F0", "#334155"))
+    card_stock.grid(row=0, column=1, padx=4, sticky="ew")
+    top_s = ctk.CTkFrame(card_stock, fg_color="transparent")
+    top_s.pack(fill="x", padx=16, pady=(12, 2))
+    ctk.CTkLabel(top_s, text="Low Stock (< 5 items)", font=("Segoe UI", 12), text_color="#94A3B8").pack(side="left")
+    ctk.CTkLabel(top_s, text="⚠️", font=("Segoe UI", 16)).pack(side="right")
+    low_stock_label = ctk.CTkLabel(card_stock, text="0", font=("Segoe UI", 26, "bold"), text_color="#EF4444")
+    low_stock_label.pack(anchor="w", padx=16, pady=(0, 12))
+
+    # Card 3: Inventory Value
+    card_val = ctk.CTkFrame(stats_row, corner_radius=12, fg_color=("#FFFFFF", "#1E293B"), border_width=1, border_color=("#E2E8F0", "#334155"))
+    card_val.grid(row=0, column=2, padx=(8, 0), sticky="ew")
+    top_v = ctk.CTkFrame(card_val, fg_color="transparent")
+    top_v.pack(fill="x", padx=16, pady=(12, 2))
+    ctk.CTkLabel(top_v, text="Inventory Value", font=("Segoe UI", 12), text_color="#94A3B8").pack(side="left")
+    ctk.CTkLabel(top_v, text="💰", font=("Segoe UI", 16)).pack(side="right")
+    inventory_value_label = ctk.CTkLabel(card_val, text="₹0.00", font=("Segoe UI", 24, "bold"), text_color="#10B981")
+    inventory_value_label.pack(anchor="w", padx=16, pady=(0, 12))
+
+
+    # =====================================================
+    # 5. WORKSPACE (PRODUCT FORM CARD + TABLE CARD)
+    # =====================================================
+
+    workspace = ctk.CTkFrame(main_content, fg_color="transparent")
+    workspace.grid(row=2, column=0, sticky="nsew")
+    workspace.grid_columnconfigure(0, weight=0)  # Form Card
+    workspace.grid_columnconfigure(1, weight=1)  # Table Card
+    workspace.grid_rowconfigure(0, weight=1)
+
+    # -----------------------------------------------------
+    # PRODUCT FORM CARD
+    # -----------------------------------------------------
+    form_card = ctk.CTkFrame(
+        workspace,
+        width=310,
+        corner_radius=14,
+        fg_color=("#FFFFFF", "#1E293B"),
+        border_width=1,
+        border_color=("#E2E8F0", "#334155")
     )
+    form_card.grid(row=0, column=0, sticky="nsew", padx=(0, 12))
+    form_card.grid_propagate(False)
 
-    brand_entry.pack(
-        padx=20,
-        pady=10,
-        fill="x"
-    )
+    form_scroll = ctk.CTkScrollableFrame(form_card, fg_color="transparent")
+    form_scroll.pack(fill="both", expand=True, padx=14, pady=14)
 
+    ctk.CTkLabel(
+        form_scroll,
+        text="🏷️ Product Controls",
+        font=("Segoe UI", 16, "bold"),
+        text_color="#38BDF8"
+    ).pack(anchor="w", pady=(0, 10))
 
+    ctk.CTkLabel(form_scroll, text="Product Name", font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(2, 2))
+    name_entry = ctk.CTkEntry(form_scroll, placeholder_text="e.g. Feather Wand", height=36)
+    name_entry.pack(fill="x", pady=(0, 6))
+
+    ctk.CTkLabel(form_scroll, text="Price (₹)", font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(2, 2))
+    price_entry = ctk.CTkEntry(form_scroll, placeholder_text="e.g. 499.00", height=36)
+    price_entry.pack(fill="x", pady=(0, 6))
+
+    ctk.CTkLabel(form_scroll, text="Brand", font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(2, 2))
+    brand_entry = ctk.CTkEntry(form_scroll, placeholder_text="e.g. CatNip Co", height=36)
+    brand_entry.pack(fill="x", pady=(0, 6))
+
+    ctk.CTkLabel(form_scroll, text="Category", font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(2, 2))
     category_entry = ctk.CTkComboBox(
-        sidebar,
-        values=["Food", "Accessory"]
+        form_scroll,
+        values=["Food", "Accessory"],
+        height=36,
+        state="readonly"
     )
+    category_entry.set("Select Category")
+    category_entry.pack(fill="x", pady=(0, 6))
 
-    category_entry.set(
-        "Select Category"
-    )
+    ctk.CTkLabel(form_scroll, text="Stock Quantity", font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(2, 2))
+    stock_entry = ctk.CTkEntry(form_scroll, placeholder_text="e.g. 20", height=36)
+    stock_entry.pack(fill="x", pady=(0, 12))
 
-    category_entry.pack(
-        padx=20,
-        pady=10,
-        fill="x"
-    )
-
-
-    stock_entry = ctk.CTkEntry(
-        sidebar,
-        placeholder_text="Stock"
-    )
-
-    stock_entry.pack(
-        padx=20,
-        pady=10,
-        fill="x"
-    )
-
-
+    # Add Product Button
     ctk.CTkButton(
-        sidebar,
+        form_scroll,
         text="➕ Add Product",
-        command=add_product_gui
-    ).pack(
-        padx=20,
-        pady=10,
-        fill="x"
-    )
+        command=add_product_gui,
+        height=38,
+        font=("Segoe UI", 12, "bold"),
+        fg_color="#0284C7",
+        hover_color="#0369A1"
+    ).pack(fill="x", pady=4)
 
-
-    ctk.CTkButton(
-        sidebar,
-        text="🗑 Remove Selected",
-        command=delete_selected,
-        fg_color="#D9534F"
-    ).pack(
-        padx=20,
-        pady=10,
-        fill="x"
-    )
-
-
+    # Edit Selected Button
     edit_button = ctk.CTkButton(
-        sidebar,
+        form_scroll,
         text="✏️ Edit Selected",
-        command=edit_selected
+        command=edit_selected,
+        height=36,
+        font=("Segoe UI", 12),
+        fg_color="#334155",
+        hover_color="#475569"
     )
+    edit_button.pack(fill="x", pady=4)
 
-    edit_button.pack(
-        padx=20,
-        pady=10,
-        fill="x"
-    )
-
+    # Quick Stock Adjustment Side-by-Side Grid
+    stock_grid = ctk.CTkFrame(form_scroll, fg_color="transparent")
+    stock_grid.pack(fill="x", pady=4)
+    stock_grid.columnconfigure((0, 1), weight=1)
 
     ctk.CTkButton(
-        sidebar,
-        text="+ Stock",
-        command=increase_stock
-    ).pack(
-        padx=20,
-        pady=10,
-        fill="x"
-    )
-
+        stock_grid,
+        text="▲ +1 Stock",
+        command=increase_stock,
+        height=34,
+        font=("Segoe UI", 11, "bold"),
+        fg_color="#10B981",
+        hover_color="#059669"
+    ).grid(row=0, column=0, padx=(0, 4), sticky="ew")
 
     ctk.CTkButton(
-        sidebar,
-        text="- Stock",
-        command=decrease_stock
-    ).pack(
-        padx=20,
-        pady=10,
-        fill="x"
+        stock_grid,
+        text="▼ -1 Stock",
+        command=decrease_stock,
+        height=34,
+        font=("Segoe UI", 11, "bold"),
+        fg_color="#F59E0B",
+        hover_color="#D97706"
+    ).grid(row=0, column=1, padx=(4, 0), sticky="ew")
+
+    # Delete Selected Button
+    ctk.CTkButton(
+        form_scroll,
+        text="🗑️ Remove Selected",
+        command=delete_selected,
+        height=36,
+        font=("Segoe UI", 12),
+        fg_color="#EF4444",
+        hover_color="#DC2626"
+    ).pack(fill="x", pady=(8, 4))
+
+
+    # -----------------------------------------------------
+    # PRODUCT TABLE CARD
+    # -----------------------------------------------------
+    table_card = ctk.CTkFrame(
+        workspace,
+        corner_radius=14,
+        fg_color=("#FFFFFF", "#1E293B"),
+        border_width=1,
+        border_color=("#E2E8F0", "#334155")
     )
+    table_card.grid(row=0, column=1, sticky="nsew")
+    table_card.grid_rowconfigure(1, weight=1)
+    table_card.grid_columnconfigure(0, weight=1)
 
-
-    # =====================================================
-    # TABLE FRAME
-    # =====================================================
-
-    table_frame = ctk.CTkFrame(
-        admin_frame
-    )
-
-    table_frame.grid(
-        row=1,
-        column=1,
-        sticky="nsew",
-        padx=(8, 15),
-        pady=(0, 15)
-    )
-
-
-    # =====================================================
-    # SEARCH
-    # =====================================================
-
-    search_frame = ctk.CTkFrame(
-        table_frame,
-        fg_color="transparent"
-    )
-
-    search_frame.grid(
-        row=0,
-        column=0,
-        columnspan=2,
-        sticky="ew",
-        padx=10,
-        pady=(10, 5)
-    )
-
-    search_frame.grid_columnconfigure(
-        0,
-        weight=1
-    )
-
+    # Search Bar Toolbar
+    search_frame = ctk.CTkFrame(table_card, fg_color="transparent")
+    search_frame.grid(row=0, column=0, columnspan=2, sticky="ew", padx=16, pady=(14, 10))
+    search_frame.grid_columnconfigure(0, weight=1)
 
     search_entry = ctk.CTkEntry(
         search_frame,
-        placeholder_text="🔎 Search products..."
+        placeholder_text="🔎 Search by product name, brand, category...",
+        height=38,
+        font=("Segoe UI", 12)
     )
-
-    search_entry.grid(
-        row=0,
-        column=0,
-        sticky="ew",
-        padx=(0, 5)
-    )
-
+    search_entry.grid(row=0, column=0, sticky="ew", padx=(0, 8))
+    search_entry.bind("<Return>", lambda e: search_products())
 
     ctk.CTkButton(
         search_frame,
         text="Search",
-        width=100,
+        width=90,
+        height=38,
+        font=("Segoe UI", 12, "bold"),
+        fg_color="#0284C7",
+        hover_color="#0369A1",
         command=search_products
-    ).grid(
-        row=0,
-        column=1,
-        padx=5
-    )
-
+    ).grid(row=0, column=1, padx=4)
 
     ctk.CTkButton(
         search_frame,
         text="Clear",
-        width=80,
-        command=load_products
-    ).grid(
-        row=0,
-        column=2,
-        padx=(5, 0)
-    )
+        width=75,
+        height=38,
+        font=("Segoe UI", 12),
+        fg_color="#64748B",
+        hover_color="#475569",
+        command=lambda: (search_entry.delete(0, "end"), load_products())
+    ).grid(row=0, column=2, padx=4)
 
     ctk.CTkButton(
         search_frame,
         text="🔄 Refresh",
-        width=100,
+        width=95,
+        height=38,
+        font=("Segoe UI", 12),
+        fg_color="#334155",
+        hover_color="#475569",
         command=load_products
-    ).grid(
-        row=0,
-        column=3,
-        padx=(5, 0)
-    )
+    ).grid(row=0, column=3, padx=(4, 0))
 
-
-    # =====================================================
-    # PRODUCT TABLE
-    # =====================================================
-
-    table_frame.grid_rowconfigure(
-        1,
-        weight=1
-    )
-
-    table_frame.grid_columnconfigure(
-        0,
-        weight=1
-    )
-
-
+    # Product Table
     columns = (
         "ID",
         "Name",
@@ -1321,61 +1117,33 @@ def create_admin_frame(container, show_frame):
         "Stock"
     )
 
-
     tree = ttk.Treeview(
-        table_frame,
+        table_card,
         columns=columns,
-        show="headings"
+        show="headings",
+        style="CatNip.Treeview"
     )
-
 
     for col in columns:
+        tree.heading(col, text=col)
+        tree.column(col, anchor="center", width=120)
 
-        tree.heading(
-            col,
-            text=col
-        )
+    tree.column("ID", width=70)
+    tree.column("Name", width=220, anchor="w")
+    tree.column("Brand", width=140)
+    tree.column("Category", width=120)
 
-        tree.column(
-            col,
-            anchor="center",
-            width=120
-        )
-
-
-    tree.grid(
-        row=1,
-        column=0,
-        sticky="nsew",
-        padx=10,
-        pady=10
-    )
-
+    tree.grid(row=1, column=0, sticky="nsew", padx=(16, 0), pady=(0, 16))
 
     scrollbar = ttk.Scrollbar(
-        table_frame,
+        table_card,
         orient="vertical",
         command=tree.yview
     )
+    tree.configure(yscrollcommand=scrollbar.set)
+    scrollbar.grid(row=1, column=1, sticky="ns", pady=(0, 16), padx=(0, 10))
 
-
-    tree.configure(
-        yscrollcommand=scrollbar.set
-    )
-
-
-    scrollbar.grid(
-        row=1,
-        column=1,
-        sticky="ns"
-    )
-
-
-    # =====================================================
-    # INITIAL LOAD
-    # =====================================================
-
+    # Initial Load
     load_products()
-
 
     return admin_frame
