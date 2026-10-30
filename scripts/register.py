@@ -11,7 +11,7 @@ from date_picker import attach_date_picker
 def register_screen(container, show_frame):
 
     # =====================================================
-    # REGISTER FRAME  (matches main.py peach theme)
+    # REGISTER FRAME 
     # =====================================================
 
     register_frame = ctk.CTkFrame(
@@ -187,7 +187,7 @@ def register_screen(container, show_frame):
     # spacer under phone to align with email status
     ctk.CTkLabel(form, text="", height=20).grid(row=4, column=2, columnspan=2)
 
-    # ---------- Address (full width) ----------
+    # ---------- Address ----------
     ctk.CTkLabel(
         form,
         text="Address",

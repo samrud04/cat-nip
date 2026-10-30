@@ -1,4 +1,4 @@
-"""Reusable themed date picker for Cat Nip (no third-party dependency)."""
+
 
 import calendar
 from datetime import date
@@ -13,7 +13,7 @@ MUTED = "#75675F"
 
 def attach_date_picker(entry, parent, *, date_format="%Y-%m-%d", min_date=None,
                        max_date=None, initial_date=None):
-    """Open a themed calendar beside an entry and place the selected date in it."""
+
     today = date.today()
     min_date = min_date or date(1000, 1, 1)
     max_date = max_date or date(9999, 12, 31)

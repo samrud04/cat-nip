@@ -1,4 +1,4 @@
-"""Shelter-style pet adoption UI for Cat Nip (demonstration listings)."""
+
 import customtkinter as ctk
 from tkinter import ttk, messagebox
 import db

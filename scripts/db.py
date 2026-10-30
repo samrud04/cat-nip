@@ -64,7 +64,7 @@ def login(user_type, username, password):
 
     return result is not None
 def register(username, password, email, phone, address, gender, dob):
-    """Create a user account and always release the database connection."""
+    
     con = None
     cur = None
     try:

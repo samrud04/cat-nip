@@ -22,10 +22,6 @@ from db import (
 
 def create_admin_frame(container, show_frame):
 
-    # =====================================================
-    # 1. ROOT ADMIN FRAME & DARK PALETTE TREEVIEW STYLING
-    # =====================================================
-
     admin_frame = ctk.CTkFrame(
         container,
         fg_color=("#F1F5F9", "#0F172A")
@@ -35,7 +31,7 @@ def create_admin_frame(container, show_frame):
     admin_frame.grid_columnconfigure(1, weight=1)  # Main Content Area
     admin_frame.grid_rowconfigure(0, weight=1)
 
-    # Style ttk.Treeview to seamlessly blend with CustomTkinter dark cards
+    
     style = ttk.Style()
     style.theme_use("clam")
 
@@ -368,7 +364,7 @@ def create_admin_frame(container, show_frame):
 
 
     # =====================================================
-    # ORDER MANAGEMENT WINDOW (DARK THEMED)
+    # ORDER MANAGEMENT WINDOW 
     # =====================================================
 
     def open_order_management():
@@ -556,7 +552,7 @@ def create_admin_frame(container, show_frame):
 
 
     # =====================================================
-    # BOOKING MANAGEMENT WINDOW (DARK THEMED)
+    # BOOKING MANAGEMENT WINDOW
     # =====================================================
 
     def open_booking_management():
@@ -749,10 +745,6 @@ def create_admin_frame(container, show_frame):
         refresh_booking_list()
 
 
-    # =====================================================
-    # 2. FULL-HEIGHT MODERN LEFT SIDEBAR (EXACT MATCH)
-    # =====================================================
-
     sidebar = ctk.CTkFrame(
         admin_frame,
         width=245,
@@ -785,7 +777,7 @@ def create_admin_frame(container, show_frame):
     # Divider
     ctk.CTkFrame(sidebar, height=1, fg_color=("#CBD5E1", "#334155")).pack(fill="x", padx=14, pady=(0, 15))
 
-    # Navigation Buttons (Vertical list matching earlier system)
+    # Navigation Buttons 
     ctk.CTkLabel(
         sidebar,
         text="STORE MODULES",
@@ -860,7 +852,7 @@ def create_admin_frame(container, show_frame):
 
 
     # =====================================================
-    # 3. RIGHT MAIN CONTENT AREA
+    # RIGHT MAIN CONTENT AREA
     # =====================================================
 
     main_content = ctk.CTkFrame(admin_frame, fg_color="transparent")
@@ -888,7 +880,7 @@ def create_admin_frame(container, show_frame):
 
 
     # =====================================================
-    # 4. KPI METRIC CARDS ROW (EXACT SAME 3 METRICS)
+    # KPI METRIC CARDS ROW
     # =====================================================
 
     stats_row = ctk.CTkFrame(main_content, fg_color="transparent")

@@ -7,7 +7,7 @@ import db
 def login_screen(container, show_frame, refresh_user_screen):
 
     # =====================================================
-    # LOGIN FRAME — styled to match the Cat-Nip Home screen
+    # LOGIN FRAME
     # =====================================================
 
     login = ctk.CTkFrame(container, fg_color="#ffe7d6")
@@ -16,7 +16,7 @@ def login_screen(container, show_frame, refresh_user_screen):
     login.grid_rowconfigure(0, weight=1)
 
     # =====================================================
-    # LOGIN HANDLER (existing authentication logic preserved)
+    # LOGIN HANDLER
     # =====================================================
 
     def log_submit():

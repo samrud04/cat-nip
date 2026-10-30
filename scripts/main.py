@@ -9,7 +9,7 @@ import admin
 
 def main():
 
-    # ================= APP SETUP =================
+    #  APP SETUP 
     ctk.set_appearance_mode("light")
     ctk.set_default_color_theme("blue")
 
@@ -21,7 +21,7 @@ def main():
     # Soft peach background
     app.configure(fg_color="#ffe7d6")
 
-    # ================= ICON =================
+    #  ICON 
     try:
         icon = ctk.CTkImage(
             Image.open("assets/catnipico.png"),
@@ -31,7 +31,7 @@ def main():
         print("Icon error:", e)
         icon = None
 
-    # ================= CONTAINER =================
+    #  CONTAINER 
     container = ctk.CTkFrame(app, fg_color="transparent")
     container.pack(fill="both", expand=True)
 
@@ -51,9 +51,9 @@ def main():
         frames["user"] = user_frame
         show_frame("user")
 
-    # =====================================================
+    # 
     # HOME SCREEN
-    # =====================================================
+    # ==================================================
     main_frame = ctk.CTkFrame(container, fg_color="transparent")
     main_frame.grid(row=0, column=0, sticky="nsew")
     frames["main"] = main_frame

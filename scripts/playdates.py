@@ -1,4 +1,4 @@
-"""Admin event management and customer playdate booking windows for Cat Nip."""
+
 import customtkinter as ctk
 from tkinter import ttk, messagebox
 import json
@@ -11,7 +11,7 @@ SAGE = "#DDEBDD"
 
 
 def _maximize_window(win):
-    """Maximize playdate windows on Windows; fall back to full available screen."""
+    
     def apply():
         try:
             if not win.winfo_exists():
@@ -34,7 +34,7 @@ def _maximize_window(win):
 
 
 def _show_foreground(win):
-    """Raise a child window briefly without changing the owner's state."""
+    
     def raise_window():
         try:
             if not win.winfo_exists():
@@ -57,7 +57,7 @@ def _show_foreground(win):
 
 
 def open_playdates_admin(parent):
-    """Open the admin event manager as a proper foreground application window."""
+    
     from datetime import date
     from date_picker import attach_date_picker
 
@@ -129,9 +129,7 @@ def open_playdates_admin(parent):
     rules_cell = ctk.CTkFrame(form, fg_color="transparent")
     rules_cell.grid(row=2, column=3, sticky="nsew", padx=9, pady=(4, 9))
     ctk.CTkLabel(rules_cell, text="Pet attendance", text_color=INK, font=("Arial", 12, "bold")).pack(anchor="w", pady=(0, 8))
-    # Use a regular stateful button instead of CTkCheckBox. Some installed
-    # CustomTkinter builds have raised AttributeError on CTkCheckBox._variable,
-    # including during widget teardown, which could make the app hard to close.
+    
     allow_own_pets = {"value": False}
     allow_button = ctk.CTkButton(
         rules_cell,
