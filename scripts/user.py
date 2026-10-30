@@ -7,7 +7,6 @@ from pathlib import Path
 import db
 from adoption import open_adoption_window
 from playdates import open_playdates_user
-from chatbot import create_chatbot_page
 
 
 # =====================================================
@@ -1815,11 +1814,25 @@ def show_order_history(order_frame, book_frame, settings_frame, history_frame, r
     show_user_page("history", pages, refresh_orders)
 
 
+def _show_page_notice(parent, message):
+    """Show an inline notice instead of a modal popup during navigation."""
+    for child in parent.winfo_children():
+        child.destroy()
+    ctk.CTkLabel(
+        parent,
+        text=message,
+        font=("Arial", 18, "bold"),
+        text_color="#49352F",
+        wraplength=520
+    ).pack(expand=True, padx=24, pady=30)
+
+
 def create_navbar(parent, order_frame, book_frame, settings_frame, show_frame,
                   history_frame=None, refresh_orders=None, adoption_frame=None,
-                  playdates_frame=None, chatbot_frame=None):
+                  playdates_frame=None):
     navbar = ctk.CTkFrame(parent, height=70, fg_color="#FA9A85", corner_radius=0)
-    navbar.pack(fill="x")
+    navbar.pack(side="bottom", fill="x")
+    navbar.pack_propagate(False)
     ctk.CTkLabel(navbar, text="🐾 Pet Supplies", font=("Arial", 26, "bold"), text_color="white").pack(side="left", padx=18, pady=15)
     button_frame = ctk.CTkFrame(navbar, fg_color="transparent")
     button_frame.pack(side="right", padx=12)
@@ -1828,15 +1841,31 @@ def create_navbar(parent, order_frame, book_frame, settings_frame, show_frame,
     if history_frame is not None: pages["history"] = history_frame
     if adoption_frame is not None: pages["adoption"] = adoption_frame
     if playdates_frame is not None: pages["playdates"] = playdates_frame
-    if chatbot_frame is not None: pages["chatbot"] = chatbot_frame
 
     def navigate(target):
-        # Settings is intentionally created only when first opened. The frame
-        # is otherwise empty, so populate it before switching to that page.
+        # Build pages only when the user actually opens them. user_screen() is
+        # also constructed during application startup, before anyone logs in;
+        # opening these modules at construction time triggered sign-in popups.
         if target == "settings":
             if not getattr(settings_frame, "_settings_page_built", False):
                 create_settings_page(settings_frame, show_frame)
                 settings_frame._settings_page_built = True
+
+        elif target == "adoption":
+            if not getattr(adoption_frame, "_adoption_page_built", False):
+                if current_user_id is None:
+                    _show_page_notice(adoption_frame, "Please sign in to view adoption listings.")
+                else:
+                    open_adoption_window(adoption_frame, current_user_id, embedded=True)
+                adoption_frame._adoption_page_built = True
+
+        elif target == "playdates":
+            if not getattr(playdates_frame, "_playdates_page_built", False):
+                if current_user_id is None:
+                    _show_page_notice(playdates_frame, "Please sign in to view and book playdates.")
+                else:
+                    open_playdates_user(playdates_frame, current_user_id, embedded=True)
+                playdates_frame._playdates_page_built = True
 
         show_user_page(
             target,
@@ -1856,13 +1885,12 @@ def create_navbar(parent, order_frame, book_frame, settings_frame, show_frame,
             command=lambda key=target: navigate(key)
         ).pack(side="left", padx=3)
 
-    nav_button("Order", "order")
-    nav_button("Book", "book")
+    nav_button("🛍️ Order", "order")
+    nav_button("📅 Book", "book")
     if adoption_frame is not None: nav_button("🐾 Adopt", "adoption")
     if playdates_frame is not None: nav_button("🐕 Playdates", "playdates")
-    if chatbot_frame is not None: nav_button("💬 Chatbot", "chatbot")
-    nav_button("Settings", "settings")
-    if history_frame is not None: nav_button("My Orders", "history")
+    nav_button("⚙️ Settings", "settings")
+    if history_frame is not None: nav_button("📦 My Orders", "history")
 
 
 # =====================================================
@@ -2210,10 +2238,8 @@ def user_screen(
     )
 
 
-    content_area.pack(
-        fill="both",
-        expand=True
-    )
+    # Content area is packed after the bottom navbar is created, so it fills
+    # only the available space above the navbar.
 
 
     # =================================================
@@ -2312,11 +2338,11 @@ def user_screen(
 
     # These features are embedded into the main user-page content area, just
     # like Order, Book, Settings, and My Orders (not separate pop-up windows).
+    # Keep these pages empty until their navbar button is selected. The app
+    # creates an initial user screen before login, so opening them here would
+    # incorrectly trigger "Please sign in" dialogs during startup.
     adoption_frame = ctk.CTkFrame(page_container, fg_color="#FFF6EF", corner_radius=0)
-    open_adoption_window(adoption_frame, current_user_id, embedded=True)
     playdates_frame = ctk.CTkFrame(page_container, fg_color="#FFF6EF", corner_radius=0)
-    open_playdates_user(playdates_frame, current_user_id, embedded=True)
-    chatbot_frame = create_chatbot_page(page_container)
 
     # =====================================================
     # NAVBAR
@@ -2334,16 +2360,18 @@ def user_screen(
         history_frame,
         refresh_orders,
         adoption_frame,
-        playdates_frame,
-        chatbot_frame
+        playdates_frame
     )
+
+    # Pin the navbar to the bottom and let the content fill the area above it.
+    content_area.pack(side="top", fill="both", expand=True)
 
 
     # =================================================
     # SHOW ORDER PAGE
     # =================================================
 
-    for _page in (book_frame, settings_frame, history_frame, adoption_frame, playdates_frame, chatbot_frame):
+    for _page in (book_frame, settings_frame, history_frame, adoption_frame, playdates_frame):
         _page.pack_forget()
 
     order_frame.pack(

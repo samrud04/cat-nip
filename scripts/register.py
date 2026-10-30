@@ -7,6 +7,7 @@ from datetime import datetime
 from PIL import Image
 from datetime import date
 from date_picker import attach_date_picker
+import email_verification
 
 
 def register_screen(container, show_frame):
@@ -158,6 +159,104 @@ def register_screen(container, show_frame):
         x=370,
         y=345
     )
+
+    email_verified = {"value": False, "address": ""}
+
+    email_status_label = ctk.CTkLabel(
+        register_frame,
+        text="Email not verified",
+        text_color="#8B4513",
+        font=("Arial", 13, "bold")
+    )
+    email_status_label.place(x=370, y=372)
+
+    def email_changed(event=None):
+        current_email = email_entry.get().strip().lower()
+        if email_verified["value"] and current_email != email_verified["address"]:
+            email_verified["value"] = False
+            email_verified["address"] = ""
+            email_status_label.configure(
+                text="Email not verified",
+                text_color="#8B4513"
+            )
+
+    email_entry.bind("<KeyRelease>", email_changed)
+
+    def open_otp_verification():
+        email = email_entry.get().strip().lower()
+
+        if not re.match(r'^[\\w\\.-]+@[\\w\\.-]+\\.\\w+$', email):
+            messagebox.showerror("Invalid Email", "Please enter a valid email address.")
+            return
+
+        if email_verified["value"] and email_verified["address"] == email:
+            messagebox.showinfo("Email Verified", "This email address is already verified.")
+            return
+
+        sent, response = email_verification.send_otp(email)
+        if not sent:
+            messagebox.showerror("OTP Error", response)
+            return
+
+        messagebox.showinfo("OTP Sent", response)
+
+        otp_window = ctk.CTkToplevel(register_frame)
+        otp_window.title("Verify Email")
+        otp_window.geometry("380x230")
+        otp_window.resizable(False, False)
+        otp_window.transient(register_frame.winfo_toplevel())
+        otp_window.grab_set()
+
+        ctk.CTkLabel(
+            otp_window,
+            text=f"Enter the 6-digit OTP sent to\\n{email}",
+            font=("Arial", 17, "bold"),
+            text_color="black"
+        ).pack(pady=(22, 12))
+
+        otp_entry = ctk.CTkEntry(
+            otp_window,
+            width=220,
+            height=38,
+            placeholder_text="6-digit OTP",
+            justify="center"
+        )
+        otp_entry.pack(pady=8)
+        otp_entry.focus()
+
+        def confirm_otp():
+            valid, result = email_verification.verify_otp(email, otp_entry.get())
+            if valid:
+                email_verified["value"] = True
+                email_verified["address"] = email
+                email_status_label.configure(
+                    text="✓ Email verified",
+                    text_color="green"
+                )
+                messagebox.showinfo("Verified", result, parent=otp_window)
+                otp_window.destroy()
+            else:
+                messagebox.showerror("Verification Failed", result, parent=otp_window)
+
+        ctk.CTkButton(
+            otp_window,
+            text="Verify OTP",
+            command=confirm_otp,
+            width=150,
+            height=38
+        ).pack(pady=12)
+
+    ctk.CTkButton(
+        register_frame,
+        text="Send OTP",
+        command=open_otp_verification,
+        width=105,
+        height=35,
+        fg_color="#F4B183",
+        hover_color="#D98958",
+        text_color="black",
+        font=("Arial", 14, "bold")
+    ).place(x=630, y=342)
 
 
     # =====================================================
@@ -368,6 +467,13 @@ def register_screen(container, show_frame):
 
             return
 
+        if not email_verified["value"] or email_verified["address"] != email.lower():
+            messagebox.showerror(
+                "Email Verification Required",
+                "Please verify your email address using the OTP before registering."
+            )
+            return
+
 
         # =================================================
         # PHONE CHECK
@@ -464,6 +570,12 @@ def register_screen(container, show_frame):
             confirm_entry.delete(0, "end")
 
             email_entry.delete(0, "end")
+            email_verified["value"] = False
+            email_verified["address"] = ""
+            email_status_label.configure(
+                text="Email not verified",
+                text_color="#8B4513"
+            )
             phone_entry.delete(0, "end")
 
             address_entry.delete(0, "end")
