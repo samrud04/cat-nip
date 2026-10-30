@@ -4,251 +4,364 @@ import tkinter as tk
 from tkinter import messagebox
 import db
 from datetime import datetime
-from PIL import Image
 from datetime import date
 from date_picker import attach_date_picker
+import email_verification
 
 
 def register_screen(container, show_frame):
 
     # =====================================================
-    # REGISTER FRAME
+    # REGISTER FRAME  (matches main.py peach theme)
     # =====================================================
 
     register_frame = ctk.CTkFrame(
-        container
+        container,
+        fg_color="#ffe7d6"
     )
 
-
-    bg_image = ctk.CTkImage(
-        light_image=Image.open("assets/register_bg.png"),
-        dark_image=Image.open("assets/register_bg.png"),
-        size=(1400, 750)
-    )
-
-    bg_label = ctk.CTkLabel(
+    # Center content card
+    card = ctk.CTkFrame(
         register_frame,
-        text="",
-        image=bg_image
+        fg_color="#FA9A85",
+        corner_radius=40
     )
-    bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-    
+    card.place(relx=0.5, rely=0.5, anchor="center", relwidth=0.88, relheight=0.88)
 
+    # Inner content area
+    content = ctk.CTkFrame(card, fg_color="transparent")
+    content.pack(fill="both", expand=True, padx=50, pady=30)
 
     # =====================================================
-    # TITLE
+    # HEADER
     # =====================================================
+
+    header = ctk.CTkFrame(content, fg_color="transparent")
+    header.pack(fill="x", pady=(10, 20))
+
+    ctk.CTkButton(
+        header,
+        text="← Back",
+        command=lambda: show_frame("main"),
+        width=110,
+        height=40,
+        fg_color="#fed9bf",
+        hover_color="#ffc9a3",
+        text_color="#2b1d14",
+        font=("Segoe UI", 16, "bold"),
+        corner_radius=20
+    ).pack(side="left")
 
     ctk.CTkLabel(
-        register_frame,
-        text="User Registration",
-        font=("Arial", 40, "bold"),
-        text_color="black"
-    ).place(
-        x=650,
-        y=70
-    )
-
+        header,
+        text="🐾 Create Account",
+        font=("Segoe UI", 36, "bold"),
+        text_color="#2b1d14"
+    ).pack(side="left", padx=30)
 
     # =====================================================
-    # USERNAME
+    # FORM GRID
     # =====================================================
 
+    form = ctk.CTkFrame(content, fg_color="transparent")
+    form.pack(fill="both", expand=True)
+
+    form.grid_columnconfigure(0, weight=1)
+    form.grid_columnconfigure(1, weight=1)
+    form.grid_columnconfigure(2, weight=1)
+    form.grid_columnconfigure(3, weight=1)
+
+    # ---------- Username ----------
     ctk.CTkLabel(
-        register_frame,
-        text="Username:",
-        text_color="black",
-        font=("Arial", 24)
-    ).place(
-        x=200,
-        y=180
-    )
+        form,
+        text="Username",
+        text_color="#2b1d14",
+        font=("Segoe UI", 16, "bold"),
+        anchor="w"
+    ).grid(row=0, column=0, columnspan=2, sticky="w", padx=(0, 15), pady=(0, 4))
 
     register_uname_entry = ctk.CTkEntry(
-        register_frame,
-        width=250,
-        fg_color="white",
-        text_color="black"
+        form,
+        height=42,
+        fg_color="#fff8f2",
+        border_color="#fca265",
+        border_width=2,
+        text_color="#2b1d14",
+        font=("Segoe UI", 15),
+        corner_radius=12
     )
+    register_uname_entry.grid(row=1, column=0, columnspan=2, sticky="ew", padx=(0, 15), pady=(0, 16))
 
-    register_uname_entry.place(
-        x=370,
-        y=185
-    )
-
-
-    # =====================================================
-    # PASSWORD
-    # =====================================================
-
+    # ---------- Password ----------
     ctk.CTkLabel(
-        register_frame,
-        text="Password:",
-        text_color="black",
-        font=("Arial", 24)
-    ).place(
-        x=200,
-        y=260
-    )
+        form,
+        text="Password",
+        text_color="#2b1d14",
+        font=("Segoe UI", 16, "bold"),
+        anchor="w"
+    ).grid(row=0, column=2, sticky="w", padx=(15, 8), pady=(0, 4))
 
     register_pwd_entry = ctk.CTkEntry(
-        register_frame,
+        form,
         show="*",
-        width=250,
-        fg_color="white",
-        text_color="black"
+        height=42,
+        fg_color="#fff8f2",
+        border_color="#fca265",
+        border_width=2,
+        text_color="#2b1d14",
+        font=("Segoe UI", 15),
+        corner_radius=12
     )
+    register_pwd_entry.grid(row=1, column=2, sticky="ew", padx=(15, 8), pady=(0, 16))
 
-    register_pwd_entry.place(
-        x=370,
-        y=265
-    )
-
-
-    # =====================================================
-    # CONFIRM PASSWORD
-    # =====================================================
-
+    # ---------- Confirm Password ----------
     ctk.CTkLabel(
-        register_frame,
-        text="Confirm Password:",
-        text_color="black",
-        font=("Arial", 24)
-    ).place(
-        x=700,
-        y=260
-    )
+        form,
+        text="Confirm Password",
+        text_color="#2b1d14",
+        font=("Segoe UI", 16, "bold"),
+        anchor="w"
+    ).grid(row=0, column=3, sticky="w", padx=(8, 0), pady=(0, 4))
 
     confirm_entry = ctk.CTkEntry(
-        register_frame,
+        form,
         show="*",
-        width=250,
-        fg_color="white",
-        text_color="black"
+        height=42,
+        fg_color="#fff8f2",
+        border_color="#fca265",
+        border_width=2,
+        text_color="#2b1d14",
+        font=("Segoe UI", 15),
+        corner_radius=12
     )
+    confirm_entry.grid(row=1, column=3, sticky="ew", padx=(8, 0), pady=(0, 16))
 
-    confirm_entry.place(
-        x=950,
-        y=265
-    )
-
-
-    # =====================================================
-    # EMAIL
-    # =====================================================
-
+    # ---------- Email + Send OTP ----------
     ctk.CTkLabel(
-        register_frame,
-        text="Email:",
-        text_color="black",
-        font=("Arial", 24)
-    ).place(
-        x=200,
-        y=340
-    )
+        form,
+        text="Email",
+        text_color="#2b1d14",
+        font=("Segoe UI", 16, "bold"),
+        anchor="w"
+    ).grid(row=2, column=0, columnspan=2, sticky="w", padx=(0, 15), pady=(0, 4))
+
+    email_row = ctk.CTkFrame(form, fg_color="transparent")
+    email_row.grid(row=3, column=0, columnspan=2, sticky="ew", padx=(0, 15), pady=(0, 4))
+    email_row.grid_columnconfigure(0, weight=1)
 
     email_entry = ctk.CTkEntry(
-        register_frame,
-        width=250,
-        fg_color="white",
-        text_color="black"
+        email_row,
+        height=42,
+        fg_color="#fff8f2",
+        border_color="#fca265",
+        border_width=2,
+        text_color="#2b1d14",
+        font=("Segoe UI", 15),
+        corner_radius=12
     )
+    email_entry.grid(row=0, column=0, sticky="ew", padx=(0, 10))
 
-    email_entry.place(
-        x=370,
-        y=345
+    ctk.CTkButton(
+        email_row,
+        text="Send OTP",
+        command=lambda: open_otp_verification(),
+        width=110,
+        height=42,
+        fg_color="#fca265",
+        hover_color="#e8904f",
+        text_color="#2b1d14",
+        font=("Segoe UI", 14, "bold"),
+        corner_radius=12
+    ).grid(row=0, column=1)
+
+    email_verified = {"value": False, "address": ""}
+
+    email_status_label = ctk.CTkLabel(
+        form,
+        text="Email not verified",
+        text_color="#8B4513",
+        font=("Segoe UI", 13, "bold"),
+        anchor="w"
     )
+    email_status_label.grid(row=4, column=0, columnspan=2, sticky="w", padx=(0, 15), pady=(0, 16))
 
+    def email_changed(event=None):
+        current_email = email_entry.get().strip().lower()
+        if email_verified["value"] and current_email != email_verified["address"]:
+            email_verified["value"] = False
+            email_verified["address"] = ""
+            email_status_label.configure(
+                text="Email not verified",
+                text_color="#8B4513"
+            )
 
-    # =====================================================
-    # PHONE
-    # =====================================================
+    email_entry.bind("<KeyRelease>", email_changed)
 
+    def open_otp_verification():
+        email = email_entry.get().strip().lower()
+
+        if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+            messagebox.showerror("Invalid Email", "Please enter a valid email address.")
+            return
+
+        if email_verified["value"] and email_verified["address"] == email:
+            messagebox.showinfo("Email Verified", "This email address is already verified.")
+            return
+
+        sent, response = email_verification.send_otp(email)
+        if not sent:
+            messagebox.showerror("OTP Error", response)
+            return
+
+        messagebox.showinfo("OTP Sent", response)
+
+        otp_window = ctk.CTkToplevel(register_frame)
+        otp_window.title("Verify Email")
+        otp_window.geometry("400x250")
+        otp_window.resizable(False, False)
+        otp_window.configure(fg_color="#ffe7d6")
+        otp_window.transient(register_frame.winfo_toplevel())
+        otp_window.grab_set()
+
+        otp_card = ctk.CTkFrame(
+            otp_window,
+            fg_color="#FA9A85",
+            corner_radius=25
+        )
+        otp_card.pack(fill="both", expand=True, padx=18, pady=18)
+
+        ctk.CTkLabel(
+            otp_card,
+            text=f"Enter the 6-digit OTP sent to\n{email}",
+            font=("Segoe UI", 16, "bold"),
+            text_color="#2b1d14"
+        ).pack(pady=(22, 14))
+
+        otp_entry = ctk.CTkEntry(
+            otp_card,
+            width=220,
+            height=40,
+            placeholder_text="6-digit OTP",
+            justify="center",
+            fg_color="#fff8f2",
+            border_color="#fca265",
+            border_width=2,
+            text_color="#2b1d14",
+            font=("Segoe UI", 16),
+            corner_radius=12
+        )
+        otp_entry.pack(pady=8)
+        otp_entry.focus()
+
+        def confirm_otp():
+            valid, result = email_verification.verify_otp(email, otp_entry.get())
+            if valid:
+                email_verified["value"] = True
+                email_verified["address"] = email
+                email_status_label.configure(
+                    text="✓ Email verified",
+                    text_color="#2e7d32"
+                )
+                messagebox.showinfo("Verified", result, parent=otp_window)
+                otp_window.destroy()
+            else:
+                messagebox.showerror("Verification Failed", result, parent=otp_window)
+
+        ctk.CTkButton(
+            otp_card,
+            text="Verify OTP",
+            command=confirm_otp,
+            width=160,
+            height=40,
+            fg_color="#fed9bf",
+            hover_color="#ffc9a3",
+            text_color="#2b1d14",
+            font=("Segoe UI", 15, "bold"),
+            corner_radius=20
+        ).pack(pady=16)
+
+    # ---------- Phone ----------
     ctk.CTkLabel(
-        register_frame,
-        text="Phone:",
-        text_color="black",
-        font=("Arial", 24)
-    ).place(
-        x=750,
-        y=340
-    )
+        form,
+        text="Phone",
+        text_color="#2b1d14",
+        font=("Segoe UI", 16, "bold"),
+        anchor="w"
+    ).grid(row=2, column=2, columnspan=2, sticky="w", padx=(15, 0), pady=(0, 4))
 
     phone_entry = ctk.CTkEntry(
-        register_frame,
-        width=180,
-        fg_color="white",
-        text_color="black"
+        form,
+        height=42,
+        fg_color="#fff8f2",
+        border_color="#fca265",
+        border_width=2,
+        text_color="#2b1d14",
+        font=("Segoe UI", 15),
+        corner_radius=12,
+        placeholder_text="10-digit number"
     )
+    phone_entry.grid(row=3, column=2, columnspan=2, sticky="ew", padx=(15, 0), pady=(0, 4))
 
-    phone_entry.place(
-        x=850,
-        y=345
-    )
+    # spacer under phone to align with email status
+    ctk.CTkLabel(form, text="", height=20).grid(row=4, column=2, columnspan=2)
 
-
-    # =====================================================
-    # ADDRESS
-    # =====================================================
-
+    # ---------- Address (full width) ----------
     ctk.CTkLabel(
-        register_frame,
-        text="Address:",
-        text_color="black",
-        font=("Arial", 24)
-    ).place(
-        x=200,
-        y=420
-    )
+        form,
+        text="Address",
+        text_color="#2b1d14",
+        font=("Segoe UI", 16, "bold"),
+        anchor="w"
+    ).grid(row=5, column=0, columnspan=4, sticky="w", pady=(0, 4))
 
     address_entry = ctk.CTkEntry(
-        register_frame,
-        width=800,
-        fg_color="white",
-        text_color="black"
+        form,
+        height=42,
+        fg_color="#fff8f2",
+        border_color="#fca265",
+        border_width=2,
+        text_color="#2b1d14",
+        font=("Segoe UI", 15),
+        corner_radius=12
     )
+    address_entry.grid(row=6, column=0, columnspan=4, sticky="ew", pady=(0, 16))
 
-    address_entry.place(
-        x=370,
-        y=425
-    )
-
-
-    # =====================================================
-    # DATE OF BIRTH
-    # =====================================================
-
+    # ---------- DOB + Gender ----------
     ctk.CTkLabel(
-        register_frame,
-        text="Date of Birth:",
-        text_color="black",
-        font=("Arial", 24)
-    ).place(
-        x=200,
-        y=500
-    )
+        form,
+        text="Date of Birth",
+        text_color="#2b1d14",
+        font=("Segoe UI", 16, "bold"),
+        anchor="w"
+    ).grid(row=7, column=0, columnspan=2, sticky="w", padx=(0, 15), pady=(0, 4))
+
+    dob_row = ctk.CTkFrame(form, fg_color="transparent")
+    dob_row.grid(row=8, column=0, columnspan=2, sticky="ew", padx=(0, 15), pady=(0, 20))
+    dob_row.grid_columnconfigure(0, weight=1)
 
     dob_entry = ctk.CTkEntry(
-        register_frame,
-        width=150,
-        fg_color="white",
-        text_color="black",
+        dob_row,
+        height=42,
+        fg_color="#fff8f2",
+        border_color="#fca265",
+        border_width=2,
+        text_color="#2b1d14",
+        font=("Segoe UI", 15),
+        corner_radius=12,
         placeholder_text="DD-MM-YYYY"
     )
-
-    dob_entry.place(
-        x=400,
-        y=505
-    )
+    dob_entry.grid(row=0, column=0, sticky="ew", padx=(0, 8))
 
     dob_calendar_button = ctk.CTkButton(
-        register_frame,
+        dob_row,
         text="📅",
-        width=42,
-        height=32,
-        fg_color="#F4B183",
-        hover_color="#D98958",
-        text_color="black",
+        width=48,
+        height=42,
+        fg_color="#fca265",
+        hover_color="#e8904f",
+        text_color="#2b1d14",
+        font=("Segoe UI", 18),
+        corner_radius=12,
         command=attach_date_picker(
             dob_entry,
             register_frame,
@@ -258,43 +371,36 @@ def register_screen(container, show_frame):
             initial_date=date(2000, 1, 1)
         )
     )
-    dob_calendar_button.place(x=555, y=505)
-
-
-    # =====================================================
-    # GENDER
-    # =====================================================
+    dob_calendar_button.grid(row=0, column=1)
 
     ctk.CTkLabel(
-        register_frame,
-        text="Gender:",
-        text_color="black",
-        font=("Arial", 24)
-    ).place(
-        x=650,
-        y=500
-    )
+        form,
+        text="Gender",
+        text_color="#2b1d14",
+        font=("Segoe UI", 16, "bold"),
+        anchor="w"
+    ).grid(row=7, column=2, columnspan=2, sticky="w", padx=(15, 0), pady=(0, 4))
 
     gender_entry = ctk.CTkComboBox(
-        register_frame,
-        values=[
-            "Male",
-            "Female",
-            "Other"
-        ],
-        width=200
+        form,
+        values=["Male", "Female", "Other"],
+        height=42,
+        fg_color="#fff8f2",
+        border_color="#fca265",
+        border_width=2,
+        button_color="#fca265",
+        button_hover_color="#e8904f",
+        dropdown_fg_color="#fff8f2",
+        dropdown_hover_color="#fed9bf",
+        text_color="#2b1d14",
+        font=("Segoe UI", 15),
+        corner_radius=12
     )
-
     gender_entry.set("Select Gender")
-
-    gender_entry.place(
-        x=760,
-        y=505
-    )
-
+    gender_entry.grid(row=8, column=2, columnspan=2, sticky="ew", padx=(15, 0), pady=(0, 20))
 
     # =====================================================
-    # REGISTER FUNCTION
+    # SUBMIT BUTTON
     # =====================================================
 
     def reg_submit():
@@ -311,7 +417,6 @@ def register_screen(container, show_frame):
 
         dob = dob_entry.get().strip()
 
-
         # =================================================
         # EMPTY FIELDS
         # =================================================
@@ -326,28 +431,22 @@ def register_screen(container, show_frame):
             or not dob
             or gender == "Select Gender"
         ):
-
             messagebox.showerror(
                 "Error",
                 "Please fill all fields!"
             )
-
             return
-
 
         # =================================================
         # PASSWORD CHECK
         # =================================================
 
         if password != confirm:
-
             messagebox.showerror(
                 "Error",
                 "Passwords do not match!"
             )
-
             return
-
 
         # =================================================
         # EMAIL CHECK
@@ -358,16 +457,19 @@ def register_screen(container, show_frame):
             email
         )
 
-
         if email_check is None:
-
             messagebox.showerror(
                 "Error",
                 "Invalid email address!"
             )
-
             return
 
+        if not email_verified["value"] or email_verified["address"] != email.lower():
+            messagebox.showerror(
+                "Email Verification Required",
+                "Please verify your email address using the OTP before registering."
+            )
+            return
 
         # =================================================
         # PHONE CHECK
@@ -378,61 +480,44 @@ def register_screen(container, show_frame):
             phone
         )
 
-
         if phone_check is None:
-
             messagebox.showerror(
                 "Error",
                 "Invalid phone number! Enter a valid 10 digit number."
             )
-
             return
-
 
         # =================================================
         # DATE OF BIRTH CHECK
         # =================================================
 
         try:
-
             dob_date = datetime.strptime(
                 dob,
                 "%d-%m-%Y"
             )
 
-
-            current_year = datetime.now().year
-
-
             if (
                 dob_date.year < 1900
                 or dob_date.date() > datetime.now().date()
             ):
-
                 messagebox.showerror(
                     "Error",
                     "Enter a valid birth year!"
                 )
-
                 return
 
-
             # DATABASE FORMAT
-
             dob = dob_date.strftime(
                 "%Y-%m-%d"
             )
 
-
         except ValueError:
-
             messagebox.showerror(
                 "Error",
                 "Invalid DOB! Use DD-MM-YYYY format."
             )
-
             return
-
 
         # =================================================
         # DATABASE REGISTRATION
@@ -448,22 +533,24 @@ def register_screen(container, show_frame):
             dob
         )
 
-
         if registered:
-
             messagebox.showinfo(
                 "Success",
                 "Registration successful! You can now log in."
             )
 
-
             # CLEAR FIELDS
-
             register_uname_entry.delete(0, "end")
             register_pwd_entry.delete(0, "end")
             confirm_entry.delete(0, "end")
 
             email_entry.delete(0, "end")
+            email_verified["value"] = False
+            email_verified["address"] = ""
+            email_status_label.configure(
+                text="Email not verified",
+                text_color="#8B4513"
+            )
             phone_entry.delete(0, "end")
 
             address_entry.delete(0, "end")
@@ -473,59 +560,30 @@ def register_screen(container, show_frame):
                 "Select Gender"
             )
 
-
             # GO TO LOGIN
-
             show_frame("login")
 
-
         else:
-
             messagebox.showerror(
                 "Error",
                 "Username already exists! Please choose another one."
             )
 
-
-    # =====================================================
-    # SUBMIT BUTTON
-    # =====================================================
+    # Submit button centered at bottom
+    btn_frame = ctk.CTkFrame(content, fg_color="transparent")
+    btn_frame.pack(fill="x", pady=(5, 10))
 
     ctk.CTkButton(
-        register_frame,
-        text="Submit",
+        btn_frame,
+        text="Create Account",
         command=reg_submit,
-        text_color="black",
-        fg_color="#7ed957",
-        hover_color="#99D980",
-        width=220,
-        height=50,
-        font=("Arial", 24, "bold")
-    ).place(
-        x=900,
-        y=600
-    )
-
-
-    # =====================================================
-    # BACK BUTTON
-    # =====================================================
-
-    ctk.CTkButton(
-        register_frame,
-        text="← Back",
-        command=lambda: show_frame("main"),
-        width=120,
-        height=45,
-        fg_color="tomato",
-        text_color="black",
-        hover_color="#FC846F",
-        font=("Arial", 18, "bold"),
-        corner_radius=20
-    ).place(
-        x=50,
-        y=50
-    )
-
+        width=260,
+        height=52,
+        fg_color="#fed9bf",
+        hover_color="#ffc9a3",
+        text_color="#2b1d14",
+        font=("Segoe UI", 20, "bold"),
+        corner_radius=26
+    ).pack()
 
     return register_frame

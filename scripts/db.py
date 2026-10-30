@@ -64,12 +64,36 @@ def login(user_type, username, password):
 
     return result is not None
 def register(username, password, email, phone, address, gender, dob):
-    con, cur = connect()
-    cur.execute("SELECT * FROM user WHERE username = %s", (username,))
-    if cur.fetchone() is not None:
-        return False
-    add_data("user", (username, password, email, phone, address, gender, dob))
-    return True
+    """Create a user account and always release the database connection."""
+    con = None
+    cur = None
+    try:
+        con, cur = connect()
+
+        # Check the username while using the same connection as the insert.
+        cur.execute("SELECT id FROM user WHERE username = %s", (username,))
+        if cur.fetchone() is not None:
+            return False
+
+        cur.execute(
+            """
+            INSERT INTO user
+                (username, password, email, phone, address, gender, dob)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (username, password, email, phone, address, gender, dob)
+        )
+        con.commit()
+        return True
+    except Exception:
+        if con is not None:
+            con.rollback()
+        raise
+    finally:
+        if cur is not None:
+            cur.close()
+        if con is not None and con.is_connected():
+            con.close()
 
 def get_user_id(username):
     """Get user_id from username"""
