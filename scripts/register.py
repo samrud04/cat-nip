@@ -6,7 +6,6 @@ import db
 from datetime import datetime
 from datetime import date
 from date_picker import attach_date_picker
-import email_verification
 
 
 def register_screen(container, show_frame):
@@ -136,7 +135,7 @@ def register_screen(container, show_frame):
     )
     confirm_entry.grid(row=1, column=3, sticky="ew", padx=(8, 0), pady=(0, 16))
 
-    # ---------- Email + Send OTP ----------
+    # ---------- Email ----------
     ctk.CTkLabel(
         form,
         text="Email",
@@ -161,124 +160,7 @@ def register_screen(container, show_frame):
     )
     email_entry.grid(row=0, column=0, sticky="ew", padx=(0, 10))
 
-    ctk.CTkButton(
-        email_row,
-        text="Send OTP",
-        command=lambda: open_otp_verification(),
-        width=110,
-        height=42,
-        fg_color="#fca265",
-        hover_color="#e8904f",
-        text_color="#2b1d14",
-        font=("Segoe UI", 14, "bold"),
-        corner_radius=12
-    ).grid(row=0, column=1)
-
-    email_verified = {"value": False, "address": ""}
-
-    email_status_label = ctk.CTkLabel(
-        form,
-        text="Email not verified",
-        text_color="#8B4513",
-        font=("Segoe UI", 13, "bold"),
-        anchor="w"
-    )
-    email_status_label.grid(row=4, column=0, columnspan=2, sticky="w", padx=(0, 15), pady=(0, 16))
-
-    def email_changed(event=None):
-        current_email = email_entry.get().strip().lower()
-        if email_verified["value"] and current_email != email_verified["address"]:
-            email_verified["value"] = False
-            email_verified["address"] = ""
-            email_status_label.configure(
-                text="Email not verified",
-                text_color="#8B4513"
-            )
-
-    email_entry.bind("<KeyRelease>", email_changed)
-
-    def open_otp_verification():
-        email = email_entry.get().strip().lower()
-
-        if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
-            messagebox.showerror("Invalid Email", "Please enter a valid email address.")
-            return
-
-        if email_verified["value"] and email_verified["address"] == email:
-            messagebox.showinfo("Email Verified", "This email address is already verified.")
-            return
-
-        sent, response = email_verification.send_otp(email)
-        if not sent:
-            messagebox.showerror("OTP Error", response)
-            return
-
-        messagebox.showinfo("OTP Sent", response)
-
-        otp_window = ctk.CTkToplevel(register_frame)
-        otp_window.title("Verify Email")
-        otp_window.geometry("400x250")
-        otp_window.resizable(False, False)
-        otp_window.configure(fg_color="#ffe7d6")
-        otp_window.transient(register_frame.winfo_toplevel())
-        otp_window.grab_set()
-
-        otp_card = ctk.CTkFrame(
-            otp_window,
-            fg_color="#FA9A85",
-            corner_radius=25
-        )
-        otp_card.pack(fill="both", expand=True, padx=18, pady=18)
-
-        ctk.CTkLabel(
-            otp_card,
-            text=f"Enter the 6-digit OTP sent to\n{email}",
-            font=("Segoe UI", 16, "bold"),
-            text_color="#2b1d14"
-        ).pack(pady=(22, 14))
-
-        otp_entry = ctk.CTkEntry(
-            otp_card,
-            width=220,
-            height=40,
-            placeholder_text="6-digit OTP",
-            justify="center",
-            fg_color="#fff8f2",
-            border_color="#fca265",
-            border_width=2,
-            text_color="#2b1d14",
-            font=("Segoe UI", 16),
-            corner_radius=12
-        )
-        otp_entry.pack(pady=8)
-        otp_entry.focus()
-
-        def confirm_otp():
-            valid, result = email_verification.verify_otp(email, otp_entry.get())
-            if valid:
-                email_verified["value"] = True
-                email_verified["address"] = email
-                email_status_label.configure(
-                    text="✓ Email verified",
-                    text_color="#2e7d32"
-                )
-                messagebox.showinfo("Verified", result, parent=otp_window)
-                otp_window.destroy()
-            else:
-                messagebox.showerror("Verification Failed", result, parent=otp_window)
-
-        ctk.CTkButton(
-            otp_card,
-            text="Verify OTP",
-            command=confirm_otp,
-            width=160,
-            height=40,
-            fg_color="#fed9bf",
-            hover_color="#ffc9a3",
-            text_color="#2b1d14",
-            font=("Segoe UI", 15, "bold"),
-            corner_radius=20
-        ).pack(pady=16)
+    
 
     # ---------- Phone ----------
     ctk.CTkLabel(
@@ -464,12 +346,6 @@ def register_screen(container, show_frame):
             )
             return
 
-        if not email_verified["value"] or email_verified["address"] != email.lower():
-            messagebox.showerror(
-                "Email Verification Required",
-                "Please verify your email address using the OTP before registering."
-            )
-            return
 
         # =================================================
         # PHONE CHECK
@@ -545,12 +421,6 @@ def register_screen(container, show_frame):
             confirm_entry.delete(0, "end")
 
             email_entry.delete(0, "end")
-            email_verified["value"] = False
-            email_verified["address"] = ""
-            email_status_label.configure(
-                text="Email not verified",
-                text_color="#8B4513"
-            )
             phone_entry.delete(0, "end")
 
             address_entry.delete(0, "end")
