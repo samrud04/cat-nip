@@ -1830,10 +1830,31 @@ def create_navbar(parent, order_frame, book_frame, settings_frame, show_frame,
     if playdates_frame is not None: pages["playdates"] = playdates_frame
     if chatbot_frame is not None: pages["chatbot"] = chatbot_frame
 
+    def navigate(target):
+        # Settings is intentionally created only when first opened. The frame
+        # is otherwise empty, so populate it before switching to that page.
+        if target == "settings":
+            if not getattr(settings_frame, "_settings_page_built", False):
+                create_settings_page(settings_frame, show_frame)
+                settings_frame._settings_page_built = True
+
+        show_user_page(
+            target,
+            pages,
+            refresh_orders if target == "history" else None
+        )
+
     def nav_button(label, target):
-        ctk.CTkButton(button_frame, text=label, fg_color="white", text_color="#FA9A85",
-                      hover_color="#f9d8d1", font=("Arial", 14, "bold"), height=34,
-                      command=lambda key=target: show_user_page(key, pages, refresh_orders if key == "history" else None)).pack(side="left", padx=3)
+        ctk.CTkButton(
+            button_frame,
+            text=label,
+            fg_color="white",
+            text_color="#FA9A85",
+            hover_color="#f9d8d1",
+            font=("Arial", 14, "bold"),
+            height=34,
+            command=lambda key=target: navigate(key)
+        ).pack(side="left", padx=3)
 
     nav_button("Order", "order")
     nav_button("Book", "book")
