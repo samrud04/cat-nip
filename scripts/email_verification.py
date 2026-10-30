@@ -1,15 +1,10 @@
-"""
-Cat Nip email OTP verification.
 
-Gmail setup:
-1. Enable 2-Step Verification on the sender Gmail account.
-2. Create a Google App Password.
-3. Set these environment variables before launching Cat Nip:
-   CATNIP_EMAIL=your-sender@gmail.com
-   CATNIP_APP_PASSWORD=your-16-character-app-password
 
-The OTP is kept in memory only, expires after 5 minutes, and can be used once.
-"""
+
+CATNIP_EMAIL="aadisayamsatmanan@gmail.com"
+CATNIP_APP_PASSWORD="thisisforcatnip"
+
+
 
 import os
 import secrets
